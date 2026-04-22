@@ -426,10 +426,10 @@ export default function HomeScreen() {
             <motion.span
               className={`w-2 h-2 rounded-full ${libraryOpen ? 'bg-green-500' : 'bg-red-500'}`}
               animate={libraryOpen ? {
-                scale: [1, 1.4, 1],
-                opacity: [1, 0.7, 1],
+                scale: 1.4,
+                opacity: 0.7,
               } : {}}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              transition={{ duration: 1, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
             />
             <span className={`text-xs font-medium ${libraryOpen ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
               Library {libraryOpen ? 'Open' : 'Closed'} · {libraryOpen ? `Closes ${closingTime}` : 'Opens tomorrow'}

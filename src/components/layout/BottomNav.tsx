@@ -108,7 +108,7 @@ export default function BottomNav() {
               >
                 {/* Spring-back overshoot: scale from 0.85 → 1.05 → 1.0 on release */}
                 <motion.div
-                  animate={isActive ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+                  animate={isActive ? { scale: 1.08 } : { scale: 1 }}
                   transition={{ duration: 0.35, ease: 'easeOut' }}
                   key={`${item.id}-${isActive}`}
                 >
@@ -140,12 +140,12 @@ export default function BottomNav() {
                     layoutId="navIndicator"
                     className="w-1 h-1 rounded-full bg-lib-purple mt-0.5"
                     initial={{ scale: 0, y: -4 }}
-                    animate={{ scale: [0, 1.5, 1], y: 0 }}
+                    animate={{ scale: 1, y: 0 }}
                     exit={{ scale: 0, y: -4 }}
                     transition={{
                       type: 'spring',
                       stiffness: 500,
-                      damping: 20,
+                      damping: 15,
                       mass: 0.5,
                     }}
                   />

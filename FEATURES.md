@@ -1,6 +1,6 @@
 # LibLog — Digital Library Logbook Management System
 
-> **Feature Documentation** — Last updated: 2026-04-22
+> **Feature Documentation** — Last updated: 2025-01-27
 > This document is the single source of truth for all features. Update it whenever the system is modified.
 
 ---
@@ -19,6 +19,7 @@
 10. [Utility Libraries](#10-utility-libraries)
 11. [Seed / Test Data](#11-seed--test-data)
 12. [Technology Stack](#12-technology-stack)
+13. [Branding & Design System Guide](#13-branding--design-system-guide)
 
 ---
 
@@ -787,9 +788,35 @@ Update user profile information:
 
 ---
 
+## 13. Branding & Design System Guide
+
+A comprehensive branding guide is maintained in **`/home/z/my-project/BRANDING.md`** covering:
+
+| Section | Contents |
+|---------|----------|
+| **Typography** | SF Pro Display (headings) + SF Pro Text (body) with H1–H6 scale, button text specs, font weight rules |
+| **Color System** | Full purple palette (#652D90 + 10 shades), semantic tokens (oklch), neutral grays, contrast requirements |
+| **Corner Rounding** | 9-level radius scale (0–9999px) with element-to-radius mapping for every UI component |
+| **Spacing System** | 4px base unit, 14-step scale, layout spacing patterns, internal spacing rules |
+| **Elevation & Shadows** | 7-level shadow hierarchy, brand-tinted purple shadows, elevation rules |
+| **Gradients** | 5 brand gradients (light + dark variants), gradient usage rules |
+| **Iconography** | Lucide React library, 6 icon sizes, 4 container sizes, color rules |
+| **Motion & Animation** | 5 speed tiers, standard transitions, micro-interactions, animation rules |
+| **Layout & Grid** | 430px container, grid patterns, safe areas |
+| **Touch Targets** | Apple HIG minimums (44px), accessibility requirements (WCAG AA) |
+| **Dark Mode** | 4-level surface hierarchy, color adaptation rules, element-specific treatments |
+| **Components** | Button variants (7), card types (4), input specs, bottom nav specs |
+| **Status Colors** | Success/Warning/Error/Info (light + dark), chart palette |
+| **Imagery** | Book cover specs, avatar sizes, image treatment rules |
+| **Writing & Tone** | Voice guidelines, copy length limits, number formatting |
+| **Implementation** | Tailwind theme extensions, CSS custom properties, quick reference class mapping |
+
+---
+
 ## Changelog
 
 | Date | Change |
 |------|--------|
 | 2026-03-05 | Initial FEATURES.md created — comprehensive catalog of all 13 screens, 19 API endpoints, 8 DB models, and all supporting systems |
 | 2026-04-22 | Added Reviews/Ratings feature (3 API + UI + seed data), Edit Profile screen (14th screen), overdue fines display (₱5/day), AI-generated book covers (6 covers), comprehensive dark mode across all screens, micro-interactions (success confetti, living gradient, spring nav feedback, skeleton loading, search glow), Change Password modal fix |
+| 2025-01-27 | Created comprehensive BRANDING.md — 16-section design system guide with SF Pro typography, full purple color palette, corner rounding scale, 4px spacing system, elevation hierarchy, gradient specs, iconography, motion guidelines, dark mode system, component specs, accessibility, and implementation reference |
