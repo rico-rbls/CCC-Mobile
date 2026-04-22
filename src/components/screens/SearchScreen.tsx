@@ -89,6 +89,12 @@ export default function SearchScreen() {
     }
   }, [])
 
+  // Filter resources with useMemo (declared before useEffect that references it)
+  const filtered = useMemo(() => {
+    if (!localQuery.trim() && searchCategory === 'all') return resources
+    return resources
+  }, [resources, localQuery, searchCategory])
+
   // Initial load
   useEffect(() => {
     fetchResources(searchQuery, searchCategory)
@@ -127,11 +133,6 @@ export default function SearchScreen() {
     setSearchQuery('')
     fetchResources('', searchCategory)
   }
-
-  const filtered = useMemo(() => {
-    if (!localQuery.trim() && searchCategory === 'all') return resources
-    return resources
-  }, [resources, localQuery, searchCategory])
 
   const isSearchEmpty = !localQuery.trim() && searchCategory === 'all'
 

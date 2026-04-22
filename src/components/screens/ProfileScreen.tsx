@@ -8,15 +8,18 @@ import {
 } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
 
-const menuItems = [
-  { id: 'settings', icon: Edit, label: 'Edit Profile', desc: 'Update your information', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-  { id: 'favorites', icon: Heart, label: 'My Favorites', desc: `${0} saved books`, color: 'text-red-500', bg: 'bg-red-50' },
-  { id: 'reservations', icon: BookOpen, label: 'My Reservations', desc: 'Track reserved items', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-  { id: 'settings', icon: Bell, label: 'Notification Preferences', desc: 'Due dates, reservations', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-  { id: 'settings', icon: Shield, label: 'Privacy Policy', desc: 'How we protect your data', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-  { id: 'settings', icon: HelpCircle, label: 'Help & Support', desc: 'FAQs and contact info', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-  { id: 'settings', icon: Info, label: 'About', desc: 'Version 1.0.0', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-]
+// Menu items defined as a function to accept dynamic data
+function getMenuItems(favCount: number) {
+  return [
+    { id: 'settings', icon: Edit, label: 'Edit Profile', desc: 'Update your information', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+    { id: 'favorites', icon: Heart, label: 'My Favorites', desc: `${favCount} saved book${favCount !== 1 ? 's' : ''}`, color: 'text-red-500', bg: 'bg-red-50' },
+    { id: 'reservations', icon: BookOpen, label: 'My Reservations', desc: 'Track reserved items', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+    { id: 'settings', icon: Bell, label: 'Notification Preferences', desc: 'Due dates, reservations', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+    { id: 'settings', icon: Shield, label: 'Privacy Policy', desc: 'How we protect your data', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+    { id: 'settings', icon: HelpCircle, label: 'Help & Support', desc: 'FAQs and contact info', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+    { id: 'settings', icon: Info, label: 'About', desc: 'Version 1.0.0', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+  ]
+}
 
 // Monthly reading data for bar chart
 const monthlyData = [
@@ -222,7 +225,7 @@ export default function ProfileScreen() {
       {/* Menu */}
       <div className="flex-1 px-4 pt-4 overflow-y-auto">
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden divide-y divide-gray-50">
-          {menuItems.map((item, index) => {
+          {getMenuItems(favorites.length).map((item, index) => {
             const Icon = item.icon
             return (
               <motion.button
