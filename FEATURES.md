@@ -1,907 +1,737 @@
 # LibLog — Digital Library Logbook Management System
 
-## Complete Feature Documentation
+> **Feature Documentation** — Last updated: 2026-03-05
+> This document is the single source of truth for all features. Update it whenever the system is modified.
 
 ---
 
-## 1. Onboarding (5-Step Registration Flow)
+## Table of Contents
 
-### Step 1: Role Selection
-- Three role cards: **Student**, **Faculty**, **Visitor**
-- Each card has a unique icon (GraduationCap, Briefcase, User), label, and description
-- Selected card shows animated checkmark with spring animation
-- Cards have hover elevation effects (`whileHover: { y: -2 }`)
-- "Continue" button is disabled until a role is selected
-- Animated entrance with staggered delay per card
-- Step-specific icon in the progress indicator (Sparkles icon for Step 1)
-- Background pattern changes per step with radial gradient shifts
-
-### Step 2: Personal Information
-- Full Name input field with placeholder "Juan Dela Cruz"
-- University ID input field with placeholder "e.g. 2024-00001"
-- User icon header with spring animation
-- Input fields with purple focus border and ring effects
-- Both fields required before continuing
-
-### Step 3: Academic Information
-- **Students**: Program dropdown (10 programs: CS, Nursing, Business Admin, etc.) + Year Level grid selector (1st-5th Year)
-- **Faculty**: Department dropdown only (8 departments)
-- **Visitors**: Info card explaining limited access ("browse catalog and use QR check-in")
-- Year level buttons have purple selected state with shadow
-- Conditional rendering based on selected role
-
-### Step 4: Account Setup
-- University Email input with placeholder "you@university.edu"
-- Password field with show/hide toggle (Eye/EyeOff icons)
-- Password strength indicator (4-bar visual: Weak/Fair/Good/Strong)
-- Strength calculation based on length, uppercase, numbers, special characters
-- Confirm Password field with real-time match validation
-- Green checkmark when passwords match, red error when they don't
-- Shield icon header
-
-### Step 5: Notification Preferences
-- Due Date Reminders toggle (default: ON) — with Calendar icon and orange background
-- Reservation Alerts toggle (default: ON) — with BookOpen icon and purple background
-- System Announcements toggle (disabled, default: OFF) — with Megaphone icon
-- Each toggle is a Switch component with purple checked state
-- Animated entrance with staggered delays (0.05s per item)
-- Confetti animation on reaching Step 5 (20 animated particles in purple/amber/green colors)
-
-### Progress Indicator
-- Gradient progress bar across 5 segments
-- Current step shows gradient from purple to purple-light with glow shadow
-- Completed steps are solid purple
-- Step dots with unique icons per step (Sparkles, User, GraduationCap, ShieldCheck, Bell)
-- Completed steps show checkmark icons
-- Current step icon is animated with scale and background color transition
-
-### Onboarding-Wide Features
-- Slide animation between steps (300ms, easeInOut)
-- Back navigation with ArrowLeft button
-- Step-specific decorative background patterns
-- "Continue" / "Get Started" button with gradient on final step
-- Loading spinner during account creation
-- Registration via `/api/auth/register` POST endpoint
-- Auto-login after successful registration (sets user state and navigates to home)
-- Validation at each step before allowing progression
+1. [App Overview](#1-app-overview)
+2. [Screens & UI Features](#2-screens--ui-features)
+3. [API Endpoints](#3-api-endpoints)
+4. [Database Models](#4-database-models)
+5. [State Management](#5-state-management)
+6. [Authentication & Security](#6-authentication--security)
+7. [Theme & Design System](#7-theme--design-system)
+8. [Animations & Micro-Interactions](#8-animations--micro-interactions)
+9. [Navigation & Layout](#9-navigation--layout)
+10. [Utility Libraries](#10-utility-libraries)
+11. [Seed / Test Data](#11-seed--test-data)
+12. [Technology Stack](#12-technology-stack)
 
 ---
 
-## 2. Login
+## 1. App Overview
 
-### Authentication
-- Email + Password login form
-- Login via `/api/auth/login` POST endpoint
-- Enter key support for quick login
-- Loading state with animated spinner and "Signing in..." text
-- Error handling with toast notifications for invalid credentials
+LibLog is a **mobile-first** Digital Library Logbook Management System built for university libraries. It enables students, faculty, and visitors to browse the catalog, borrow and return books, track attendance, manage reservations, receive notifications, and more — all from a phone-sized interface.
 
-### UI Design
-- Animated gradient purple header with `rounded-b-[2.5rem]`
-- Floating decorative book/library icons (5 icons with `animate-float-icon` at staggered delays)
-- Animated gradient overlay with `gradient-shift` animation
-- Decorative circles at various positions (white/5% opacity)
-- App logo with spring entrance animation (scale from 0, rotate from -180deg)
-- Logo has `animate-micro-pulse-glow` subtle glow effect
-- "LibLog" title with "Digital Library Logbook System" subtitle and Library icon
-
-### Form Fields
-- **Email**: GraduationCap icon prefix, animated label color change on focus, purple ring and shadow on focus
-- **Password**: Show/hide toggle (Eye/EyeOff), animated label, purple focus state
-- "Forgot password?" link (visual only)
-- Input height: 48px with rounded-xl corners
-
-### Demo Account
-- "Use Demo Account" button with dashed border
-- Auto-fills: `juan@university.edu` / `password123`
-- BookOpen icon on button
-- Press-effect animation
-
-### Additional
-- Shimmer loading effect on Sign In button when both fields are filled
-- "Don't have an account? Register" link at bottom
-- Terms of Service and Privacy Policy footer text
-- Glass-card effect on form container
+| Attribute | Value |
+|-----------|-------|
+| Primary Color | `#652D90` (Purple) |
+| Background | `#FFFFFF` (White) |
+| Max Viewport | 430px (mobile container) |
+| Dark Mode | Supported (class-based toggle) |
+| Platform | Next.js 16 App Router, TypeScript |
+| Database | SQLite via Prisma ORM |
+| Test Accounts | `juan@university.edu` / `maria@university.edu` / `alex@university.edu` (password: `password123`) |
 
 ---
 
-## 3. Home Dashboard
+## 2. Screens & UI Features
 
-### Top Header Section
-- **Streak counter**: Flame icon (orange) + count + "day streak" label
-- **Notifications button**: Bell icon with red badge showing unread count
-- **Settings button**: Gear/Settings icon
-- **User greeting**: Animated greeting that changes by time of day (Good morning/afternoon/evening) with AnimatePresence transition
-- **Avatar circle**: Purple circle with initials
-- **User info**: Program, Year Level, Role (e.g., "Computer Science · 3rd Year · Student")
+### 2.1 Onboarding (5-Step Registration Wizard)
 
-### Library Status
-- Green/Red badge showing Open/Closed status
-- Open: "Library Open · Closes 9PM" with green dot
-- Closed: "Library Closed · Opens tomorrow" with red dot
-- Full date display with CalendarDays icon: "Wednesday, April 22, 2026"
+**Screen:** `OnboardingScreen` | **Route:** Internal (Zustand state)
 
-### Pull-to-Refresh
-- Touch-based pull-to-refresh gesture
-- Pull distance indicator with animated height
-- Refreshing spinner with "Refreshing..." / "Pull to refresh" text
-- Triggers data re-fetch when pull > 60px
+A multi-step registration flow for new users with animated step-by-step progression:
 
-### Announcements Section
-- Auto-rotating carousel (5-second interval)
-- Purple-tinted banner with Megaphone icon
-- Dismissible per announcement (X button)
-- Carousel dot indicators (active dot is wider with purple color)
-- Animated slide transitions between announcements
-- Fetched from `/api/announcements` endpoint
+| Step | Title | Features |
+|------|-------|----------|
+| 0 | Welcome / Role Selection | 3 role cards (Student, Faculty, Visitor) with icons + emojis, selection animation with checkmark |
+| 1 | Personal Information | Full Name input, University ID input, real-time validation |
+| 2 | Academic Information | Program dropdown (10 options), Department dropdown (8 for faculty), Year Level grid selector (5 for students), Visitor info card |
+| 3 | Account Setup | Email input, Password with show/hide toggle, 4-level strength meter (Weak/Fair/Good/Strong), Confirm password with match validation |
+| 4 | Notification Preferences | Due Date Reminders toggle (default on), Reservation Alerts toggle (default on), System Announcements toggle (forced off), Confetti animation on entry |
 
-### Today's Highlight
-- Featured book card with purple gradient background and decorative circles
-- Star + "Featured Pick" label
-- Book cover thumbnail with white/15% backdrop blur
-- Title, author, availability badge
-- Arrow indicator for navigation
-- Random book selection from API on each load
-- Tap to navigate to book detail
+**Validation:** Each step has `canContinue()` guards before progression.
 
-### Current Borrow Card
-- **With active borrow**: Book info card with:
-  - Left gradient accent border (purple gradient vertical)
-  - Title, author, category badge
-  - Days remaining badge (purple/green/yellow/red based on urgency)
-  - Progress bar showing elapsed time vs total borrow period
-  - Borrow date and due date display
-  - "View Details" button with ChevronRight
-- **No active borrows**: Empty state with:
-  - Dot pattern background
-  - Animated floating book icons
-  - "No Active Borrows" message
-  - "Browse Catalog" CTA button with BookOpen icon
-
-### Quick Actions
-- 4-column grid in white card container:
-  1. **Scan QR** — Purple background, white icon, navigates to QR scanner
-  2. **My Loans** — Purple-50 background, navigates to borrowed screen
-  3. **Reservations** — Purple-50 background, navigates to borrowed screen
-  4. **Attendance** — Purple-50 background, navigates to home
-- Each action has icon, label, and subtitle
-- whileTap scale animation (0.93)
-
-### Recommended for You
-- Horizontal scrollable card carousel
-- Program-based filtering: resources matching user's program shown first with "For You" star badge (amber)
-- Fallback to general resources
-- Each card shows: cover image (or purple gradient placeholder), category badge, availability indicator (green/red dot), title, author
-- "See All" link navigating to search
-- Hover/tap shadow transitions
-
-### Trending in Your Department
-- Numbered ranking list (1-5) in white card
-- Top 3 ranks have purple filled circle, 4-5 have purple outline
-- Title, author, and borrow count with Clock icon
-- Fetched from `/api/resources` with mock borrow counts
-
-### Loading State
-- Full skeleton UI matching actual layout
-- Skeleton cards for each section
-- Skeleton recommendation carousel with 4 placeholder cards
+**Animations:** Slide transitions between steps (directional, 300ms), spring animations on step icons, staggered card entry, checkmark spring, progress bar gradient fill, step dot indicators with icon-to-checkmark transitions, confetti particles (20 animated) on final step.
 
 ---
 
-## 4. Search Catalog
+### 2.2 Login
 
-### Search Bar
-- Search icon prefix
-- Placeholder: "Search books, research, magazines..."
-- Clear button (X) when query is present
-- Purple focus border and ring
-- 300ms debounced API search
+**Screen:** `LoginScreen` | **Route:** Internal
 
-### Popular Searches
-- "POPULAR" label with TrendingUp icon
-- 6 quick-search pill buttons: Algorithms, Deep Learning, Database, Nursing, Psychology, Clean Code
-- Tapping a pill fills the search bar and triggers search
-- Only visible when search is empty/focused
+User authentication screen with branded design:
 
-### Category Filters
-- 4 filter pills: All, Books, Research, Magazines
-- Each with unique icon (Search, BookOpen, FileText, Newspaper)
-- Active state: purple background with white text and shadow
-- Inactive: gray background with hover effect
-- Category parameter sent to API
+- **Purple gradient header** with animated floating book icons (5 icons, staggered delays)
+- **LibLog logo** with spring scale + rotate animation + micro-pulse-glow
+- **Glass-card form** overlapping header (-mt-10):
+  - Email input with GraduationCap icon + focus color transitions
+  - Password input with show/hide toggle + focus ring
+  - "Forgot password?" link (placeholder)
+  - Sign In button with gradient + shimmer-loading effect
+  - Loading state: spinner + "Signing in..."
+  - "Use Demo Account" button (auto-fills juan@university.edu / password123)
+  - Register link → navigates to onboarding
+- **Footer:** Terms of Service / Privacy Policy text
 
-### Search Results
-- Animated result count with number transition
-- "X results found" header
-- Result cards with:
-  - Cover image (or purple gradient placeholder)
-  - Title, author
-  - Category color-coded badge (purple/blue/orange)
-  - Tag pills (first 2 tags shown)
-  - Subject pill when no tags present
-  - Availability indicator (green dot + count or red dot + "Out")
-  - Card hover effect
-- Staggered entrance animation (0.03s delay per card)
-
-### Recently Viewed
-- Shown when search is empty
-- Horizontal scrollable cards (4 items)
-- Smaller cards (28x36) with category badge and cover image
-- "Recently Viewed" header with Clock icon
-
-### Empty State
-- Search icon in purple circle
-- "No results found" message
-- "Try adjusting your search or filters" suggestion
+**Keyboard:** Enter key on password field triggers login.
 
 ---
 
-## 5. QR Code Scanner
+### 2.3 Home (Dashboard)
 
-### Scanner Interface
-- Full-screen dark background (#0d0d1a)
-- Viewfinder (264x264) with:
-  - Purple corner brackets (3px border, rounded corners)
-  - Inner corner accents (2px, 40% opacity)
-  - Animated scan line moving up and down (2.5s cycle)
-  - Center ScanLine icon with pulse during scanning
-  - Outer glow effect (purple/10% blur)
-  - Semi-transparent white/5% inner overlay
+**Screen:** `HomeScreen` | **Route:** Internal (main authenticated screen)
 
-### Scan Modes
-- **Attendance Check-in** (default): UserCheck icon, purple active state
-- **Book Checkout**: BookOpen icon, secondary state
-- Toggle buttons at bottom with mode-specific icons
-- Mode indicator badge in top-left corner
+Personalized landing page with multiple content sections:
 
-### Auto-Scan Simulation
-- 2-second delay before auto-scan starts
-- 3-second scanning animation (center icon pulses, scan line active)
-- "Scanning..." indicator with pulsing dot
+1. **Top Bar:** Streak counter (flame icon + count), Notifications bell (unread badge), Settings gear
+2. **User Greeting:** Avatar initials circle, time-of-day greeting (morning/afternoon/evening, [First Name]), program/year/role subtitle
+3. **Library Status Badge:** Open/Closed indicator (green/red dot) + closing time
+4. **Full Date Display:** CalendarDays icon + formatted date
+5. **Announcements Carousel:** Auto-rotating (5s interval), dismissible cards with megaphone icon, carousel dot navigation
+6. **Today's Highlight:** Featured book card with purple gradient background, decorative circles, star badge, availability badge
+7. **Current Borrow:** Active book card with gradient left border, progress bar, days-left badge (color-coded: green > 3 days, yellow 1–3 days, red overdue), "View Details" button. Empty state with floating book animation + "Browse Catalog" CTA
+8. **Quick Actions:** 4-button grid — Scan QR, My Loans, Reservations, Attendance
+9. **Recommended for You:** Horizontal scrollable book covers with "For You" star badges (program-matched), availability dots, "See All" link
+10. **Trending in Your Department:** Ranked list (1–5) with borrow counts, numbered badges
 
-### Success Modal
-- Backdrop blur overlay
-- Spring-animated white modal with:
-  - Green CheckCircle2 icon with spring scale animation
-  - Contextual message: "Attendance Logged!" or "Book Scanned!"
-  - Description text
-  - Timestamp display with Clock icon
-  - "Scan Again" button (outline) and "Done" button (purple filled)
-- Staggered entrance animations for each element
+**Gesture:** Pull-to-refresh (60px threshold, animated pull indicator).
 
-### Flash/Torch Toggle
-- Toggle button for flash on/off
-- Yellow highlight when active (Zap icon with fill)
-- White/10% background when inactive
-
-### Navigation
-- Close button (X) in top-right with backdrop blur
-- Returns to home screen
+**Skeleton Loading:** Dedicated SkeletonCard and SkeletonRecommendations components.
 
 ---
 
-## 6. My Loans (Borrowed Books)
+### 2.4 Search (Catalog Browser)
 
-### Tab Navigation
-- Active / History tabs in purple-50 container
-- Active tab has white background with shadow
-- Tab labels show count: "Active (2)", "History (1)"
-- Animated tab switch with horizontal slide (10px)
+**Screen:** `SearchScreen` | **Route:** Internal
 
-### Summary Stats Bar
-- Purple dot + "X Active"
-- Emerald dot + "Y Returned"
+Resource catalog search and browsing:
 
-### Active Borrows List
-- Each card features:
-  - Cover image (or purple gradient placeholder with BookOpen icon)
-  - Left gradient accent border (purple gradient)
-  - Title, author
-  - Borrow date and due date
-  - Urgency badge:
-    - Green: > 3 days left
-    - Yellow: ≤ 3 days left
-    - Red: Overdue
-  - "Return" button with RotateCcw icon
-  - Return calls `/api/borrow/[id]/return` PUT endpoint
-  - Loading spinner on return button during processing
-- Staggered entrance animation (0.07s delay per card)
+- **Search input** with Search icon + clear button (X)
+- **Popular search suggestions** (6 tags: Algorithms, Deep Learning, Database, Nursing, Psychology, Clean Code) — shown when focused or empty
+- **Category filter pills:** All, Books, Research, Magazines — with icons
+- **Animated result count** (counting up/down with 20ms steps)
+- **Recently Viewed** horizontal scroll (when search empty)
+- **Result cards:** Cover image, title, author, category badge, tag pills (max 2), availability indicator
+- **Empty state** with search icon
+- **Loading spinner**
 
-### Borrow History
-- Each card features:
-  - Cover image or placeholder
-  - Title, author
-  - "Returned on [date]" badge with CheckCircle2 icon (emerald)
-  - "View" button with ChevronRight to navigate to book detail
-
-### Empty State
-- BookOpen icon in purple circle
-- "No books yet" / "Your borrowing history will appear here"
-- "Browse Catalog" CTA button (on Active tab only)
+**Debounce:** 300ms on search input change.
 
 ---
 
-## 7. Book Detail
+### 2.5 Book Detail
 
-### Header
-- Purple gradient background with cover-pattern-overlay
-- Decorative circles (white/5% opacity)
-- Back button (ArrowLeft) with white/10% background
-- "Book Details" label
-- Share button (Share2) with white/10% background
+**Screen:** `BookDetailScreen` | **Route:** Internal
 
-### Book Cover Section
-- Overlapping card (-mt-12 from header)
-- Cover image (if available) with gradient overlay, category badge, favorite button
-- Or purple gradient placeholder with:
-  - Large BookOpen icon (white/30%)
-  - Decorative border circles
-  - Category badge (top-right)
-  - Heart favorite button (top-left) with:
-    - Active: Red filled heart with scale-110
-    - Inactive: White heart outline
-    - Toggle calls `toggleFavorite()` in store
-    - Toast notification on toggle
+Detailed resource view with borrow/reserve actions:
 
-### Book Information
-- Title (large, bold)
-- Author
-- Availability badge: green "X/Y available" or red "Unavailable"
-- Shelf location with MapPin icon
-- ISBN with Hash icon (if available)
-- Publication date with Calendar icon (if available)
-- Subject tag (purple-50 background)
-- "About this book" description section
-- Tag pills (purple-50, 10px font)
+- **Purple gradient header** with decorative circles, back button, share button
+- **Book cover** (overlapping header, -mt-12): image or decorative pattern + category badge + heart/favorite button
+- **Metadata:** Title, author, availability badge (green/red), shelf location (MapPin icon), ISBN badge, publication date badge, subject badge
+- **Description:** "About this book" section
+- **Tags** as pills
+- **Action buttons:** Borrow (when available) or Reserve (when unavailable) + Share button
+- **"More Resources"** related books section
+- **Share toast:** "Copied to clipboard!" notification
 
-### Action Buttons
-- **Borrow** button (when available): Purple filled, BookOpen icon
-- **Reserve** button (when unavailable): Purple-50 outline, Bookmark icon
-- Processing state with spinner animation
-- **Share** button (outline)
-- Both buttons call respective API endpoints with loading states
+**Favorite Toggle:** Heart icon with animated scale + color change.
 
-### More Resources
-- "More Resources" section with related books
-- Fetched from `/api/resources?limit=4`, filtered to exclude current book (max 3)
-- Each item: purple gradient icon, title, author, ChevronRight
-- Tap to navigate to that book's detail
-
-### Share Feature
-- Uses `navigator.share` API on supported devices
-- Falls back to clipboard copy
-- "Copied to clipboard!" toast with bottom positioning and animation
+**Share:** Web Share API (native) or clipboard copy fallback.
 
 ---
 
-## 8. Profile
+### 2.6 My Loans (Borrowed Books)
 
-### Profile Header
-- Purple gradient background with `rounded-b-[2rem]`
-- Decorative circles (3 positions, white/5%)
-- Avatar circle with initials (white/20% backdrop blur, ring-4)
-- Full name, email (with Mail icon)
-- Role badge pill (white/20% background)
-- Program + Year Level (with GraduationCap icon)
-- University ID (mono font, white/40%)
-- Spring entrance animation for avatar
+**Screen:** `BorrowedScreen` | **Route:** Internal
 
-### Stats Cards
-- 3-column grid overlapping header (-mt-6):
-  - **Borrowed**: BookOpen icon, purple theme, total count (active + history)
-  - **Visits**: MapPin icon, emerald theme, attendance count
-  - **Streak**: Flame icon, orange theme, streak count
-- Staggered entrance animation (0.1s delay each)
+Active loans and borrowing history:
 
-### Reading Goal Card
-- Circular SVG progress ring (36x36 viewBox)
-- Track: #E8D5F3, Progress: #652D90
-- Center text: "current/goal" count
-- Default goal: 24 books/year
-- "Change" button reveals picker: 12, 24, 36, 48 options
-- Selected goal has purple filled state
-- Dynamic message: "X more books to reach your goal" or celebration emoji
+- **Tab switcher:** Active / History (with counts)
+- **Summary stats bar:** Active count + Returned count with colored dots
+- **Active book cards:** Cover image, title, author, borrow/due dates, gradient left border, days-left badge (color-coded), Return button
+- **History book cards:** "Returned on [date]" badge with checkmark, View button
+- **Empty state** with "Browse Catalog" CTA
 
-### Reading Stats Card
-- Mini bar chart (7 months: Sep-Mar)
-- Current month bar is purple, others are purple-200
-- Animated bar heights with staggered delay
-- "Total: X books this year"
-- "Avg: X.X/mo" average calculation
-- BookOpen icon header
-
-### Favorite Books Section
-- Heart icon (red filled) card
-- "{X} books saved to your collection"
-- ChevronRight to navigate to favorites screen
-- Card hover effect
-
-### Member Info Card
-- Clock icon in purple-50 background
-- "Member since [Month Year]"
-
-### Menu Items
-7 menu items in white card:
-1. **Edit Profile** — Edit icon, navigates to settings
-2. **My Favorites** — Heart icon (red), shows saved count, navigates to favorites
-3. **My Reservations** — BookOpen icon, navigates to reservations
-4. **Notification Preferences** — Bell icon, navigates to settings
-5. **Privacy Policy** — Shield icon, navigates to settings
-6. **Help & Support** — HelpCircle icon, navigates to settings
-7. **About** — Info icon, "Version 1.0.0", navigates to settings
-
-### Log Out
-- Red-outlined button with LogOut icon
-- Resets all user state (auth, onboarding, search, favorites, etc.)
-- Navigates to login screen
+**Actions:** Return book → marks as returned + increments available copies.
 
 ---
 
-## 9. Settings
+### 2.7 Profile
 
-### Header
-- Back button with ArrowLeft
-- "Settings" title
+**Screen:** `ProfileScreen` | **Route:** Internal
 
-### Account Section
-- User avatar (purple circle with initials)
-- Full name and email display
-- **Change Password** button: Opens bottom sheet modal
-- **Email** display with "Verified" badge
+User profile, statistics, reading goals, and menu:
 
-### Change Password Modal
-- Bottom sheet with spring animation (slides up from bottom)
-- Backdrop blur overlay (click outside to close)
-- Handle bar at top
-- Fields:
-  - Current Password (with show/hide toggle)
-  - New Password (with show/hide toggle + strength indicator)
-  - Confirm New Password
-- Validation: minimum 6 chars, must match, must differ from current
-- Error display in red box
+- **Purple gradient header** with avatar initials, name, email, role badge, program/year, university ID
+- **Stats cards (3 columns):** Borrowed count, Visits count, Streak count
+- **Reading Goal card:** Circular SVG progress ring, goal/borrowed count, "Change" button with goal picker (12/24/36/48)
+- **Reading Stats card:** Mini bar chart (7 months), total books, average per month
+- **Favorite Books card** (navigates to favorites screen)
+- **Quick info:** "Member since" card
+- **Menu items:** Edit Profile, My Favorites, My Reservations, Notification Preferences, Privacy Policy, Help & Support, About (v1.0.0)
+- **Logout button** (red themed)
+
+**Reading Goal Picker:** Toggle overlay to select from 12/24/36/48 annual goal.
+
+**Bar Chart:** Animated height growth (0.4s per bar, staggered 0.05s).
+
+---
+
+### 2.8 QR Scanner
+
+**Screen:** `QRScanScreen` | **Route:** Internal
+
+Simulated QR code scanner for attendance and book checkout:
+
+- **Dark background** (#0d0d1a)
+- **Mode indicator badge:** Attendance / Checkout
+- **Viewfinder:** 256×256 box with animated scan line, corner brackets (outer + inner accents), center ScanLine icon with pulse
+- **Mode buttons:** "Attendance Check-in" / "Book Checkout"
+- **Flash toggle** (torch on/off, visual only)
+- **Success modal:** Green checkmark with spring animations, success message, timestamp, "Scan Again" / "Done" buttons
+
+**Simulation:** Auto-simulated scan (2s wait → 3s scanning → success).
+
+---
+
+### 2.9 Attendance
+
+**Screen:** `AttendanceScreen` | **Route:** Internal
+
+Library attendance tracking with calendar heatmap:
+
+- **Summary cards (3):** Total Visits, Total Hours, Day Streak
+- **Calendar heat map:** Month/year label, 7-column grid (Sun–Sat), attended days highlighted purple, today with ring indicator, legend
+- **Recent Visits list:** Date, time-in → time-out, duration badge
+
+**Fallback:** 11 mock records if API returns empty.
+
+---
+
+### 2.10 Notifications
+
+**Screen:** `NotificationsScreen` | **Route:** Internal
+
+View and manage notifications:
+
+- **"Mark all read" button**
+- **Filter tabs:** All, Unread (with count badge), Mentions (reservation type)
+- **Grouped notifications:** Today, Yesterday, This Week, Earlier — with group headers and counts
+- **Notification cards:** Type-colored left border + icon (orange=due_date, purple=reservation, blue=announcement), title, message, relative time, unread dot
+- **Empty state**
+
+**Gesture:** Swipe-to-dismiss (drag x > 100px threshold dismisses, spring snap-back if under).
+
+---
+
+### 2.11 Reservations
+
+**Screen:** `ReservationsScreen` | **Route:** Internal
+
+Manage book reservations:
+
+- **Active count** + bookmark icon
+- **Filter tabs:** All, Pending (with count), Fulfilled
+- **Reservation cards:** Cover image, title, author, status badge (Pending=yellow, Fulfilled=green, Cancelled=red), date
+  - Pending: "Cancel" button
+  - Fulfilled: "Borrow Now" button
+- **Empty state** with "Browse Catalog" CTA
+
+**Actions:** Cancel reservation (soft-cancel → status changed to "cancelled").
+
+---
+
+### 2.12 Favorites
+
+**Screen:** `FavoritesScreen` | **Route:** Internal
+
+View and manage favorite/saved books:
+
+- **Count** + heart icon
+- **Book cards:** Cover image, title, author, category badge, availability, trash/remove button
+- **Empty state** with heart icon + "Browse Catalog" CTA
+
+**Actions:** Remove from favorites with exit animation (slide-left + collapse).
+
+---
+
+### 2.13 Settings
+
+**Screen:** `SettingsScreen` | **Route:** Internal
+
+App settings and account management:
+
+1. **Account:** Avatar + name/email, "Change Password" button, Email with "Verified" badge
+2. **Notifications:** Due Date Reminders switch, Reservation Alerts switch, System Announcements switch — each toggle persists to API
+3. **Appearance:** Dark Mode toggle (via next-themes)
+4. **Library:** Hours display (from API), Open/Closed status, Attendance History link
+5. **About:** App Version (1.0.0), Privacy Policy, Terms of Service
+6. **Log Out** button (red)
+
+**Password Change Modal (bottom sheet):**
+- Current password + show/hide
+- New password + show/hide + strength meter
+- Confirm new password + match validation
+- Error display
 - Cancel / Change Password buttons
-- Calls `/api/auth/update` PUT endpoint
-
-### Notifications Section
-- **Due Date Reminders**: Toggle switch, calls API on change
-- **Reservation Alerts**: Toggle switch, calls API on change
-- **System Announcements**: Toggle switch, calls API on change
-- All toggles have purple checked state (`data-[state=checked]:bg-lib-purple`)
-- Each toggle updates via `/api/auth/update` PUT with user ID
-
-### Appearance Section
-- **Dark Mode**: Toggle switch using `next-themes`
-- Sun/Moon icon based on current theme
-- Persists theme preference across sessions
-
-### Library Section
-- **Library Hours**: Opening/closing time from `/api/settings` API
-- Open/Closed status badge (green/red)
-- **Attendance History**: Link to attendance screen
-
-### About Section
-- App Version: 1.0.0
-- Privacy Policy link
-- Terms of Service link
-
-### Log Out
-- Red-outlined button, calls `logout()` and navigates to login
 
 ---
 
-## 10. Notifications
-
-### Header
-- Back button with ArrowLeft
-- "Notifications" title
-- "Mark all read" button (CheckCheck icon) — visible when unread notifications exist
-
-### Filter Tabs
-- 3 pill filters: All, Unread, Mentions
-- Active: purple background with white text + shadow
-- Inactive: gray-100 background
-- Unread tab shows count badge
-- Mentions filters for reservation-type notifications
-
-### Notification Cards
-- Swipe-to-dismiss gesture (drag > 100px triggers dismiss)
-- Spring-back animation if drag < 100px
-- Color-coded left border:
-  - Orange: due_date notifications
-  - Purple: reservation notifications
-  - Blue: announcement notifications
-- Type-specific icon in colored background circle
-- Title, message, relative time (Just now / Xh ago / Xd ago / date)
-- Unread indicator: purple dot
-
-### Date Grouping
-- Groups: Today, Yesterday, This Week, Earlier
-- Group headers with purple uppercase label, divider line, and count
-
-### Empty State
-- BookOpen icon in purple circle
-- "No unread notifications" / "No notifications" message
-
----
-
-## 11. Attendance History
-
-### Summary Cards
-- 3-column grid:
-  - **Total Visits**: MapPin icon, current month count
-  - **Total Hours**: Clock icon, calculated from durations
-  - **Day Streak**: Flame icon (orange), from user data
-
-### Calendar Heat Map
-- Full month grid with day-of-week headers (Sun-Sat)
-- Purple-filled cells for attended days
-- Gray cells for non-attended past days
-- Light gray cells for future days
-- Today highlighted with purple ring
-- "Today" dot indicator below date
-- Month/year display with Calendar icon
-- Visit count badge
-- Legend: Attended (purple), No visit (gray), Today (ring)
-- Per-cell entrance animation
-
-### Recent Visits
-- Sorted by date (most recent first, max 10)
-- Each record shows:
-  - Calendar icon in purple-50 circle
-  - Formatted date ("Mon, Mar 11")
-  - Time range ("8:15 AM → 11:30 AM")
-  - Duration badge (e.g., "3h 15m")
-
-### Data Sources
-- Primary: `/api/attendance?userId=X` API
-- Fallback: Mock data (11 records for March 2026) when API returns empty
-
----
-
-## 12. Favorites
-
-### Header
-- Back button with ArrowLeft
-- "My Favorites" title with count subtitle
-- Heart icon in red-50 circle
-
-### Favorites List
-- Each card shows:
-  - Cover image (or purple gradient placeholder)
-  - Title, author
-  - Category badge (color-coded)
-  - Availability indicator (green/red dot + count)
-  - Remove button (Trash2 icon) with hover state turning red
-- Animated entrance (0.05s stagger)
-- Swipe-to-remove (exit animation: slide left + collapse)
-
-### Empty State
-- Large Heart icon in purple circle
-- "No favorites yet" message
-- "Tap the heart icon on any book to save it here" instruction
-- "Browse Catalog" CTA button
-
-### Data Flow
-- Favorites stored in Zustand store with localStorage persistence
-- `toggleFavorite(id)` / `isFavorite(id)` methods
-- Resource details fetched from `/api/resources/[id]` for each favorite
-
----
-
-## 13. Reservations
-
-### Header
-- Back button with ArrowLeft
-- "My Reservations" title with active count
-- Bookmark icon in purple-50 circle
-
-### Filter Tabs
-- 3 pill filters: All, Pending, Fulfilled
-- Active: purple filled, Inactive: purple-50 outline
-- Pending tab shows count badge
-
-### Reservation Cards
-- Cover image (or purple gradient placeholder)
-- Title, author
-- Status badge:
-  - Pending: Clock icon, yellow-100 background
-  - Fulfilled: CheckCircle2 icon, green-100 background
-  - Cancelled: XCircle icon, red-100 background
-- Created date
-- **Pending**: "Cancel" button (XCircle icon, red text) — calls `/api/reservations/[id]` DELETE
-- **Fulfilled**: "Borrow Now" button — navigates to book detail
-
-### Empty State
-- Bookmark icon in purple circle
-- Contextual message based on active filter
-- "Browse Catalog" CTA button
-
----
-
-## 14. Bottom Navigation
-
-### Navigation Items
-5 nav items with icons:
-1. **Home** — Home icon
-2. **Search** — Search icon
-3. **Scan** — ScanLine icon (center, elevated)
-4. **Borrowed** — BookOpen icon (with active borrow count badge)
-5. **Profile** — User icon
-
-### Center Scan Button
-- Elevated (-mt-6) above nav bar
-- Full purple circle (56x56) with shadow
-- White icon
-- whileTap scale animation (0.9)
-
-### Active State
-- Active item: purple icon color, semibold label
-- Active indicator: animated dot (layoutId="navIndicator")
-- Inactive: gray-400 color
-
-### Borrow Badge
-- Shows count of active borrows on "Borrowed" nav item
-- Purple circle badge with white text (8px font)
-- Position: -top-1.5, -right-2
-- Fetched from `/api/borrow?userId=X&status=active`
-
-### Styling
-- Glass-effect background (frosted glass)
-- Border-top with purple-100 color
-- Safe-area bottom padding
-
----
-
-## 15. Dark Mode
-
-### Implementation
-- Powered by `next-themes` library
-- ThemeProvider wraps app in layout.tsx
-- Toggle in Settings screen
-- Persists across sessions via next-themes storage
-
-### Dark Mode Styling
-- Custom CSS variables for dark backgrounds
-- Enhanced styles for: purple gradients, glass effects, custom scrollbars, skeleton shimmers
-- Proper contrast ratios for text and interactive elements
-
----
-
-## 16. Backend API Endpoints
+## 3. API Endpoints
 
 ### Authentication
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/auth/register` | POST | Register new user with full profile data |
-| `/api/auth/login` | POST | Login with email/password, returns user data |
-| `/api/auth/update` | PUT | Update user profile, notification prefs, or change password |
 
-### Resources
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/resources` | GET | List resources with optional search, category, subject, limit params |
-| `/api/resources/[id]` | GET | Get single resource by ID |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/login` | Login with email + password. Returns user object (SHA-256 hash verification). |
+| POST | `/api/auth/register` | Register new user. Validates required fields, checks email + universityId uniqueness, hashes password, generates avatar initials. |
+| PUT | `/api/auth/update` | Update user profile, notification preferences, or change password (verifies current password before allowing change). |
+
+### Resources (Catalog)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/resources` | List/search resources. Query params: `category`, `subject`, `search` (OR across title/author/tags/subject), `page`, `limit`. Returns resources + pagination. |
+| GET | `/api/resources/[id]` | Get single resource with related borrow records (active/overdue, last 5) and reservations (pending, last 5). |
 
 ### Borrowing
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/borrow` | GET | Get borrow records by userId + optional status filter |
-| `/api/borrow` | POST | Borrow a resource (validates limits, creates record, decrements availability) |
-| `/api/borrow/[id]/return` | PUT | Return a borrowed book (marks returned, increments availability) |
 
-### Attendance
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/attendance` | GET | Get attendance records by userId |
-| `/api/attendance` | POST | Create new attendance record |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/borrow` | List borrow records. Query params: `userId` (required), `status` (active/returned/overdue). Returns records with resource details. |
+| POST | `/api/borrow` | Borrow a book. Validates availability, checks role-based max borrow limit (student:3, faculty:10, visitor:1), calculates role-based due date (student:14d, faculty:30d, visitor:7d). Transaction: create record + decrement available copies. |
+| POST | `/api/borrow/[id]/return` | Return a book. Checks not already returned, calculates late status. Transaction: update record + increment available copies. |
 
 ### Reservations
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/reservations` | GET | Get reservations by userId |
-| `/api/reservations` | POST | Create a reservation for a resource |
-| `/api/reservations/[id]` | DELETE | Cancel a reservation |
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/reservations` | List reservations. Query param: `userId` (required). Returns reservations with resource details. |
+| POST | `/api/reservations` | Create reservation. Validates user + resource, checks no existing pending reservation for same user+resource. |
+| DELETE | `/api/reservations/[id]` | Cancel reservation (soft-cancel: sets status to "cancelled" rather than deleting). |
 
 ### Notifications
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/notifications` | GET | Get notifications by userId (returns `{notifications, unreadCount}`) |
-| `/api/notifications/[id]/read` | PUT | Mark a notification as read |
 
-### Settings
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/settings` | GET | Get library settings (hours, borrow limits, etc.) |
-
-### Announcements
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/announcements` | GET | Get active announcements |
-
----
-
-## 17. Database Schema (8 Models)
-
-### User
-- id, email (unique), password, fullName, universityId (unique)
-- role (student/faculty/visitor/librarian), program, department, yearLevel
-- avatarInitials, notificationDueDate, notificationReservation, notificationAnnouncements
-- streakCount, streakLastDate, isOnboarded
-- Relations: borrowedBooks[], attendance[], reservations[], notifications[]
-
-### Resource
-- id, title, author, isbn, issn, category (book/research/magazine)
-- copies, availableCopies, shelfLocation, abstract, publicationDate
-- coverImage, subject, tags (comma-separated), status
-- Relations: borrowRecords[], reservations[]
-
-### BorrowRecord
-- id, userId, resourceId, borrowDate, dueDate, returnDate
-- status (active/returned/overdue), isLate
-- Relations: user, resource
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/notifications` | List notifications. Query param: `userId` (required). Returns notifications + unread count. |
+| PUT | `/api/notifications/[id]/read` | Mark a notification as read. |
 
 ### Attendance
-- id, userId, date (YYYY-MM-DD), timeIn, timeOut, duration (minutes)
-- Relations: user
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/attendance` | List attendance records. Query params: `userId`, `date` (YYYY-MM-DD). Returns records with user info. |
+| POST | `/api/attendance` | Record attendance. `type: "time-in"` checks no existing open record today, creates new. `type: "time-out"` finds today's open record, calculates duration, sets timeOut. |
+
+### Library Settings & Announcements
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/settings` | Get library settings (hours, borrow limits, QR validity). Creates defaults if none exist. |
+| PUT | `/api/settings` | Update library settings. |
+| GET | `/api/announcements` | List active announcements. Ordered by newest first. |
+
+### Health Check
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/` | Returns `{ message: "Hello, world!" }` for health check. |
+
+---
+
+## 4. Database Models
+
+### User
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | String @id | cuid() auto-generated |
+| email | String @unique | Login identifier |
+| password | String | SHA-256 hashed |
+| fullName | String | Display name |
+| universityId | String @unique | Student/faculty/visitor ID |
+| role | String | student / faculty / visitor / librarian |
+| program | String? | Academic program |
+| department | String? | Department (faculty) |
+| yearLevel | String? | Year level (students) |
+| avatarInitials | String? | Auto-generated from name |
+| notificationDueDate | Boolean | Default: true |
+| notificationReservation | Boolean | Default: true |
+| notificationAnnouncements | Boolean | Default: false |
+| streakCount | Int | Default: 0 |
+| streakLastDate | String? | Last streak date |
+| isOnboarded | Boolean | Default: false |
+| createdAt | DateTime | Auto |
+| updatedAt | DateTime | Auto |
+
+**Relations:** borrowedBooks (BorrowRecord[]), attendance (Attendance[]), reservations (Reservation[]), notifications (Notification[])
+
+---
+
+### Resource
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | String @id | cuid() |
+| title | String | Book/resource title |
+| author | String | Author name |
+| isbn | String? | ISBN identifier |
+| issn | String? | ISSN identifier |
+| category | String | book / research / magazine |
+| copies | Int | Total copies (default: 1) |
+| availableCopies | Int | Currently available (default: 1) |
+| shelfLocation | String? | Physical location |
+| abstract | String? | Description/abstract |
+| publicationDate | String? | Publication date |
+| coverImage | String? | Cover image URL/path |
+| subject | String? | Academic subject |
+| tags | String? | Comma-separated tags |
+| status | String | available / borrowed / reserved / reference-only / maintenance |
+| createdAt | DateTime | Auto |
+| updatedAt | DateTime | Auto |
+
+**Relations:** borrowRecords (BorrowRecord[]), reservations (Reservation[])
+
+---
+
+### BorrowRecord
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | String @id | cuid() |
+| userId | String | FK → User |
+| resourceId | String | FK → Resource |
+| borrowDate | DateTime | When borrowed |
+| dueDate | DateTime | Calculated from role |
+| returnDate | DateTime? | When returned (null if active) |
+| status | String | active / returned / overdue |
+| isLate | Boolean | Default: false |
+| createdAt | DateTime | Auto |
+| updatedAt | DateTime | Auto |
+
+**Relations:** user (User), resource (Resource)
+
+---
+
+### Attendance
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | String @id | cuid() |
+| userId | String | FK → User |
+| date | String | YYYY-MM-DD |
+| timeIn | DateTime? | Check-in time |
+| timeOut | DateTime? | Check-out time |
+| duration | Int? | Total minutes |
+| createdAt | DateTime | Auto |
+| updatedAt | DateTime | Auto |
+
+**Relations:** user (User)
+
+---
 
 ### Reservation
-- id, userId, resourceId, status (pending/fulfilled/cancelled)
-- Relations: user, resource
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | String @id | cuid() |
+| userId | String | FK → User |
+| resourceId | String | FK → Resource |
+| status | String | pending / fulfilled / cancelled |
+| createdAt | DateTime | Auto |
+| updatedAt | DateTime | Auto |
+
+**Relations:** user (User), resource (Resource)
+
+---
 
 ### Notification
-- id, userId, type (due_date/reservation/announcement/inquiry)
-- title, message, isRead
-- Relations: user
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | String @id | cuid() |
+| userId | String | FK → User |
+| type | String | due_date / reservation / announcement / inquiry |
+| title | String | Notification title |
+| message | String | Notification body |
+| isRead | Boolean | Default: false |
+| createdAt | DateTime | Auto |
+
+**Relations:** user (User)
+
+---
 
 ### LibrarySettings
-- id, isOpen, closingTime, openingTime
-- maxBorrowStudent (3), maxBorrowFaculty (10), maxBorrowVisitor (1)
-- borrowDaysStudent (14), borrowDaysFaculty (30), borrowDaysVisitor (7)
-- qrValidityMinutes (15)
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| id | String @id | cuid() | |
+| isOpen | Boolean | true | Library open status |
+| closingTime | String | "21:00" | Closing time |
+| openingTime | String | "07:00" | Opening time |
+| maxBorrowStudent | Int | 3 | Max concurrent borrows for students |
+| maxBorrowFaculty | Int | 10 | Max concurrent borrows for faculty |
+| maxBorrowVisitor | Int | 1 | Max concurrent borrows for visitors |
+| borrowDaysStudent | Int | 14 | Borrow period for students |
+| borrowDaysFaculty | Int | 30 | Borrow period for faculty |
+| borrowDaysVisitor | Int | 7 | Borrow period for visitors |
+| qrValidityMinutes | Int | 15 | QR code validity window |
+| updatedAt | DateTime | Auto | |
+
+---
 
 ### Announcement
-- id, title, message, targetRoles (all/student/faculty/visitor), isActive
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | String @id | cuid() |
+| title | String | Announcement title |
+| message | String | Announcement body |
+| targetRoles | String | all / student / faculty / visitor |
+| isActive | Boolean | Default: true |
+| createdAt | DateTime | Auto |
+| updatedAt | DateTime | Auto |
 
 ---
 
-## 18. State Management (Zustand + Persist)
+## 5. State Management
 
-### Navigation State
-- `currentScreen`: Active screen identifier
-- `previousScreen`: For back navigation
-- `setCurrentScreen()`: Navigate to screen
-- `goBack()`: Return to previous screen
+**Store:** Zustand with `persist` middleware → `localStorage` key `liblog-store`
 
-### Authentication State
-- `isAuthenticated`: Login status
-- `user`: Full user profile object (UserState)
-- `setUser()`: Set authenticated user
-- `logout()`: Clear all state and return to login
+### Persisted State
 
-### Onboarding State
-- `onboardingStep`: Current step (0-4)
-- `onboardingData`: Role, name, universityId, program, department, yearLevel, email, password, notification prefs
-- `resetOnboarding()`: Clear all onboarding data
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| currentScreen | AppScreen | `'onboarding'` | Current active screen |
+| previousScreen | AppScreen\|null | `null` | For goBack() navigation |
+| isAuthenticated | boolean | `false` | Login status |
+| user | UserState\|null | `null` | Full user data |
+| onboardingStep | number | `0` | Current onboarding step (0–4) |
+| onboardingData | object | *(defaults)* | Registration form data accumulator |
+| selectedBookId | string\|null | `null` | Book for detail view |
+| searchQuery | string | `''` | Active search text |
+| searchCategory | string | `'all'` | Active category filter (all/book/research/magazine) |
+| unreadCount | number | `3` | Unread notification count |
+| favorites | string[] | `[]` | Favorited resource IDs |
 
-### Search State
-- `searchQuery`: Current search text
-- `searchCategory`: Active category filter (all/book/research/magazine)
+### Actions
 
-### Notification State
-- `unreadCount`: Number of unread notifications
+| Action | Description |
+|--------|-------------|
+| `setCurrentScreen(screen)` | Navigate to screen, saves previous for back-nav |
+| `goBack()` | Navigate to previousScreen (or home as fallback) |
+| `setUser(user)` | Set user data + isAuthenticated = true |
+| `logout()` | Clear user, reset all state to defaults |
+| `setOnboardingStep(step)` | Set onboarding step |
+| `setOnboardingData(data)` | Merge partial onboarding data |
+| `resetOnboarding()` | Reset step = 0 + data to defaults |
+| `setSelectedBookId(id)` | Set book for detail view |
+| `setSearchQuery(query)` | Update search text |
+| `setSearchCategory(cat)` | Update category filter |
+| `setUnreadCount(count)` | Update notification badge |
+| `toggleFavorite(id)` | Add/remove from favorites array |
+| `isFavorite(id)` | Check if ID is in favorites |
 
-### Favorites State
-- `favorites`: Array of resource IDs
-- `toggleFavorite(id)`: Add/remove favorite
-- `isFavorite(id)`: Check if favorited
+### AppScreen Union Type
 
-### Persistence
-- Zustand `persist` middleware with `liblog-store` localStorage key
-- Partialized: currentScreen, isAuthenticated, user, onboardingStep, onboardingData, favorites
-
----
-
-## 19. Animations & Micro-Interactions
-
-### Framer Motion Animations
-- **Page transitions**: opacity + y-translate (200ms, easeInOut) via AnimatePresence
-- **Staggered entrances**: Section-level (0.08s delay) and card-level (0.03-0.07s delay)
-- **Spring animations**: Avatars, modals, success icons (stiffness: 200-300, damping: 12-25)
-- **Swipe gestures**: Notification dismiss (drag > 100px threshold)
-- **Pull-to-refresh**: Touch-based with animated height indicator
-- **Tab switches**: Horizontal slide (10px) with AnimatePresence
-- **Greeting transitions**: Animated text swap on time-of-day change
-- **Scale on tap**: Buttons (0.93-0.98), nav items (0.9)
-- **Confetti**: 20 particles with random positions, colors, rotation, and scale
-
-### CSS Animations
-- `animate-float-icon`: Floating decorative icons
-- `animate-micro-pulse-glow`: Subtle glow pulse on logos
-- `floating-animation`: Gentle up-down float for empty state icons
-- `animate-spin`: Loading spinners
-- `shimmer-loading`: Shimmer effect on buttons
-- `gradient-shift`: Animated gradient background
-- `cover-pattern-overlay`: Decorative SVG pattern on book covers
-- `card-hover-effect`: Hover elevation on cards
-- `glass-effect`: Frosted glass backdrop blur
+```
+'onboarding' | 'home' | 'search' | 'qr-scan' | 'borrowed' |
+'profile' | 'settings' | 'notifications' | 'book-detail' | 'login' |
+'attendance' | 'favorites' | 'reservations'
+```
 
 ---
 
-## 20. Seed Data
+## 6. Authentication & Security
 
-### Users (3)
-1. **Juan Dela Cruz** — Student, CS-2024-0001, Computer Science, 3rd Year, 5-day streak
-2. **Maria Santos** — Faculty, FAC-2024-0001, Nursing department
-3. **Alex Reyes** — Visitor, VIS-2024-0001
-
-### Resources (17)
-- 10 Books (Intro to Algorithms, Clean Code, Design Patterns, Deep Learning, etc.)
-- 4 Research papers (NeurIPS, ACM Computing Surveys, etc.)
-- 3 Magazines (Scientific American, National Geographic, Time)
-
-### Borrow Records (5)
-- 2 active borrows for Juan (Intro to Algorithms, AI: A Modern Approach)
-- 2 active borrows for Maria
-- 1 returned book for Juan
-
-### Notifications (6)
-- Due date reminders, reservation alerts, announcements
-
-### Announcements (2)
-- Extended Library Hours for Finals Week
-- New Arrivals: AI & Machine Learning Collection
-
-### Library Settings
-- Open 7:00 AM – 9:00 PM
-- Student: 3 books max, 14 days
-- Faculty: 10 books max, 30 days
-- Visitor: 1 book max, 7 days
+- **Password Hashing:** SHA-256 via Web Crypto API (`src/lib/auth.ts`)
+- **Session:** Client-side only (Zustand + localStorage) — no server sessions
+- **Auth Guard:** Unauthenticated users can only see login/onboarding screens
+- **Role-Based Access Control:**
+  - **Student:** Max 3 concurrent borrows, 14-day loan period
+  - **Faculty:** Max 10 concurrent borrows, 30-day loan period
+  - **Visitor:** Max 1 concurrent borrow, 7-day loan period
+- **Password Strength Meter:** Checks length, uppercase, numbers, special characters (4 levels: Weak/Fair/Good/Strong)
+- **Registration Validation:** Email uniqueness, university ID uniqueness, required fields per step
 
 ---
 
-## 21. Design System
+## 7. Theme & Design System
 
-### Color Theme
-- **Primary**: `#652D90` (LibPurple)
-- **Primary Light**: `#9B5BBF`
-- **Primary Lighter**: `#B87DD4`
-- **Primary 50**: `#F3E8FA` (lightest purple tint)
-- **Primary 100**: `#E8D5F3`
-- **Background**: `#FFFFFF`
-- **Surface**: `#F9FAFB` (gray-50)
-- **Text**: Foreground / Muted Foreground
+### Brand Colors
 
-### Typography
-- Headings: Bold, various sizes (10px-2xl)
-- Body: Regular/medium weight
-- Labels: 10-12px, uppercase tracking for section headers
-- Mono: University IDs
+| Shade | Hex |
+|-------|-----|
+| 50 | #F5EDF9 |
+| 100 | #E8D5F3 |
+| 200 | #D4ADE7 |
+| 300 | #B87DD4 |
+| 400 | #9B5BBF |
+| **500 (Primary)** | **#652D90** |
+| 600 | #5A2880 |
+| 700 | #4A2068 |
+| 800 | #3A1850 |
+| 900 | #2A1038 |
+| Light | #7B3FA8 |
+| Dark | #522575 |
 
-### Component Patterns
-- Rounded corners: `rounded-xl` (inputs), `rounded-2xl` (cards), `rounded-3xl` (modals)
-- Card shadows: `shadow-sm` default, `shadow-lg` for emphasis
-- Icon containers: 36-48px rounded-xl with colored backgrounds
-- Badge pills: `rounded-full` with 10px text
-- Section dividers: Gradient from transparent via purple/gray to transparent
+### Custom CSS Classes
 
-### Mobile-First Design
-- Max container width: 430px
-- Touch targets: minimum 44px
-- Bottom safe area padding for navigation
-- Pull-to-refresh gesture support
-- Horizontal scroll with hidden scrollbar (`hide-scrollbar`)
+| Class | Purpose |
+|-------|---------|
+| `bg-purple-gradient` | Purple gradient background |
+| `bg-purple-gradient-subtle` | Lighter purple gradient |
+| `glass-effect` / `glass-card` | Frosted glass with backdrop blur |
+| `card-hover-effect` | Hover lift + purple shadow |
+| `purple-shimmer` | Animated gradient shimmer |
+| `cover-pattern-overlay` | Diagonal stripes overlay on book covers |
+| `gradient-border` | Animated gradient border effect |
+| `dot-pattern-bg` | Decorative dot pattern |
+| `grid-pattern-bg` | Decorative grid pattern |
+| `section-header-pattern` | Section header decoration |
+| `shimmer-loading` | Button shimmer sweep animation |
+| `press-effect` | Active scale-down for buttons |
+| `hover-lift` | Subtle hover lift |
+| `gradient-text` | Purple gradient text fill |
+| `safe-bottom` | iOS safe area padding |
+| `custom-scrollbar` | Styled scrollbar |
+| `hide-scrollbar` | Hidden scrollbar |
+
+### Dark Mode
+
+- Class-based toggle via `next-themes`
+- Full dark theme CSS variables (enhanced shadows, dark scrollbar, dark glass effects, dark skeleton shimmer)
+- Toggle available in Settings screen
 
 ---
 
-## 22. Test Accounts
+## 8. Animations & Micro-Interactions
 
-| Email | Password | Role | Program |
-|---|---|---|---|
-| juan@university.edu | password123 | Student | Computer Science |
-| maria@university.edu | password123 | Faculty | Nursing |
-| alex@university.edu | password123 | Visitor | — |
+### Screen-Level Animations
+- **Screen transitions:** AnimatePresence mode="wait" with opacity + y:8 slide
+- **Onboarding step transitions:** Directional slide (left/right, 300ms)
+- **Tab content switching:** AnimatePresence with x-slide
+
+### Component Animations
+- **Staggered entry:** Cards, menu items, stats with configurable delays
+- **Spring animations:** Logo entrance, checkmarks, success modal elements
+- **Pull-to-refresh:** Touch-based with 60px threshold
+- **Swipe-to-dismiss:** Notifications with spring snap-back (x > 100px threshold)
+- **Floating icons:** Login screen book icons (6s loop)
+- **Confetti:** 20 particles on onboarding final step
+
+### Keyframe Animations (Defined in CSS)
+`shimmer` · `floating` · `pulse-glow` · `slide-in` · `slide-in-up` · `fade-in` · `particle-float` · `gradient-shift` · `subtle-bounce` · `micro-pulse-glow` · `confetti-fall` · `checkmark-draw` · `float-icon` · `count-up` · `badge-shimmer` · `shimmer-sweep` · `star-fill` · `progress-fill` · `skeleton-shimmer` · `badge-pulse` · `countdown-ring` · `slide-indicator` · `page-enter` · `page-exit`
 
 ---
 
-*Last updated: April 22, 2026*
-*App Version: 1.0.0*
+## 9. Navigation & Layout
+
+### Root Layout
+- **Fonts:** Geist Sans + Geist Mono
+- **ThemeProvider** (next-themes): class-based, default light, system-enabled
+- **Toaster** component (shadcn/ui)
+- **Viewport:** device-width, no user scaling, theme-color #652D90
+
+### Mobile Container
+- Max-width 430px, centered with `shadow-xl`
+- Screen routing via Zustand `currentScreen` → component map
+- Auth guard: unauthenticated → login/onboarding only
+- BottomNav visible for authenticated users (hidden on onboarding/login/qr-scan)
+
+### Bottom Navigation (5 Tabs)
+
+| Tab | Icon | Screen | Special |
+|-----|------|--------|---------|
+| Home | Home | home | — |
+| Search | Search | search | — |
+| Scan | ScanLine | qr-scan | Center elevated button (-mt-6), purple circle, shadow-lg |
+| Borrowed | BookOpen | borrowed | Active borrows count badge |
+| Profile | User | profile | — |
+
+- **Active state:** Purple icon + font-semibold + animated dot indicator (layoutId="navIndicator")
+- **Glass effect** background
+
+---
+
+## 10. Utility Libraries
+
+### `src/lib/auth.ts`
+- `hashPassword(password)` — SHA-256 hash via Web Crypto API
+- `verifyPassword(password, hashedPassword)` — Compare hash
+- `getAvatarInitials(fullName)` — First letter of first + last name
+- `getBorrowDays(role, settings)` — Role→days mapping
+- `getMaxBorrow(role, settings)` — Role→max books mapping
+
+### `src/lib/covers.ts`
+- `coverMap` — Maps 9 title keywords to `/covers/*.png` image paths
+- `getBookCover(title)` — Fuzzy-match title to cover image path
+- `getResourceCover(coverImage, title)` — Priority: API coverImage > generated from title > null
+
+### `src/lib/db.ts`
+- PrismaClient singleton (prevents multiple instances in dev)
+- Logging enabled
+
+### `src/lib/utils.ts`
+- `cn(...inputs)` — Tailwind CSS class merge utility (clsx + twMerge)
+
+---
+
+## 11. Seed / Test Data
+
+### Test Accounts (password: `password123`)
+
+| Role | Name | Email | University ID | Extra |
+|------|------|-------|---------------|-------|
+| Student | Juan Dela Cruz | juan@university.edu | CS-2024-0001 | CS program, 3rd Year, streak=5 |
+| Faculty | Maria Santos | maria@university.edu | FAC-2024-0001 | CS Department, streak=12 |
+| Visitor | Alex Reyes | alex@university.edu | VIS-2024-0001 | — |
+
+### Resources (17 total)
+- **10 Books:** Introduction to Algorithms, Clean Code, Design Patterns, Deep Learning, The Pragmatic Programmer, Database System Concepts, Operating System Concepts, Computer Networks, AI: A Modern Approach, Computer Architecture
+- **4 Research:** ML: Probabilistic Perspective, Journal of CS Vol. 42, NeurIPS 2025, ACM Computing Surveys
+- **3 Magazines:** National Geographic Mar 2026, Time Magazine Spring 2026, Scientific American Apr 2026
+
+### Other Seed Data
+- **Borrow Records (5):** 2 active + 1 overdue (student), 2 returned (1 late, 1 on time)
+- **Notifications (6):** Due soon, overdue, reservation ready, library hours, reservation confirmed, return reminder
+- **Announcements (2):** Extended hours for finals, New AI/ML arrivals
+- **Reservations (1):** Student → Clean Code (pending)
+- **Attendance (2):** Today (time-in only), Yesterday (7 hours)
+- **Cover Images (9):** Mapped in `public/covers/` directory
+
+---
+
+## 12. Technology Stack
+
+| Category | Technology |
+|----------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript 5 |
+| Styling | Tailwind CSS 4 |
+| UI Components | shadcn/ui (New York style, 40+ components) |
+| Icons | Lucide React |
+| Database | SQLite via Prisma ORM 6 |
+| State Management | Zustand 5 (persist middleware) |
+| Animations | Framer Motion 12 |
+| Theming | next-themes (class-based dark mode) |
+| Forms | react-hook-form + zod |
+| Charts | Recharts |
+| Tables | @tanstack/react-table + @tanstack/react-query |
+| Auth | NextAuth.js v4 (available, not actively used) |
+| Image Processing | Sharp |
+| Fonts | Geist Sans + Geist Mono |
+
+---
+
+## Changelog
+
+| Date | Change |
+|------|--------|
+| 2026-03-05 | Initial FEATURES.md created — comprehensive catalog of all 13 screens, 19 API endpoints, 8 DB models, and all supporting systems |
