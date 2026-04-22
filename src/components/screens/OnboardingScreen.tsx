@@ -137,29 +137,36 @@ export default function OnboardingScreen() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Progress bar */}
-      <div className="px-6 pt-4">
-        <div className="flex items-center gap-2 mb-2">
+      {/* Progress bar with gradient background */}
+      <div className="bg-lib-purple-50/50 px-6 pt-5 pb-4">
+        <div className="flex items-center gap-1.5 mb-3">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div
               key={i}
-              className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                i <= step ? 'bg-lib-purple' : 'bg-lib-purple-100'
+              className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                i < step ? 'bg-lib-purple' : i === step ? 'bg-lib-purple shadow-sm shadow-lib-purple/30' : 'bg-lib-purple-200'
               }`}
             />
           ))}
         </div>
         <div className="flex items-center justify-between">
           {step > 0 ? (
-            <button onClick={handleBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50">
+            <button onClick={handleBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-100 active:bg-lib-purple-200 transition-colors">
               <ArrowLeft className="w-5 h-5 text-lib-purple" />
             </button>
           ) : (
             <div className="w-9" />
           )}
-          <span className="text-xs text-muted-foreground font-medium">
-            Step {step + 1} of {totalSteps}
-          </span>
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: totalSteps }).map((_, i) => (
+              <div
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                  i === step ? 'bg-lib-purple scale-125' : i < step ? 'bg-lib-purple-400' : 'bg-lib-purple-200'
+                }`}
+              />
+            ))}
+          </div>
           <div className="w-9" />
         </div>
       </div>
@@ -179,26 +186,34 @@ export default function OnboardingScreen() {
           >
             {step === 0 && (
               <div className="flex flex-col items-center">
-                <div className="w-20 h-20 rounded-full bg-purple-gradient flex items-center justify-center mb-4">
-                  <BookOpen className="w-10 h-10 text-white" />
-                </div>
-                <h2 className="text-xl font-bold text-foreground mb-1">Welcome to LibLog</h2>
-                <p className="text-sm text-muted-foreground mb-6 text-center">
-                  Choose your role to get started
+                <motion.div
+                  initial={{ scale: 0, rotate: -90 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                  className="w-24 h-24 rounded-3xl bg-purple-gradient flex items-center justify-center mb-5 shadow-lg shadow-lib-purple/25"
+                >
+                  <BookOpen className="w-12 h-12 text-white" />
+                </motion.div>
+                <h2 className="text-2xl font-bold text-foreground mb-1">Welcome to LibLog</h2>
+                <p className="text-sm text-muted-foreground mb-6 text-center max-w-[260px]">
+                  Choose your role to get started with the digital library
                 </p>
                 <div className="w-full space-y-3">
-                  {roleCards.map((r) => {
+                  {roleCards.map((r, idx) => {
                     const selected = onboardingData.role === r.id
                     const Icon = r.icon
                     return (
                       <motion.button
                         key={r.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.1 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setOnboardingData({ role: r.id })}
-                        className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
+                        className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 ${
                           selected
-                            ? 'border-lib-purple bg-lib-purple-50'
-                            : 'border-gray-200 bg-white hover:border-lib-purple-200'
+                            ? 'border-lib-purple bg-lib-purple-50 shadow-md shadow-lib-purple/10'
+                            : 'border-gray-200 bg-white hover:border-lib-purple-200 hover:shadow-sm'
                         }`}
                       >
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${

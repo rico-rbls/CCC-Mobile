@@ -13,6 +13,7 @@ import ProfileScreen from '@/components/screens/ProfileScreen'
 import SettingsScreen from '@/components/screens/SettingsScreen'
 import NotificationsScreen from '@/components/screens/NotificationsScreen'
 import BookDetailScreen from '@/components/screens/BookDetailScreen'
+import AttendanceScreen from '@/components/screens/AttendanceScreen'
 import BottomNav from '@/components/layout/BottomNav'
 
 const screenComponents: Record<string, React.ComponentType> = {
@@ -26,6 +27,7 @@ const screenComponents: Record<string, React.ComponentType> = {
   settings: SettingsScreen,
   notifications: NotificationsScreen,
   'book-detail': BookDetailScreen,
+  attendance: AttendanceScreen,
 }
 
 // Screens that should NOT show bottom nav

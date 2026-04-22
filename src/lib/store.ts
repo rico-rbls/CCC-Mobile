@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type AppScreen = 'onboarding' | 'home' | 'search' | 'qr-scan' | 'borrowed' | 'profile' | 'settings' | 'notifications' | 'book-detail' | 'login'
+export type AppScreen = 'onboarding' | 'home' | 'search' | 'qr-scan' | 'borrowed' | 'profile' | 'settings' | 'notifications' | 'book-detail' | 'login' | 'attendance'
 
 export interface UserState {
   id: string
@@ -136,8 +136,14 @@ export const useAppStore = create<AppState>()(
       logout: () => set({ 
         user: null, 
         isAuthenticated: false, 
-        currentScreen: 'onboarding',
-        previousScreen: null 
+        currentScreen: 'login',
+        previousScreen: null,
+        onboardingStep: 0,
+        onboardingData: defaultOnboardingData,
+        selectedBookId: null,
+        searchQuery: '',
+        searchCategory: 'all',
+        unreadCount: 0,
       }),
 
       // Onboarding

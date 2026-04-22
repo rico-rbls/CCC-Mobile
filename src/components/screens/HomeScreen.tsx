@@ -1,24 +1,105 @@
 'use client'
 
 import { useAppStore, type BorrowedBook, type ResourceItem } from '@/lib/store'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Flame, Bell, Settings, QrCode, BookOpen, Bookmark,
-  ChevronRight, Clock, TrendingUp, Loader2
+  ChevronRight, Clock, TrendingUp, Loader2, Megaphone, X,
+  CalendarDays, Star, Calendar,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { useEffect, useState, useCallback } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Badge } from '@/components/ui/badge'
+import { useEffect, useState, useCallback, useRef } from 'react'
 
+// ── Types ──────────────────────────────────────────────────────────
+interface Announcement {
+  id: string
+  title: string
+  message: string
+  targetRoles: string
+  isActive: boolean
+  createdAt: string
+}
+
+interface TrendingItem {
+  rank: number
+  title: string
+  author: string
+  borrows: number
+}
+
+// ── Section header with purple accent bar ──────────────────────────
+function SectionHeader({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 mb-3">
+      <div className="w-1 h-5 rounded-full bg-lib-purple" />
+      {icon}
+      <h3 className="font-bold text-foreground">{children}</h3>
+    </div>
+  )
+}
+
+// ── Shimmer / skeleton card ────────────────────────────────────────
+function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-3 w-1/2" />
+      <Skeleton className="h-1.5 w-full" />
+    </div>
+  )
+}
+
+function SkeletonRecommendations() {
+  return (
+    <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="flex-shrink-0 w-32 space-y-2">
+          <Skeleton className="w-32 h-44 rounded-xl" />
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-2 w-16" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ── Stagger animation variants ─────────────────────────────────────
+const sectionVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.35, ease: 'easeOut' },
+  }),
+}
+
+// ── Main component ─────────────────────────────────────────────────
 export default function HomeScreen() {
   const { user, setCurrentScreen, setSelectedBookId, unreadCount } = useAppStore()
+
+  // Data state
   const [borrowedBooks, setBorrowedBooks] = useState<BorrowedBook[]>([])
   const [recommendations, setRecommendations] = useState<ResourceItem[]>([])
-  const [trending, setTrending] = useState<{ rank: number; title: string; author: string; borrows: number }[]>([])
-  const [loading, setLoading] = useState(true)
+  const [trending, setTrending] = useState<TrendingItem[]>([])
+  const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(new Set())
   const [libraryOpen, setLibraryOpen] = useState(true)
   const [closingTime, setClosingTime] = useState('9PM')
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
 
+  // Announcement carousel
+  const [announcementIndex, setAnnouncementIndex] = useState(0)
+  const carouselRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Pull-to-refresh
+  const [pullDistance, setPullDistance] = useState(0)
+  const touchStartY = useRef(0)
+
+  // ── Fetch all data ────────────────────────────────────────────
   const fetchData = useCallback(async () => {
     if (!user?.id) return
     try {
@@ -50,24 +131,35 @@ export default function HomeScreen() {
         setBorrowedBooks(books)
       }
 
-      // Fetch resources for recommendations
-      const resRes = await fetch('/api/resources?limit=6')
-      const resData = await resRes.json()
-      if (resRes.ok && resData.resources) {
-        const items: ResourceItem[] = resData.resources.map((r: Record<string, unknown>) => ({
-          id: r.id as string,
-          title: r.title as string,
-          author: r.author as string,
-          category: r.category as 'book' | 'research' | 'magazine',
-          coverImage: r.coverImage as string | null,
-          availableCopies: r.availableCopies as number,
-          totalCopies: r.copies as number,
-          shelfLocation: r.shelfLocation as string,
-          status: r.status as string,
-          subject: r.subject as string,
-          tags: (r.tags as string || '').split(',').filter(Boolean),
-        }))
-        setRecommendations(items)
+      // Fetch program-based recommendations
+      const program = user?.program || ''
+      let programResources: ResourceItem[] = []
+      if (program) {
+        const progRes = await fetch(`/api/resources?subject=${encodeURIComponent(program)}&limit=6`)
+        const progData = await progRes.json()
+        if (progRes.ok && progData.resources) {
+          programResources = progData.resources.map(mapResource)
+        }
+      }
+
+      // Fetch general recommendations as fallback
+      const genRes = await fetch('/api/resources?limit=6')
+      const genData = await genRes.json()
+      let generalResources: ResourceItem[] = []
+      if (genRes.ok && genData.resources) {
+        generalResources = genData.resources.map(mapResource)
+      }
+
+      // Merge: program-based first, then fill with general, deduplicate
+      const seen = new Set(programResources.map(r => r.id))
+      const merged = [...programResources, ...generalResources.filter(r => !seen.has(r.id))].slice(0, 6)
+      setRecommendations(merged.length > 0 ? merged : generalResources)
+
+      // Fetch announcements
+      const annRes = await fetch('/api/announcements')
+      const annData = await annRes.json()
+      if (annRes.ok && Array.isArray(annData)) {
+        setAnnouncements(annData)
       }
 
       // Fetch library settings
@@ -85,11 +177,30 @@ export default function HomeScreen() {
       console.error('Failed to fetch home data:', e)
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
-  }, [user?.id])
+  }, [user?.id, user?.program])
 
+  // Helper to map resource from API
+  function mapResource(r: Record<string, unknown>): ResourceItem {
+    return {
+      id: r.id as string,
+      title: r.title as string,
+      author: r.author as string,
+      category: r.category as 'book' | 'research' | 'magazine',
+      coverImage: r.coverImage as string | null,
+      availableCopies: r.availableCopies as number,
+      totalCopies: r.copies as number,
+      shelfLocation: r.shelfLocation as string,
+      status: r.status as string,
+      subject: r.subject as string,
+      tags: (r.tags as string || '').split(',').filter(Boolean),
+      publicationDate: r.publicationDate as string | undefined,
+    } as ResourceItem & { publicationDate?: string }
+  }
+
+  // ── Trending data ─────────────────────────────────────────────
   useEffect(() => {
-    // Use mock trending data for now
     setTrending([
       { rank: 1, title: 'Introduction to Algorithms', author: 'Cormen et al.', borrows: 142 },
       { rank: 2, title: 'Clean Code', author: 'Robert C. Martin', borrows: 128 },
@@ -103,6 +214,49 @@ export default function HomeScreen() {
     fetchData()
   }, [fetchData])
 
+  // ── Announcement auto-rotate carousel ─────────────────────────
+  const visibleAnnouncements = announcements.filter(a => !dismissedAnnouncements.has(a.id))
+
+  useEffect(() => {
+    if (visibleAnnouncements.length <= 1) {
+      if (carouselRef.current) clearInterval(carouselRef.current)
+      return
+    }
+    carouselRef.current = setInterval(() => {
+      setAnnouncementIndex(prev => (prev + 1) % visibleAnnouncements.length)
+    }, 5000)
+    return () => {
+      if (carouselRef.current) clearInterval(carouselRef.current)
+    }
+  }, [visibleAnnouncements.length])
+
+  useEffect(() => {
+    if (announcementIndex >= visibleAnnouncements.length) {
+      setAnnouncementIndex(0)
+    }
+  }, [announcementIndex, visibleAnnouncements.length])
+
+  // ── Pull-to-refresh ───────────────────────────────────────────
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const diff = e.touches[0].clientY - touchStartY.current
+    if (diff > 0 && diff < 100) {
+      setPullDistance(diff)
+    }
+  }
+
+  const handleTouchEnd = () => {
+    if (pullDistance > 60 && !refreshing) {
+      setRefreshing(true)
+      fetchData()
+    }
+    setPullDistance(0)
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────
   const greeting = () => {
     const h = new Date().getHours()
     if (h < 12) return 'Good morning'
@@ -110,11 +264,14 @@ export default function HomeScreen() {
     return 'Good evening'
   }
 
-  const formatDate = () => {
+  const formatFullDate = () => {
     const d = new Date()
-    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    return `${days[d.getDay()]}/${months[d.getMonth()]}/${String(d.getDate()).padStart(2, '0')}`
+    return d.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
   }
 
   const activeBook = borrowedBooks[0]
@@ -122,18 +279,71 @@ export default function HomeScreen() {
   const elapsed = (activeBook as BorrowedBook & { _elapsed?: number })?._elapsed || 0
   const progressPercent = activeBook ? Math.min(100, Math.max(0, (elapsed / totalDays) * 100)) : 0
 
+  const currentAnnouncement = visibleAnnouncements[announcementIndex] || null
+
+  // ── Quick actions config ──────────────────────────────────────
+  const quickActions = [
+    { label: 'Scan QR', subtitle: 'Attendance', icon: QrCode, bg: 'bg-lib-purple', text: 'text-white', screen: 'qr-scan' as const },
+    { label: 'My Loans', subtitle: 'View history', icon: BookOpen, bg: 'bg-lib-purple-50', text: 'text-lib-purple', screen: 'borrowed' as const },
+    { label: 'Reservations', subtitle: 'Track items', icon: Bookmark, bg: 'bg-lib-purple-50', text: 'text-lib-purple', screen: 'borrowed' as const },
+    { label: 'Attendance', subtitle: 'Check in', icon: Calendar, bg: 'bg-lib-purple-50', text: 'text-lib-purple', screen: 'home' as const },
+  ]
+
+  // ── Loading state ─────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 items-center justify-center">
-        <Loader2 className="w-8 h-8 text-lib-purple animate-spin" />
-        <p className="text-sm text-muted-foreground mt-2">Loading...</p>
+      <div className="flex flex-col min-h-screen bg-gray-50">
+        <div className="bg-white px-4 pt-4 pb-3">
+          <div className="flex items-center justify-between mb-3">
+            <Skeleton className="h-5 w-28" />
+            <div className="flex gap-2">
+              <Skeleton className="w-9 h-9 rounded-full" />
+              <Skeleton className="w-9 h-9 rounded-full" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3 mb-3">
+            <Skeleton className="w-11 h-11 rounded-full" />
+            <div className="space-y-1.5">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-56" />
+            </div>
+          </div>
+          <Skeleton className="h-7 w-56 rounded-full" />
+        </div>
+        <div className="flex-1 px-4 py-4 space-y-4">
+          <SkeletonCard />
+          <SkeletonRecommendations />
+        </div>
       </div>
     )
   }
 
+  // ── Render ────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Top section */}
+    <div
+      className="flex flex-col min-h-screen bg-gray-50"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      <AnimatePresence>
+        {pullDistance > 0 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: Math.min(pullDistance * 0.5, 40), opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="flex items-center justify-center overflow-hidden"
+          >
+            <Loader2 className={`w-5 h-5 text-lib-purple ${refreshing ? 'animate-spin' : ''}`} />
+            <span className="text-xs text-lib-purple ml-1.5">
+              {refreshing ? 'Refreshing...' : 'Pull to refresh'}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Top section ─────────────────────────────────────── */}
       <div className="bg-white px-4 pt-4 pb-3">
         {/* Top bar */}
         <div className="flex items-center justify-between mb-3">
@@ -145,7 +355,8 @@ export default function HomeScreen() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentScreen('notifications')}
-              className="relative p-2 rounded-full hover:bg-lib-purple-50"
+              className="relative p-2 rounded-full hover:bg-lib-purple-50 transition-colors"
+              aria-label="Notifications"
             >
               <Bell className="w-5 h-5 text-foreground" />
               {unreadCount > 0 && (
@@ -156,7 +367,8 @@ export default function HomeScreen() {
             </button>
             <button
               onClick={() => setCurrentScreen('settings')}
-              className="p-2 rounded-full hover:bg-lib-purple-50"
+              className="p-2 rounded-full hover:bg-lib-purple-50 transition-colors"
+              aria-label="Settings"
             >
               <Settings className="w-5 h-5 text-foreground" />
             </button>
@@ -169,15 +381,26 @@ export default function HomeScreen() {
             <span className="text-white font-bold text-sm">{user?.avatarInitials ?? 'U'}</span>
           </div>
           <div>
-            <h2 className="font-bold text-foreground">{greeting()}, {user?.fullName?.split(' ')[0] ?? 'User'}!</h2>
+            <AnimatePresence mode="wait">
+              <motion.h2
+                key={greeting()}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 8 }}
+                transition={{ duration: 0.25 }}
+                className="font-bold text-foreground"
+              >
+                {greeting()}, {user?.fullName?.split(' ')[0] ?? 'User'}!
+              </motion.h2>
+            </AnimatePresence>
             <p className="text-xs text-muted-foreground">
               {[user?.program, user?.yearLevel, user?.role].filter(Boolean).map(s => s?.charAt(0).toUpperCase() + s?.slice(1)).join(' · ')}
             </p>
           </div>
         </div>
 
-        {/* Library status + date */}
-        <div className="flex items-center justify-between">
+        {/* Library status badge */}
+        <div className="flex items-center justify-between mb-1">
           <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${
             libraryOpen
               ? 'bg-green-50 border-green-200'
@@ -188,73 +411,206 @@ export default function HomeScreen() {
               Library {libraryOpen ? 'Open' : 'Closed'} · {libraryOpen ? `Closes ${closingTime}` : 'Opens tomorrow'}
             </span>
           </div>
-          <span className="text-xs font-semibold text-lib-purple">{formatDate()}</span>
+        </div>
+
+        {/* Full date display */}
+        <div className="flex items-center gap-1.5 mt-1.5">
+          <CalendarDays className="w-3.5 h-3.5 text-lib-purple" />
+          <span className="text-xs text-muted-foreground font-medium">{formatFullDate()}</span>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 px-4 py-4 space-y-4 overflow-y-auto">
-        {/* Active borrowed book */}
-        {activeBook && (
+      {/* ── Subtle divider ──────────────────────────────────── */}
+      <div className="h-px bg-gradient-to-r from-transparent via-lib-purple-200 to-transparent" />
+
+      {/* ── Main content ─────────────────────────────────────── */}
+      <div className="flex-1 px-4 py-4 space-y-5 overflow-y-auto custom-scrollbar">
+
+        {/* ── Announcements section ────────────────────────── */}
+        {visibleAnnouncements.length > 0 && currentAnnouncement && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-sm overflow-hidden border-l-4 border-lib-purple"
+            custom={0}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
           >
-            <div className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground text-sm leading-tight">{activeBook.title}</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">{activeBook.author}</p>
+            <SectionHeader icon={<Megaphone className="w-4 h-4 text-lib-purple" />}>Announcements</SectionHeader>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentAnnouncement.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="bg-lib-purple-50 border border-lib-purple-200 rounded-2xl p-4 relative"
+              >
+                <button
+                  onClick={() => {
+                    setDismissedAnnouncements(prev => new Set(prev).add(currentAnnouncement.id))
+                    setAnnouncementIndex(0)
+                  }}
+                  className="absolute top-3 right-3 p-1 rounded-full hover:bg-lib-purple-100 transition-colors"
+                  aria-label="Dismiss announcement"
+                >
+                  <X className="w-3.5 h-3.5 text-lib-purple" />
+                </button>
+                <div className="flex items-start gap-3 pr-6">
+                  <div className="w-8 h-8 rounded-lg bg-lib-purple flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Megaphone className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-semibold text-lib-purple text-sm leading-tight">{currentAnnouncement.title}</h4>
+                    <p className="text-xs text-lib-purple-700 mt-1 leading-relaxed">{currentAnnouncement.message}</p>
+                  </div>
                 </div>
-                <div className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                  activeBook.status === 'overdue'
-                    ? 'bg-red-100 text-red-700'
-                    : activeBook.daysLeft <= 3
-                    ? 'bg-yellow-100 text-yellow-700'
-                    : 'bg-lib-purple-50 text-lib-purple'
-                }`}>
-                  {activeBook.status === 'overdue'
-                    ? `${Math.abs(activeBook.daysLeft)} days overdue`
-                    : `${activeBook.daysLeft} days left`
-                  }
-                </div>
-              </div>
-              <Progress value={progressPercent} className="h-1.5 mt-2" />
-              <div className="flex items-center justify-between mt-1.5">
-                <span className="text-[10px] text-muted-foreground">Borrowed {activeBook.borrowDate}</span>
-                <span className="text-[10px] text-muted-foreground">Due {activeBook.dueDate}</span>
-              </div>
-            </div>
+                {/* Carousel dots */}
+                {visibleAnnouncements.length > 1 && (
+                  <div className="flex items-center justify-center gap-1.5 mt-3">
+                    {visibleAnnouncements.map((a, idx) => (
+                      <button
+                        key={a.id}
+                        onClick={() => setAnnouncementIndex(idx)}
+                        className={`w-1.5 h-1.5 rounded-full transition-all ${
+                          idx === announcementIndex ? 'bg-lib-purple w-4' : 'bg-lib-purple-300'
+                        }`}
+                        aria-label={`Go to announcement ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </motion.div>
         )}
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: 'Scan QR', icon: QrCode, bg: 'bg-lib-purple', text: 'text-white', screen: 'qr-scan' as const },
-            { label: 'My Loans', icon: BookOpen, bg: 'bg-lib-purple-50', text: 'text-lib-purple', screen: 'borrowed' as const },
-            { label: 'Reservations', icon: Bookmark, bg: 'bg-lib-purple-50', text: 'text-lib-purple', screen: 'borrowed' as const },
-          ].map((action) => (
-            <motion.button
-              key={action.label}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setCurrentScreen(action.screen)}
-              className="flex flex-col items-center gap-2 p-4 rounded-2xl"
+        {/* ── Active borrowed book card ───────────────────── */}
+        <motion.div
+          custom={1}
+          variants={sectionVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <SectionHeader>Current Borrow</SectionHeader>
+          {activeBook ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl shadow-sm overflow-hidden relative"
             >
-              <div className={`w-12 h-12 rounded-xl ${action.bg} flex items-center justify-center`}>
-                <action.icon className={`w-6 h-6 ${action.text}`} />
-              </div>
-              <span className="text-xs font-medium text-foreground">{action.label}</span>
-            </motion.button>
-          ))}
-        </div>
+              {/* Gradient overlay on left border */}
+              <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-2xl" />
 
-        {/* Recommended for You */}
+              <div className="p-4 pl-5">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-foreground text-sm leading-tight">{activeBook.title}</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">{activeBook.author}</p>
+                  </div>
+                  <div className={`px-2 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 ml-2 ${
+                    activeBook.status === 'overdue'
+                      ? 'bg-red-100 text-red-700'
+                      : activeBook.daysLeft <= 3
+                      ? 'bg-yellow-100 text-yellow-700'
+                      : 'bg-lib-purple-50 text-lib-purple'
+                  }`}>
+                    {activeBook.status === 'overdue'
+                      ? `${Math.abs(activeBook.daysLeft)} days overdue`
+                      : `${activeBook.daysLeft} days left`
+                    }
+                  </div>
+                </div>
+
+                {/* Category badge */}
+                {activeBook.category && (
+                  <Badge variant="secondary" className="mb-2 text-[10px] h-5 bg-lib-purple-50 text-lib-purple border-lib-purple-200">
+                    {activeBook.category}
+                  </Badge>
+                )}
+
+                <Progress value={progressPercent} className="h-1.5 mt-2" />
+                <div className="flex items-center justify-between mt-1.5">
+                  <span className="text-[10px] text-muted-foreground">Borrowed {activeBook.borrowDate}</span>
+                  <span className="text-[10px] text-muted-foreground">Due {activeBook.dueDate}</span>
+                </div>
+
+                {/* View Details button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2 h-7 px-2 text-lib-purple hover:text-lib-purple-light hover:bg-lib-purple-50 text-xs font-medium p-0"
+                  onClick={() => { setSelectedBookId(activeBook.id); setCurrentScreen('book-detail') }}
+                >
+                  View Details <ChevronRight className="w-3 h-3 ml-0.5" />
+                </Button>
+              </div>
+            </motion.div>
+          ) : (
+            /* Empty state - no borrowed books */
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl shadow-sm p-6 flex flex-col items-center text-center"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-lib-purple-50 flex items-center justify-center mb-3">
+                <BookOpen className="w-7 h-7 text-lib-purple" />
+              </div>
+              <h4 className="font-semibold text-foreground text-sm">No Active Borrows</h4>
+              <p className="text-xs text-muted-foreground mt-1 mb-3 leading-relaxed">
+                You don&apos;t have any books checked out right now.<br />Explore the catalog to find your next read!
+              </p>
+              <Button
+                size="sm"
+                className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-8 px-4"
+                onClick={() => setCurrentScreen('search')}
+              >
+                <BookOpen className="w-3.5 h-3.5 mr-1.5" />
+                Browse Catalog
+              </Button>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* ── Quick Actions ────────────────────────────────── */}
+        <motion.div
+          custom={2}
+          variants={sectionVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <SectionHeader>Quick Actions</SectionHeader>
+          <div className="bg-white rounded-2xl shadow-sm p-3">
+            <div className="grid grid-cols-4 gap-2">
+              {quickActions.map((action) => (
+                <motion.button
+                  key={action.label}
+                  whileTap={{ scale: 0.93 }}
+                  onClick={() => setCurrentScreen(action.screen)}
+                  className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl hover:bg-lib-purple-50/50 transition-colors"
+                >
+                  <div className={`w-10 h-10 rounded-xl ${action.bg} flex items-center justify-center`}>
+                    <action.icon className={`w-5 h-5 ${action.text}`} />
+                  </div>
+                  <span className="text-[10px] font-semibold text-foreground leading-tight">{action.label}</span>
+                  <span className="text-[9px] text-muted-foreground leading-tight">{action.subtitle}</span>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── Subtle divider ──────────────────────────────── */}
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+
+        {/* ── Recommended for You ──────────────────────────── */}
         {recommendations.length > 0 && (
-          <div>
+          <motion.div
+            custom={3}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
+          >
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-foreground">Recommended for You</h3>
+              <SectionHeader>Recommended for You</SectionHeader>
               <button
                 onClick={() => setCurrentScreen('search')}
                 className="text-xs text-lib-purple font-medium flex items-center gap-0.5"
@@ -263,42 +619,70 @@ export default function HomeScreen() {
               </button>
             </div>
             <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
-              {recommendations.map((book) => (
-                <motion.button
-                  key={book.id}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
-                  className="flex-shrink-0 w-32"
-                >
-                  <div className="w-32 h-44 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center">
-                    <BookOpen className="w-8 h-8 text-white/50" />
-                  </div>
-                  <div className="flex items-center gap-1 mb-0.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${book.availableCopies > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
-                    <span className="text-[10px] text-muted-foreground">
-                      {book.availableCopies > 0 ? `${book.availableCopies} available` : 'Unavailable'}
-                    </span>
-                  </div>
-                  <h4 className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{book.title}</h4>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{book.author}</p>
-                </motion.button>
-              ))}
+              {recommendations.map((book) => {
+                const isForYou = user?.program && book.subject?.toLowerCase().includes(user.program.toLowerCase())
+                return (
+                  <motion.button
+                    key={book.id}
+                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
+                    className="flex-shrink-0 w-32 group"
+                  >
+                    <div className="w-32 h-44 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                      <BookOpen className="w-8 h-8 text-white/50" />
+                      {/* Category badge on cover */}
+                      {book.category && (
+                        <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                          {book.category}
+                        </span>
+                      )}
+                      {/* "For You" star badge */}
+                      {isForYou && (
+                        <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none flex items-center gap-0.5">
+                          <Star className="w-2.5 h-2.5 fill-current" />
+                          For You
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className={`w-1.5 h-1.5 rounded-full ${book.availableCopies > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
+                      <span className="text-[10px] text-muted-foreground">
+                        {book.availableCopies > 0 ? `${book.availableCopies} available` : 'Unavailable'}
+                      </span>
+                    </div>
+                    <h4 className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{book.title}</h4>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{book.author}</p>
+                    {/* Publication date if available */}
+                    {(book as ResourceItem & { publicationDate?: string }).publicationDate && (
+                      <p className="text-[9px] text-muted-foreground mt-0.5">
+                        {(book as ResourceItem & { publicationDate?: string }).publicationDate}
+                      </p>
+                    )}
+                  </motion.button>
+                )
+              })}
             </div>
-          </div>
+          </motion.div>
         )}
 
-        {/* Trending in Your Department */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="w-4 h-4 text-lib-purple" />
-            <h3 className="font-bold text-foreground">Trending in Your Department</h3>
-          </div>
+        {/* ── Subtle divider ──────────────────────────────── */}
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+
+        {/* ── Trending in Your Department ──────────────────── */}
+        <motion.div
+          custom={4}
+          variants={sectionVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <SectionHeader icon={<TrendingUp className="w-4 h-4 text-lib-purple" />}>Trending in Your Department</SectionHeader>
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             {trending.map((item, index) => (
               <button
                 key={item.rank}
                 onClick={() => { setSelectedBookId(`t${item.rank}`); setCurrentScreen('book-detail') }}
-                className={`flex items-center gap-3 w-full px-4 py-3 hover:bg-lib-purple-50/50 transition-colors ${
+                className={`flex items-center gap-3 w-full px-4 py-3 hover:bg-lib-purple-50/50 active:bg-lib-purple-50 transition-colors ${
                   index < trending.length - 1 ? 'border-b border-gray-100' : ''
                 }`}
               >
@@ -316,10 +700,10 @@ export default function HomeScreen() {
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Extra padding at bottom for nav */}
-        <div className="h-4" />
+        {/* ── Bottom safe area padding for nav bar ──────── */}
+        <div className="h-20" />
       </div>
     </div>
   )

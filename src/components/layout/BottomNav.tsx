@@ -15,6 +15,10 @@ const navItems: { id: AppScreen; icon: typeof Home; label: string }[] = [
 export default function BottomNav() {
   const { currentScreen, setCurrentScreen } = useAppStore()
 
+  const handleNavClick = (screenId: AppScreen) => {
+    setCurrentScreen(screenId)
+  }
+
   return (
     <nav className="glass-effect border-t border-lib-purple-100 safe-bottom">
       <div className="flex items-end justify-around px-2 pt-2 pb-2">
@@ -27,16 +31,13 @@ export default function BottomNav() {
             return (
               <button
                 key={item.id}
-                onClick={() => setCurrentScreen(item.id)}
-                className="flex flex-col items-center -mt-6 relative"
+                onClick={() => handleNavClick(item.id)}
+                className="flex flex-col items-center -mt-6 relative z-10"
                 aria-label={item.label}
               >
-                <motion.div
-                  whileTap={{ scale: 0.9 }}
-                  className="w-14 h-14 rounded-full bg-lib-purple flex items-center justify-center shadow-lg shadow-lib-purple/30"
-                >
+                <div className="w-14 h-14 rounded-full bg-lib-purple flex items-center justify-center shadow-lg shadow-lib-purple/30 active:scale-90 transition-transform">
                   <Icon className="w-6 h-6 text-white" />
-                </motion.div>
+                </div>
                 <span className="text-[10px] mt-1 text-lib-purple font-medium">
                   {item.label}
                 </span>
@@ -47,17 +48,15 @@ export default function BottomNav() {
           return (
             <button
               key={item.id}
-              onClick={() => setCurrentScreen(item.id)}
+              onClick={() => handleNavClick(item.id)}
               className="flex flex-col items-center gap-0.5 py-1 min-w-[48px] min-h-[44px] justify-center"
               aria-label={item.label}
             >
-              <motion.div whileTap={{ scale: 0.9 }}>
-                <Icon
-                  className={`w-5 h-5 transition-colors ${
-                    isActive ? 'text-lib-purple' : 'text-gray-400'
-                  }`}
-                />
-              </motion.div>
+              <Icon
+                className={`w-5 h-5 transition-colors ${
+                  isActive ? 'text-lib-purple' : 'text-gray-400'
+                }`}
+              />
               <span
                 className={`text-[10px] transition-colors ${
                   isActive ? 'text-lib-purple font-semibold' : 'text-gray-400'
