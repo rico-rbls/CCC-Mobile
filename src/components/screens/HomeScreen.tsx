@@ -401,10 +401,10 @@ export default function HomeScreen() {
             <AnimatePresence mode="wait">
               <motion.h2
                 key={greeting()}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 8 }}
-                transition={{ duration: 0.25 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, ease: 'easeInOut' }}
                 className="font-bold text-foreground"
               >
                 {greeting()}, {user?.fullName?.split(' ')[0] ?? 'User'}!
@@ -416,14 +416,21 @@ export default function HomeScreen() {
           </div>
         </div>
 
-        {/* Library status badge */}
+        {/* Library status badge — pulse when Open */}
         <div className="flex items-center justify-between mb-1">
           <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${
             libraryOpen
               ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
               : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
           }`}>
-            <span className={`w-2 h-2 rounded-full ${libraryOpen ? 'bg-green-500' : 'bg-red-500'}`} />
+            <motion.span
+              className={`w-2 h-2 rounded-full ${libraryOpen ? 'bg-green-500' : 'bg-red-500'}`}
+              animate={libraryOpen ? {
+                scale: [1, 1.4, 1],
+                opacity: [1, 0.7, 1],
+              } : {}}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            />
             <span className={`text-xs font-medium ${libraryOpen ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
               Library {libraryOpen ? 'Open' : 'Closed'} · {libraryOpen ? `Closes ${closingTime}` : 'Opens tomorrow'}
             </span>
@@ -561,8 +568,14 @@ export default function HomeScreen() {
               animate={{ opacity: 1, y: 0 }}
               className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden relative card-hover-effect"
             >
-              {/* Gradient overlay on left border */}
-              <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-2xl" />
+              {/* Left border animation — fills from top to bottom on mount */}
+              <motion.div
+                className="absolute left-0 top-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-2xl origin-top"
+                initial={{ scaleY: 0 }}
+                animate={{ scaleY: 1 }}
+                transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+                style={{ bottom: 0 }}
+              />
 
               <div className="p-4 pl-5">
                 <div className="flex items-start justify-between mb-2">
@@ -659,9 +672,12 @@ export default function HomeScreen() {
           <SectionHeader>Quick Actions</SectionHeader>
           <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-3">
             <div className="grid grid-cols-4 gap-2">
-              {quickActions.map((action) => (
+              {quickActions.map((action, actionIndex) => (
                 <motion.button
                   key={action.label}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * actionIndex + 0.3, duration: 0.3, ease: 'easeOut' }}
                   whileTap={{ scale: 0.93 }}
                   onClick={() => setCurrentScreen(action.screen)}
                   className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl hover:bg-lib-purple-50/50 dark:hover:bg-gray-800 transition-colors"

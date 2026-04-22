@@ -2,8 +2,8 @@
 
 import { useAppStore, type AppScreen } from '@/lib/store'
 import { Home, Search, ScanLine, BookOpen, User } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState, useCallback } from 'react'
 
 const navItems: { id: AppScreen; icon: typeof Home; label: string }[] = [
   { id: 'home', icon: Home, label: 'Home' },
@@ -13,9 +13,23 @@ const navItems: { id: AppScreen; icon: typeof Home; label: string }[] = [
   { id: 'profile', icon: User, label: 'Profile' },
 ]
 
+// ── Ripple Effect Component ──────────────────────────────────────────
+function RippleEffect() {
+  return (
+    <motion.div
+      initial={{ scale: 0, opacity: 0.5 }}
+      animate={{ scale: 2.5, opacity: 0 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="absolute inset-0 rounded-full bg-white/30 pointer-events-none"
+    />
+  )
+}
+
 export default function BottomNav() {
   const { currentScreen, setCurrentScreen, user } = useAppStore()
   const [activeBorrows, setActiveBorrows] = useState(0)
+  const [rippleKey, setRippleKey] = useState(0)
+  const [prevScreen, setPrevScreen] = useState<AppScreen>(currentScreen)
 
   useEffect(() => {
     if (!user?.id) return
@@ -34,9 +48,16 @@ export default function BottomNav() {
     fetchCount()
   }, [user?.id, currentScreen])
 
-  const handleNavClick = (screenId: AppScreen) => {
+  const handleNavClick = useCallback((screenId: AppScreen) => {
+    setPrevScreen(currentScreen)
     setCurrentScreen(screenId)
-  }
+    if (screenId === 'qr-scan') {
+      setRippleKey(prev => prev + 1)
+    }
+  }, [currentScreen, setCurrentScreen])
+
+  // Track screen changes for indicator bounce
+  const screenChanged = prevScreen !== currentScreen
 
   return (
     <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-800/50 safe-bottom">
@@ -56,10 +77,14 @@ export default function BottomNav() {
               >
                 <motion.div
                   whileTap={{ scale: 0.85 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                  className="w-14 h-14 rounded-full bg-lib-purple flex items-center justify-center shadow-lg shadow-lib-purple/30"
+                  transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                  className="w-14 h-14 rounded-full bg-lib-purple flex items-center justify-center shadow-lg shadow-lib-purple/30 relative overflow-hidden"
                 >
-                  <Icon className="w-6 h-6 text-white" />
+                  {/* Ripple effect on press */}
+                  <AnimatePresence>
+                    {rippleKey > 0 && <RippleEffect key={rippleKey} />}
+                  </AnimatePresence>
+                  <Icon className="w-6 h-6 text-white relative z-10" />
                 </motion.div>
                 <span className="text-[10px] mt-1 text-lib-purple dark:text-lib-purple-300 font-medium">
                   {item.label}
@@ -76,15 +101,23 @@ export default function BottomNav() {
               aria-label={item.label}
             >
               <motion.div
-                whileTap={{ scale: 0.8 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                whileTap={{ scale: 0.85 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 12, restDelta: 0.01 }}
                 className="relative"
+                style={{ transformOrigin: 'center center' }}
               >
-                <Icon
-                  className={`w-5 h-5 transition-colors ${
-                    isActive ? 'text-lib-purple' : 'text-gray-400 dark:text-gray-500'
-                  }`}
-                />
+                {/* Spring-back overshoot: scale from 0.85 → 1.05 → 1.0 on release */}
+                <motion.div
+                  animate={isActive ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+                  transition={{ duration: 0.35, ease: 'easeOut' }}
+                  key={`${item.id}-${isActive}`}
+                >
+                  <Icon
+                    className={`w-5 h-5 transition-colors ${
+                      isActive ? 'text-lib-purple' : 'text-gray-400 dark:text-gray-500'
+                    }`}
+                  />
+                </motion.div>
                 {/* Badge for active borrows */}
                 {item.id === 'borrowed' && activeBorrows > 0 && (
                   <span className="absolute -top-1.5 -right-2 w-4 h-4 rounded-full bg-lib-purple text-[8px] text-white font-bold flex items-center justify-center animate-badge-pulse">
@@ -99,13 +132,25 @@ export default function BottomNav() {
               >
                 {item.label}
               </span>
-              {isActive && (
-                <motion.div
-                  layoutId="navIndicator"
-                  className="w-1 h-1 rounded-full bg-lib-purple mt-0.5"
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                />
-              )}
+              {/* Active indicator dot with bounce */}
+              <AnimatePresence mode="wait">
+                {isActive && (
+                  <motion.div
+                    key={`indicator-${item.id}`}
+                    layoutId="navIndicator"
+                    className="w-1 h-1 rounded-full bg-lib-purple mt-0.5"
+                    initial={{ scale: 0, y: -4 }}
+                    animate={{ scale: [0, 1.5, 1], y: 0 }}
+                    exit={{ scale: 0, y: -4 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 500,
+                      damping: 20,
+                      mass: 0.5,
+                    }}
+                  />
+                )}
+              </AnimatePresence>
             </button>
           )
         })}

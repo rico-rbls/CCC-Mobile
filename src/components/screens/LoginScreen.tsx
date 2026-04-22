@@ -5,7 +5,7 @@ import { BookOpen, Eye, EyeOff, Loader2, GraduationCap, Library, BookMarked, Boo
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useToast } from '@/hooks/use-toast'
 
@@ -18,6 +18,12 @@ export default function LoginScreen() {
   const [emailFocused, setEmailFocused] = useState(false)
   const [passwordFocused, setPasswordFocused] = useState(false)
   const { toast } = useToast()
+
+  // Check if email is valid for button glow effect
+  const isValidEmail = useMemo(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }, [email])
 
   const handleLogin = async () => {
     setLoading(true)
@@ -68,14 +74,36 @@ export default function LoginScreen() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative overflow-hidden">
-      {/* Animated gradient background with floating icons */}
+      {/* Animated gradient background with floating icons — living gradient */}
       <div className="relative bg-purple-gradient px-6 pt-14 pb-20 rounded-b-[2.5rem] overflow-hidden">
-        {/* Animated gradient overlay */}
-        <div className="absolute inset-0 opacity-30" style={{
-          background: 'linear-gradient(135deg, rgba(155,91,191,0.4) 0%, transparent 40%, rgba(184,125,212,0.3) 70%, transparent 100%)',
-          animation: 'gradient-shift 6s ease infinite',
-          backgroundSize: '200% 200%',
-        }} />
+        {/* Living gradient overlay — slowly shifts colors like a living background */}
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            background: [
+              'linear-gradient(135deg, rgba(155,91,191,0.4) 0%, transparent 40%, rgba(184,125,212,0.3) 70%, transparent 100%)',
+              'linear-gradient(135deg, transparent 0%, rgba(155,91,191,0.3) 30%, rgba(101,45,144,0.4) 60%, transparent 100%)',
+              'linear-gradient(135deg, rgba(184,125,212,0.3) 0%, transparent 30%, rgba(155,91,191,0.5) 70%, transparent 100%)',
+              'linear-gradient(135deg, rgba(155,91,191,0.4) 0%, transparent 40%, rgba(184,125,212,0.3) 70%, transparent 100%)',
+            ],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ opacity: 0.35 }}
+        />
+        {/* Secondary slow-moving gradient layer for depth */}
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            background: [
+              'radial-gradient(ellipse at 20% 50%, rgba(184,125,212,0.2) 0%, transparent 50%)',
+              'radial-gradient(ellipse at 80% 30%, rgba(101,45,144,0.3) 0%, transparent 50%)',
+              'radial-gradient(ellipse at 40% 70%, rgba(155,91,191,0.2) 0%, transparent 50%)',
+              'radial-gradient(ellipse at 20% 50%, rgba(184,125,212,0.2) 0%, transparent 50%)',
+            ],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ opacity: 0.5 }}
+        />
 
         {/* Decorative floating book icons */}
         <div className="absolute top-8 left-4 animate-float-icon" style={{ animationDelay: '0s' }}>
@@ -105,14 +133,27 @@ export default function LoginScreen() {
           transition={{ duration: 0.5 }}
           className="flex flex-col items-center relative z-10"
         >
-          {/* App logo with glow */}
+          {/* App logo with continuous subtle glow pulse */}
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-            className="w-20 h-20 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mb-4 shadow-lg shadow-black/10 ring-1 ring-white/20 animate-micro-pulse-glow"
+            className="w-20 h-20 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mb-4 ring-1 ring-white/20"
+            style={{ boxShadow: '0 0 0 0 rgba(255,255,255,0)' }}
           >
-            <BookOpen className="w-10 h-10 text-white" />
+            {/* Glow pulse ring — continuous subtle glow */}
+            <motion.div
+              className="absolute inset-0 rounded-2xl"
+              animate={{
+                boxShadow: [
+                  '0 0 0 0 rgba(255,255,255,0.15)',
+                  '0 0 20px 8px rgba(155,91,191,0.3)',
+                  '0 0 0 0 rgba(255,255,255,0.15)',
+                ],
+              }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <BookOpen className="w-10 h-10 text-white relative z-10" />
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
@@ -219,12 +260,29 @@ export default function LoginScreen() {
               </div>
             </div>
 
-            {/* Login button with gradient and loading animation */}
+            {/* Login button with gradient, loading animation, and valid email glow */}
             <Button
               onClick={handleLogin}
               disabled={loading || !email || !password}
               className="w-full h-12 rounded-xl bg-lib-purple hover:bg-lib-purple-dark text-white font-semibold text-base disabled:opacity-50 shadow-lg shadow-lib-purple/25 active:scale-[0.98] transition-all relative overflow-hidden"
+              style={isValidEmail && !loading ? {
+                boxShadow: '0 0 20px 4px rgba(101, 45, 144, 0.35), 0 4px 14px -2px rgba(101, 45, 144, 0.25)',
+              } : undefined}
             >
+              {/* Glow effect when email is valid */}
+              {isValidEmail && !loading && (
+                <motion.div
+                  className="absolute inset-0 rounded-xl"
+                  animate={{
+                    boxShadow: [
+                      '0 0 15px 2px rgba(101, 45, 144, 0.3)',
+                      '0 0 25px 6px rgba(101, 45, 144, 0.45)',
+                      '0 0 15px 2px rgba(101, 45, 144, 0.3)',
+                    ],
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              )}
               <AnimatePresence mode="wait">
                 {loading ? (
                   <motion.div
@@ -232,7 +290,7 @@ export default function LoginScreen() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 relative z-10"
                   >
                     <div className="relative w-5 h-5">
                       <Loader2 className="w-5 h-5 animate-spin" />
@@ -245,6 +303,7 @@ export default function LoginScreen() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
+                    className="relative z-10"
                   >
                     Sign In
                   </motion.span>

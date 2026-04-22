@@ -3,6 +3,7 @@
 import { useAppStore, type ResourceItem } from '@/lib/store'
 import { Search, BookOpen, FileText, Newspaper, Loader2, Clock, TrendingUp, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { getResourceCover } from '@/lib/covers'
@@ -31,6 +32,8 @@ export default function SearchScreen() {
   const [recentlyViewed, setRecentlyViewed] = useState<ResourceItem[]>([])
   const [searchFocused, setSearchFocused] = useState(false)
   const [animatedCount, setAnimatedCount] = useState(0)
+  const [prevCount, setPrevCount] = useState(0)
+  const [countHighlight, setCountHighlight] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const fetchResources = useCallback(async (query: string, category: string) => {
@@ -102,7 +105,7 @@ export default function SearchScreen() {
     fetchRecentlyViewed()
   }, [searchCategory, fetchResources, fetchRecentlyViewed])
 
-  // Animate result count
+  // Animate result count and highlight on change
   useEffect(() => {
     const target = filtered.length
     if (animatedCount === target) return
@@ -110,6 +113,16 @@ export default function SearchScreen() {
     const timer = setTimeout(() => setAnimatedCount(prev => prev + step), 20)
     return () => clearTimeout(timer)
   }, [filtered.length, animatedCount])
+
+  // Highlight effect when count changes
+  useEffect(() => {
+    if (filtered.length !== prevCount && prevCount !== 0) {
+      setCountHighlight(true)
+      const timer = setTimeout(() => setCountHighlight(false), 600)
+      return () => clearTimeout(timer)
+    }
+    setPrevCount(filtered.length)
+  }, [filtered.length, prevCount])
 
   // Debounced search
   const handleSearchChange = (value: string) => {
@@ -192,24 +205,32 @@ export default function SearchScreen() {
           )}
         </AnimatePresence>
 
-        {/* Category filters */}
+        {/* Category filters with spring animation */}
         <div className="flex gap-2 overflow-x-auto hide-scrollbar">
           {categories.map((cat) => {
             const Icon = cat.icon
             const isActive = searchCategory === cat.id
             return (
-              <button
+              <motion.button
                 key={cat.id}
                 onClick={() => setSearchCategory(cat.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                whileTap={{ scale: 0.92 }}
+                layout
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                   isActive
                     ? 'bg-lib-purple text-white shadow-sm shadow-lib-purple/20'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-lib-purple-50 dark:hover:bg-gray-700'
                 }`}
               >
-                <Icon className="w-3 h-3" />
-                {cat.label}
-              </button>
+                <motion.span
+                  layout
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  className="flex items-center gap-1.5"
+                >
+                  <Icon className="w-3 h-3" />
+                  {cat.label}
+                </motion.span>
+              </motion.button>
             )
           })}
         </div>
@@ -218,8 +239,27 @@ export default function SearchScreen() {
       {/* Results */}
       <div className="flex-1 px-4 py-3 overflow-y-auto">
         {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 text-lib-purple animate-spin" />
+          <div className="space-y-3">
+            {/* Skeleton loading cards */}
+            {[0, 1, 2, 3].map((i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08 }}
+                className="bg-white dark:bg-gray-900 rounded-xl shadow-sm p-4 flex items-start gap-3"
+              >
+                <Skeleton className="w-14 h-[72px] rounded-lg flex-shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <div className="flex gap-2 pt-1">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-5 w-12 rounded-full" />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         ) : filtered.length === 0 && localQuery.trim() ? (
           <div className="flex flex-col items-center justify-center py-16">
@@ -233,17 +273,30 @@ export default function SearchScreen() {
           </div>
         ) : (
           <div className="space-y-3">
-            {/* Animated total results count */}
+            {/* Animated total results count with highlight */}
             {!isSearchEmpty && (
-              <motion.div
-                key={animatedCount}
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2"
-              >
-                <span className="text-xs font-semibold text-lib-purple">{animatedCount}</span>
-                <span className="text-xs text-muted-foreground">result{animatedCount !== 1 ? 's' : ''} found</span>
-              </motion.div>
+              <div className="flex items-center gap-2">
+                <motion.span
+                  key={animatedCount}
+                  initial={{ opacity: 0, y: -4, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  className={`text-xs font-semibold transition-colors duration-300 ${
+                    countHighlight ? 'text-lib-purple' : 'text-lib-purple'
+                  }`}
+                  style={countHighlight ? {
+                    textShadow: '0 0 8px rgba(101, 45, 144, 0.4)',
+                  } : undefined}
+                >
+                  {animatedCount}
+                </motion.span>
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-xs text-muted-foreground"
+                >
+                  result{animatedCount !== 1 ? 's' : ''} found
+                </motion.span>
+              </div>
             )}
 
             {/* Recently Viewed section when search is empty */}

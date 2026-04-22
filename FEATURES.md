@@ -66,13 +66,13 @@ A multi-step registration flow for new users with animated step-by-step progress
 
 User authentication screen with branded design:
 
-- **Purple gradient header** with animated floating book icons (5 icons, staggered delays)
-- **LibLog logo** with spring scale + rotate animation + micro-pulse-glow
+- **Living gradient header** with two animated gradient layers shifting through 4 color states each (8s & 10s cycles) for parallax effect
+- **LibLog logo** with spring scale + rotate animation + continuous glow pulse (2.5s cycle)
 - **Glass-card form** overlapping header (-mt-10):
   - Email input with GraduationCap icon + focus color transitions
   - Password input with show/hide toggle + focus ring
   - "Forgot password?" link (placeholder)
-  - Sign In button with gradient + shimmer-loading effect
+  - Sign In button with gradient + shimmer-loading effect + pulsing glow when email is valid (2s cycle)
   - Loading state: spinner + "Signing in..."
   - "Use Demo Account" button (auto-fills juan@university.edu / password123)
   - Register link → navigates to onboarding
@@ -89,13 +89,13 @@ User authentication screen with branded design:
 Personalized landing page with multiple content sections:
 
 1. **Top Bar:** Streak counter (flame icon + count), Notifications bell (unread badge), Settings gear
-2. **User Greeting:** Avatar initials circle, time-of-day greeting (morning/afternoon/evening, [First Name]), program/year/role subtitle
-3. **Library Status Badge:** Open/Closed indicator (green/red dot) + closing time
+2. **User Greeting:** Avatar initials circle, time-of-day greeting with crossfade transition (morning/afternoon/evening, [First Name]), program/year/role subtitle
+3. **Library Status Badge:** Open/Closed indicator with pulsing green dot when Open (2s cycle) + closing time
 4. **Full Date Display:** CalendarDays icon + formatted date
 5. **Announcements Carousel:** Auto-rotating (5s interval), dismissible cards with megaphone icon, carousel dot navigation
 6. **Today's Highlight:** Featured book card with purple gradient background, decorative circles, star badge, availability badge
-7. **Current Borrow:** Active book card with gradient left border, progress bar, days-left badge (color-coded: green > 3 days, yellow 1–3 days, red overdue), "View Details" button. Empty state with floating book animation + "Browse Catalog" CTA
-8. **Quick Actions:** 4-button grid — Scan QR, My Loans, Reservations, Attendance
+7. **Current Borrow:** Active book card with animated gradient left border (scaleY 0→1 on mount), progress bar, days-left badge (color-coded: green > 3 days, yellow 1–3 days, red overdue), "View Details" button. Empty state with floating book animation + "Browse Catalog" CTA
+8. **Quick Actions:** 4-button grid — Scan QR, My Loans, Reservations, Attendance (staggered entry, 0.1s delay per button)
 9. **Recommended for You:** Horizontal scrollable book covers with "For You" star badges (program-matched), availability dots, "See All" link
 10. **Trending in Your Department:** Ranked list (1–5) with borrow counts, numbered badges
 
@@ -113,12 +113,12 @@ Resource catalog search and browsing:
 
 - **Search input** with Search icon + clear button (X)
 - **Popular search suggestions** (6 tags: Algorithms, Deep Learning, Database, Nursing, Psychology, Clean Code) — shown when focused or empty
-- **Category filter pills:** All, Books, Research, Magazines — with icons
-- **Animated result count** (counting up/down with 20ms steps)
+- **Category filter pills** with spring animation on selection (whileTap scale 0.92, layout prop for smooth transitions)
+- **Animated result count** with purple text glow pulse on count change (600ms)
 - **Recently Viewed** horizontal scroll (when search empty)
 - **Result cards:** Cover image, title, author, category badge, tag pills (max 2), availability indicator
 - **Empty state** with search icon
-- **Loading spinner**
+- **Skeleton loading** — 4 skeleton cards with staggered entrance (replaces spinner)
 
 **Debounce:** 300ms on search input change.
 
@@ -158,11 +158,16 @@ Active loans and borrowing history:
 
 - **Tab switcher:** Active / History (with counts)
 - **Summary stats bar:** Active count + Returned count with colored dots
+- **Fines Summary Card** (when overdue items exist): Red-themed card with AlertTriangle icon, total fines owed, overdue count, fine rate (₱5.00/day), "Pay at the circulation desk" note
+- **Overdue Fine Badges:** Red "Overdue Fine: ₱XX.XX" badge with "Overdue X days · Fine: ₱XX.XX" per book
+- **Due Soon Warnings:** Amber "Due soon — return within X days to avoid fines" for books 1-3 days from due
+- **Color-coded accent borders:** Red gradient for overdue, amber for due-soon, purple for normal
+- **Success animation:** Confetti particles + green checkmark overlay on successful book return (2s display)
 - **Active book cards:** Cover image, title, author, borrow/due dates, gradient left border, days-left badge (color-coded), Return button
 - **History book cards:** "Returned on [date]" badge with checkmark, View button
 - **Empty state** with "Browse Catalog" CTA
 
-**Actions:** Return book → marks as returned + increments available copies.
+**Actions:** Return book → marks as returned + increments available copies + shows celebration animation.
 
 ---
 
@@ -284,6 +289,25 @@ App settings and account management:
 - Confirm new password + match validation
 - Error display
 - Cancel / Change Password buttons
+
+---
+
+### 2.14 Edit Profile
+
+**Screen:** `EditProfileScreen` | **Route:** Internal
+
+Update user profile information:
+
+- **Purple gradient header** with back button, title, avatar with camera icon overlay
+- **Form fields:**
+  - Full Name (editable)
+  - Email (disabled — "Email cannot be changed")
+  - University ID (disabled — "University ID cannot be changed")
+  - Program/Department dropdown (10 programs for students, 8 departments for faculty)
+  - Year Level selector (5 options for students only)
+- **Save button** — calls PUT /api/auth/update, updates Zustand store, navigates back with success toast
+- **Cancel button** — navigates back without saving
+- **Loading state** on save button
 
 ---
 
@@ -573,7 +597,7 @@ App settings and account management:
 ```
 'onboarding' | 'home' | 'search' | 'qr-scan' | 'borrowed' |
 'profile' | 'settings' | 'notifications' | 'book-detail' | 'login' |
-'attendance' | 'favorites' | 'reservations'
+'attendance' | 'favorites' | 'reservations' | 'edit-profile'
 ```
 
 ---
@@ -685,7 +709,9 @@ App settings and account management:
 | Borrowed | BookOpen | borrowed | Active borrows count badge |
 | Profile | User | profile | — |
 
-- **Active state:** Purple icon + font-semibold + animated dot indicator (layoutId="navIndicator")
+- **Active state:** Purple icon + font-semibold + animated dot indicator with bounce animation (scale [0, 1.5, 1])
+- **Spring press feedback:** Scale to 0.85 with spring-back (stiffness: 500, damping: 12) on tab press
+- **Scan button ripple:** RippleEffect component scales 0 → 2.5 with opacity fade
 - **Glass effect** background
 
 ---
@@ -734,7 +760,8 @@ App settings and account management:
 - **Announcements (2):** Extended hours for finals, New AI/ML arrivals
 - **Reservations (1):** Student → Clean Code (pending)
 - **Attendance (2):** Today (time-in only), Yesterday (7 hours)
-- **Cover Images (9):** Mapped in `public/covers/` directory
+- **Reviews (10):** Across 6 resources with ratings 2-5 and realistic comments
+- **Cover Images (15):** AI-generated covers for 6 popular books + original covers mapped in `public/covers/` directory
 
 ---
 
@@ -765,3 +792,4 @@ App settings and account management:
 | Date | Change |
 |------|--------|
 | 2026-03-05 | Initial FEATURES.md created — comprehensive catalog of all 13 screens, 19 API endpoints, 8 DB models, and all supporting systems |
+| 2026-04-22 | Added Reviews/Ratings feature (3 API + UI + seed data), Edit Profile screen (14th screen), overdue fines display (₱5/day), AI-generated book covers (6 covers), comprehensive dark mode across all screens, micro-interactions (success confetti, living gradient, spring nav feedback, skeleton loading, search glow), Change Password modal fix |

@@ -1,11 +1,15 @@
 // Book cover image mapping
 // Maps book title keywords to generated cover image paths
+// Covers generated using AI image generation (z-ai-web-dev-sdk)
 const coverMap: Record<string, string> = {
   'introduction-to-algorithms': '/covers/introduction-to-algorithms.png',
   'clean-code': '/covers/clean-code.png',
   'design-patterns': '/covers/design-patterns.png',
   'artificial-intelligence': '/covers/ai-modern-approach.png',
   'ai-modern-approach': '/covers/ai-modern-approach.png',
+  'deep-learning': '/covers/deep-learning.png',
+  'the-pragmatic-programmer': '/covers/the-pragmatic-programmer.png',
+  'pragmatic-programmer': '/covers/the-pragmatic-programmer.png',
   'database-systems': '/covers/database-systems.png',
   'psychology': '/covers/psychology-101.png',
   'nursing': '/covers/nursing-fundamentals.png',

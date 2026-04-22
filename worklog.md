@@ -400,3 +400,83 @@ Files Modified:
 - `/home/z/my-project/src/components/screens/ReservationsScreen.tsx` - Full dark mode overhaul
 
 All lint checks pass with zero errors. Dev server compiles successfully.
+
+---
+Task ID: 9-a
+Agent: Overdue Fines & Covers Agent
+Task: Add overdue fines display + AI book cover generation
+
+Work Log:
+- Enhanced BorrowedScreen.tsx with comprehensive overdue fines display:
+  1. **Fine Rate Constant**: Added `FINE_RATE_PER_DAY = 5.00` (₱5.00/day, Philippine Peso for Filipino university library)
+  2. **formatCurrency helper**: Formats amounts as ₱XX.XX
+  3. **Derived fine calculations**: `overdueBooks` and `totalFines` via useMemo
+  4. **Fines Summary Card**: Red-themed card at top of Active tab (only shows when overdue items exist) with AlertTriangle icon, total fines owed, number of overdue items, fine rate, and "Pay at the circulation desk" note
+  5. **Overdue Fine Badge**: Red badge on each overdue book card showing "Overdue Fine: ₱XX.XX" with AlertTriangle icon
+  6. **Due Soon Warning**: Yellow/amber warning for books with 1-3 days left: "Due soon — return within X days to avoid fines" with Info icon
+  7. **Fine Accrual Notice**: Small info text below overdue items: "Fines accrue at ₱5.00/day until returned"
+  8. **Color-coded left accent borders**: Red gradient for overdue, amber for due-soon, purple for normal
+  9. **Overdue count in stats bar**: Added red dot + count in summary stats bar
+- Generated 6 AI book covers using z-ai image-generation CLI (864x1152 portrait size):
+  1. Introduction to Algorithms — dark navy with algorithm flowcharts and binary trees
+  2. Clean Code — minimalist white with green accent code lines
+  3. Deep Learning — dark purple with luminous neural network visualization
+  4. AI: A Modern Approach — deep blue circuit board with robot silhouette
+  5. Design Patterns — teal blueprint style with architectural diagrams
+  6. The Pragmatic Programmer — warm orange/brown with compass metaphor
+- Updated `/home/z/my-project/src/lib/covers.ts`: Added deep-learning and the-pragmatic-programmer entries to coverMap
+- Updated `/home/z/my-project/prisma/seed.ts`: Added `coverImage` field to 6 resource entries (Introduction to Algorithms, Clean Code, Design Patterns, Deep Learning, The Pragmatic Programmer, AI: A Modern Approach)
+- Re-seeded database with `npx prisma db seed` — all records created successfully
+- Lint passes with zero errors
+
+Stage Summary:
+- BorrowedScreen now shows comprehensive overdue fine information (₱5.00/day rate, per-book fines, total fines summary card, due-soon warnings, fine accrual notices)
+- 6 AI-generated book covers saved to `/home/z/my-project/public/covers/`
+- Seed data includes coverImage paths for the 6 most popular books
+- Cover mapping updated to support Deep Learning and The Pragmatic Programmer titles
+- All lint checks pass with zero errors
+
+---
+Task ID: 9-b
+Agent: Micro-interactions & Polish Agent
+Task: Add micro-interactions, polish transitions, and improve overall styling
+
+Work Log:
+- **Part 1: BorrowedScreen Success Animation**:
+  - Created `ConfettiParticle` component with randomized trajectory (y, x, scale, rotate) and 7 colors (#652D90, #9B5BBF, #B87DD4, #4ADE80, #22C55E, #F59E0B, #EC4899)
+  - Created `SuccessOverlay` component with 18 confetti particles, green checkmark circle with scale animation [0 → 1.2 → 1], SVG path animation for the checkmark, and success text with book title
+  - Added `showSuccess` and `returnedBookTitle` state variables
+  - On successful return, shows celebration overlay instead of toast; overlay auto-dismisses after 2 seconds via useEffect timer
+  - AnimatePresence wraps overlay for smooth enter/exit transitions
+  - Backdrop uses `bg-black/30 backdrop-blur-sm`
+
+- **Part 2: LoginScreen Enhanced Animations**:
+  - **Living gradient**: Replaced static CSS gradient overlay with two Framer Motion `motion.div` layers that animate `background` property through 4 keyframe states each, creating a slowly shifting living gradient effect (8s and 10s cycles, Infinite, easeInOut)
+  - **Logo glow pulse**: Removed `animate-micro-pulse-glow` CSS class, replaced with Framer Motion `motion.div` child that animates `boxShadow` through 3 keyframe states (0 → 20px glow → 0) with 2.5s infinite cycle
+  - **Valid email button glow**: Added `isValidEmail` useMemo with regex check; when valid, Sign In button gets inline `boxShadow` style + a Framer Motion child that pulses boxShadow with 2s infinite cycle (15px → 25px → 15px glow)
+
+- **Part 3: BottomNav Haptic-like Feedback**:
+  - **Spring animation on tab press**: Changed `whileTap` from `scale: 0.8` to `scale: 0.85` with `stiffness: 500, damping: 12, restDelta: 0.01` for more pronounced press and spring-back
+  - **Active icon overshoot**: Added `motion.div` wrapper around icon that animates `scale: [1, 1.08, 1]` when becoming active, creating a bounce effect
+  - **Indicator dot bounce**: Changed from simple `layoutId` transition to explicit `initial/animate/exit` with `scale: [0, 1.5, 1]` bounce and spring physics (stiffness: 500, damping: 20, mass: 0.5)
+  - **Scan button ripple**: Created `RippleEffect` component that scales from 0→2.5 with opacity fade; triggered via `rippleKey` state increment on scan press; wrapped in AnimatePresence
+
+- **Part 4: HomeScreen Enhanced Transitions**:
+  - **Greeting crossfade**: Changed from slide animation (x: -8 → 0, x: 0 → 8) to pure opacity crossfade (opacity: 0 → 1, opacity: 1 → 0) with 0.4s easeInOut duration
+  - **Library status badge pulse**: Changed green dot from static `<span>` to `<motion.span>` that animates `scale: [1, 1.4, 1]` and `opacity: [1, 0.7, 1]` with 2s infinite cycle when library is Open
+  - **Current Borrow border animation**: Replaced static left border div with `motion.div` that animates `scaleY: 0 → 1` with 0.6s easeOut and 0.2s delay, creating a top-to-bottom fill effect using `origin-top`
+  - **Quick action staggered entrance**: Added `initial={{ opacity: 0, y: 8 }}` and `animate={{ opacity: 1, y: 0 }}` to each quick action button with `delay: 0.1 * actionIndex + 0.3` (0.1s stagger between each)
+
+- **Part 5: SearchScreen Enhanced Feedback**:
+  - **Skeleton loading**: Replaced single Loader2 spinner with 4 skeleton cards using `Skeleton` component from shadcn/ui, each with cover placeholder (w-14 h-72px), title line, author line, and 2 category pill placeholders; staggered entrance with 0.08s delay per card
+  - **Result count highlight**: Added `prevCount` and `countHighlight` state; useEffect detects count changes and sets `countHighlight: true` for 600ms; count text gets `textShadow: 0 0 8px rgba(101,45,144,0.4)` glow when highlighted
+  - **Category pills spring**: Changed from `<button>` to `<motion.button>` with `whileTap={{ scale: 0.92 }}`, `layout` prop for smooth position transitions, and inner `<motion.span layout>` with spring transition (stiffness: 500, damping: 30)
+
+Files Modified:
+- `/home/z/my-project/src/components/screens/BorrowedScreen.tsx` - Added SuccessOverlay, ConfettiParticle, celebration animation on return
+- `/home/z/my-project/src/components/screens/LoginScreen.tsx` - Living gradient, logo glow pulse, valid email button glow
+- `/home/z/my-project/src/components/layout/BottomNav.tsx` - Spring press animation, indicator bounce, scan ripple
+- `/home/z/my-project/src/components/screens/HomeScreen.tsx` - Greeting crossfade, library badge pulse, border fill animation, staggered quick actions
+- `/home/z/my-project/src/components/screens/SearchScreen.tsx` - Skeleton loading, count highlight glow, spring category pills
+
+All lint checks pass with zero errors.
