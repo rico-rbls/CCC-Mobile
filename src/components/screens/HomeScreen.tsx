@@ -12,6 +12,7 @@ import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { useEffect, useState, useCallback, useRef } from 'react'
+import { getResourceCover } from '@/lib/covers'
 
 // ── Types ──────────────────────────────────────────────────────────
 interface Announcement {
@@ -706,22 +707,44 @@ export default function HomeScreen() {
                     onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
                     className="flex-shrink-0 w-32 group"
                   >
-                    <div className="w-32 h-44 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow cover-pattern-overlay">
-                      <BookOpen className="w-8 h-8 text-white/50" />
-                      {/* Category badge on cover */}
-                      {book.category && (
-                        <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
-                          {book.category}
-                        </span>
-                      )}
-                      {/* "For You" star badge */}
-                      {isForYou && (
-                        <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none flex items-center gap-0.5">
-                          <Star className="w-2.5 h-2.5 fill-current" />
-                          For You
-                        </span>
-                      )}
-                    </div>
+                    {(() => {
+                      const coverSrc = getResourceCover(book.coverImage, book.title)
+                      return coverSrc ? (
+                        <div className="w-32 h-44 rounded-xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                          <img src={coverSrc} alt={book.title} className="w-full h-full object-cover" />
+                          {/* Category badge on cover */}
+                          {book.category && (
+                            <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                              {book.category}
+                            </span>
+                          )}
+                          {/* "For You" star badge */}
+                          {isForYou && (
+                            <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none flex items-center gap-0.5">
+                              <Star className="w-2.5 h-2.5 fill-current" />
+                              For You
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="w-32 h-44 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow cover-pattern-overlay">
+                          <BookOpen className="w-8 h-8 text-white/50" />
+                          {/* Category badge on cover */}
+                          {book.category && (
+                            <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                              {book.category}
+                            </span>
+                          )}
+                          {/* "For You" star badge */}
+                          {isForYou && (
+                            <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none flex items-center gap-0.5">
+                              <Star className="w-2.5 h-2.5 fill-current" />
+                              For You
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })()}
                     <div className="flex items-center gap-1 mb-0.5">
                       <span className={`w-1.5 h-1.5 rounded-full ${book.availableCopies > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
                       <span className="text-[10px] text-muted-foreground">

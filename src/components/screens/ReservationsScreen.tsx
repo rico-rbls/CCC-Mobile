@@ -6,6 +6,7 @@ import { ArrowLeft, Bookmark, BookOpen, Clock, CheckCircle2, XCircle, Loader2 } 
 import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { getResourceCover } from '@/lib/covers'
 
 interface ReservationItem {
   id: string
@@ -171,9 +172,16 @@ export default function ReservationsScreen() {
                       onClick={() => { setSelectedBookId(reservation.resourceId); setCurrentScreen('book-detail') }}
                       className="flex-shrink-0"
                     >
-                      <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center cover-pattern-overlay shadow-sm">
-                        <BookOpen className="w-5 h-5 text-white/50" />
-                      </div>
+                      {(() => {
+                        const coverSrc = getResourceCover(null, reservation.resourceTitle)
+                        return coverSrc ? (
+                          <img src={coverSrc} alt={reservation.resourceTitle} className="w-14 h-[72px] rounded-lg object-cover shadow-sm" />
+                        ) : (
+                          <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center cover-pattern-overlay shadow-sm">
+                            <BookOpen className="w-5 h-5 text-white/50" />
+                          </div>
+                        )
+                      })()}
                     </button>
                     <div className="flex-1 min-w-0">
                       <button

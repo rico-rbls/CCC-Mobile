@@ -36,6 +36,8 @@ export default function ProfileScreen() {
   const { user, setCurrentScreen, logout, favorites } = useAppStore()
   const [borrowCount, setBorrowCount] = useState(0)
   const [attendanceCount, setAttendanceCount] = useState(0)
+  const [readingGoal, setReadingGoal] = useState(24)
+  const [showGoalPicker, setShowGoalPicker] = useState(false)
   const userIdRef = useRef(user?.id)
 
   useEffect(() => {
@@ -142,6 +144,79 @@ export default function ProfileScreen() {
             )
           })}
         </div>
+      </div>
+
+      {/* Reading Goal card */}
+      <div className="px-4 mt-3">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12 }}
+          className="bg-white rounded-2xl shadow-sm p-4"
+        >
+          <div className="flex items-center gap-4">
+            {/* Circular progress */}
+            <div className="relative w-16 h-16 flex-shrink-0">
+              <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#E8D5F3"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#652D90"
+                  strokeWidth="3"
+                  strokeDasharray={`${Math.min(100, (borrowCount / readingGoal) * 100)}, 100`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xs font-bold text-lib-purple">{borrowCount}/{readingGoal}</span>
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-foreground">Reading Goal</h4>
+                <button
+                  onClick={() => setShowGoalPicker(!showGoalPicker)}
+                  className="text-xs text-lib-purple font-medium"
+                >
+                  {showGoalPicker ? 'Done' : 'Change'}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {borrowCount >= readingGoal
+                  ? '\uD83C\uDF89 Goal achieved! Great job!'
+                  : `${readingGoal - borrowCount} more book${readingGoal - borrowCount !== 1 ? 's' : ''} to reach your goal`
+                }
+              </p>
+              {showGoalPicker && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="flex gap-2 mt-2"
+                >
+                  {[12, 24, 36, 48].map(goal => (
+                    <button
+                      key={goal}
+                      onClick={() => { setReadingGoal(goal); setShowGoalPicker(false) }}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        readingGoal === goal
+                          ? 'bg-lib-purple text-white'
+                          : 'bg-lib-purple-50 text-lib-purple hover:bg-lib-purple-100'
+                      }`}
+                    >
+                      {goal}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Reading Stats card with mini bar chart */}

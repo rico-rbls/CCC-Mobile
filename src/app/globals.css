@@ -350,3 +350,123 @@
 .animate-fade-in {
   animation: fade-in 0.3s ease-out forwards;
 }
+
+/* Dark mode enhanced styles */
+.dark .bg-purple-gradient {
+  background: linear-gradient(135deg, #522575 0%, #5A2880 50%, #7B3FA8 100%);
+}
+
+.dark .bg-purple-gradient-subtle {
+  background: linear-gradient(135deg, #2A1038 0%, #3A1850 100%);
+}
+
+.dark .glass-effect {
+  background: rgba(30, 30, 30, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.dark .card-hover-effect:hover {
+  box-shadow: 0 8px 25px -5px rgba(101, 45, 144, 0.25), 0 4px 10px -3px rgba(101, 45, 144, 0.15);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #9B5BBF60;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9B5BBF90;
+}
+
+/* Smooth page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+/* Focus ring styles for accessibility */
+.focus-ring:focus-visible {
+  outline: 2px solid #652D90;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Subtle hover lift for interactive elements */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(101, 45, 144, 0.12);
+}
+.hover-lift:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Reading progress ring animation */
+@keyframes progress-fill {
+  from {
+    stroke-dasharray: 0, 100;
+  }
+}
+
+.animate-progress-fill {
+  animation: progress-fill 1s ease-out forwards;
+}
+
+/* Skeleton loading shimmer */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(90deg, #2a2a2a 25%, #333333 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Badge pulse for notifications */
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.animate-badge-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* Success checkmark animation */
+@keyframes checkmark-draw {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-checkmark {
+  stroke-dasharray: 24;
+  animation: checkmark-draw 0.4s ease-out forwards;
+}

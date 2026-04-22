@@ -5,6 +5,7 @@ import { Search, BookOpen, FileText, Newspaper, Loader2, Clock, TrendingUp, X } 
 import { Input } from '@/components/ui/input'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
+import { getResourceCover } from '@/lib/covers'
 
 const categories = [
   { id: 'all' as const, label: 'All', icon: Search },
@@ -260,14 +261,28 @@ export default function SearchScreen() {
                       onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
                       className="flex-shrink-0 w-28 group"
                     >
-                      <div className="w-28 h-36 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm cover-pattern-overlay">
-                        <BookOpen className="w-6 h-6 text-white/50" />
-                        {resource.category && (
-                          <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
-                            {resource.category}
-                          </span>
-                        )}
-                      </div>
+                      {(() => {
+                        const coverSrc = getResourceCover(resource.coverImage, resource.title)
+                        return coverSrc ? (
+                          <div className="w-28 h-36 rounded-xl mb-2 relative overflow-hidden shadow-sm">
+                            <img src={coverSrc} alt={resource.title} className="w-full h-full object-cover" />
+                            {resource.category && (
+                              <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                                {resource.category}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="w-28 h-36 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm cover-pattern-overlay">
+                            <BookOpen className="w-6 h-6 text-white/50" />
+                            {resource.category && (
+                              <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                                {resource.category}
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })()}
                       <h4 className="text-[11px] font-semibold text-foreground leading-tight line-clamp-2">{resource.title}</h4>
                       <p className="text-[9px] text-muted-foreground mt-0.5">{resource.author}</p>
                     </motion.button>
@@ -286,9 +301,16 @@ export default function SearchScreen() {
                 onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
                 className="w-full bg-white rounded-xl shadow-sm p-4 flex items-start gap-3 text-left card-hover-effect"
               >
-                <div className="w-14 h-18 rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 cover-pattern-overlay">
-                  <BookOpen className="w-5 h-5 text-white/50" />
-                </div>
+                {(() => {
+                  const coverSrc = getResourceCover(resource.coverImage, resource.title)
+                  return coverSrc ? (
+                    <img src={coverSrc} alt={resource.title} className="w-14 h-[72px] rounded-lg object-cover flex-shrink-0 shadow-sm" />
+                  ) : (
+                    <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 cover-pattern-overlay shadow-sm">
+                      <BookOpen className="w-5 h-5 text-white/50" />
+                    </div>
+                  )
+                })()}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <h4 className="font-semibold text-sm text-foreground leading-tight line-clamp-2">{resource.title}</h4>

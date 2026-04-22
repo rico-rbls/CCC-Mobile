@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useState, useEffect, useCallback } from 'react'
 import { useToast } from '@/hooks/use-toast'
+import { getResourceCover } from '@/lib/covers'
 
 export default function BookDetailScreen() {
   const { selectedBookId, user, goBack, setCurrentScreen, setSelectedBookId, toggleFavorite, isFavorite } = useAppStore()
@@ -207,44 +208,45 @@ export default function BookDetailScreen() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl shadow-sm overflow-hidden"
         >
-          {/* Cover with decorative pattern overlay */}
-          <div className="h-48 bg-purple-gradient flex items-center justify-center relative cover-pattern-overlay">
-            <BookOpen className="w-16 h-16 text-white/30" />
-
-            {/* Decorative circles */}
-            <div className="absolute top-4 left-4 w-20 h-20 rounded-full border border-white/10" />
-            <div className="absolute bottom-6 right-6 w-16 h-16 rounded-full border border-white/10" />
-            <div className="absolute top-8 right-12 w-8 h-8 rounded-full bg-white/5" />
-
-            {/* Category badge */}
-            <Badge className="absolute top-3 right-3 bg-white/20 text-white border-0 hover:bg-white/30">
-              {book.category.charAt(0).toUpperCase() + book.category.slice(1)}
-            </Badge>
-
-            {/* Favorite button */}
-            <button
-              onClick={handleFavorite}
-              className="absolute top-3 left-3 w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center hover:bg-white/25 transition-all active:scale-90"
-              aria-label={hearted ? 'Remove from favorites' : 'Add to favorites'}
-            >
-              <Heart className={`w-5 h-5 transition-all ${hearted ? 'text-red-400 fill-red-400 scale-110' : 'text-white'}`} />
-            </button>
-
-            {/* Heart pulse animation */}
-            <AnimatePresence>
-              {hearted && (
-                <motion.div
-                  initial={{ scale: 1 }}
-                  animate={{ scale: 2, opacity: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center pointer-events-none"
+          {/* Cover with image or decorative pattern overlay */}
+          {(() => {
+            const coverSrc = getResourceCover(book.coverImage, book.title)
+            return coverSrc ? (
+              <div className="h-48 relative overflow-hidden">
+                <img src={coverSrc} alt={book.title} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                {/* Category badge */}
+                <Badge className="absolute top-3 right-3 bg-white/20 text-white border-0 hover:bg-white/30">
+                  {book.category.charAt(0).toUpperCase() + book.category.slice(1)}
+                </Badge>
+                {/* Favorite button */}
+                <button
+                  onClick={handleFavorite}
+                  className="absolute top-3 left-3 w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center hover:bg-white/25 transition-all active:scale-90"
+                  aria-label={hearted ? 'Remove from favorites' : 'Add to favorites'}
                 >
-                  <Heart className="w-5 h-5 text-red-400 fill-red-400" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  <Heart className={`w-5 h-5 transition-all ${hearted ? 'text-red-400 fill-red-400 scale-110' : 'text-white'}`} />
+                </button>
+              </div>
+            ) : (
+              <div className="h-48 bg-purple-gradient flex items-center justify-center relative cover-pattern-overlay">
+                <BookOpen className="w-16 h-16 text-white/30" />
+                <div className="absolute top-4 left-4 w-20 h-20 rounded-full border border-white/10" />
+                <div className="absolute bottom-6 right-6 w-16 h-16 rounded-full border border-white/10" />
+                <div className="absolute top-8 right-12 w-8 h-8 rounded-full bg-white/5" />
+                <Badge className="absolute top-3 right-3 bg-white/20 text-white border-0 hover:bg-white/30">
+                  {book.category.charAt(0).toUpperCase() + book.category.slice(1)}
+                </Badge>
+                <button
+                  onClick={handleFavorite}
+                  className="absolute top-3 left-3 w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center hover:bg-white/25 transition-all active:scale-90"
+                  aria-label={hearted ? 'Remove from favorites' : 'Add to favorites'}
+                >
+                  <Heart className={`w-5 h-5 transition-all ${hearted ? 'text-red-400 fill-red-400 scale-110' : 'text-white'}`} />
+                </button>
+              </div>
+            )
+          })()}
 
           <div className="p-4">
             <h2 className="text-lg font-bold text-foreground leading-tight">{book.title}</h2>

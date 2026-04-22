@@ -4,6 +4,7 @@ import { useAppStore, type BorrowedBook } from '@/lib/store'
 import { BookOpen, Clock, Loader2, RotateCcw, CheckCircle2, ChevronRight } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { getResourceCover } from '@/lib/covers'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 
@@ -118,6 +119,18 @@ export default function BorrowedScreen() {
         </div>
       </div>
 
+      {/* Summary stats bar */}
+      <div className="flex items-center gap-4 px-4 py-2">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-lib-purple" />
+          <span className="text-xs text-muted-foreground">{activeBooks.length} Active</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="text-xs text-muted-foreground">{historyBooks.length} Returned</span>
+        </div>
+      </div>
+
       {/* Books list */}
       <div className="flex-1 px-4 py-3 overflow-y-auto">
         {loading ? (
@@ -160,13 +173,23 @@ export default function BorrowedScreen() {
                   key={book.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="bg-white rounded-2xl shadow-sm overflow-hidden"
+                  transition={{ delay: index * 0.07 }}
+                  className="bg-white rounded-2xl shadow-sm overflow-hidden relative"
                 >
-                  <div className="p-4 flex items-start gap-3">
-                    <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 shadow-sm">
-                      <BookOpen className="w-5 h-5 text-white/50" />
-                    </div>
+                  {activeTab === 'active' && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-2xl" />
+                  )}
+                  <div className={`flex items-start gap-3 ${activeTab === 'active' ? 'p-4 pl-5' : 'p-4'}`}>
+                    {(() => {
+                      const coverSrc = getResourceCover(book.coverImage, book.title)
+                      return coverSrc ? (
+                        <img src={coverSrc} alt={book.title} className="w-14 h-[72px] rounded-lg object-cover flex-shrink-0 shadow-sm" />
+                      ) : (
+                        <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 shadow-sm cover-pattern-overlay">
+                          <BookOpen className="w-5 h-5 text-white/50" />
+                        </div>
+                      )
+                    })()}
                     <div className="flex-1 min-w-0">
                       <h4 className="font-semibold text-sm text-foreground leading-tight line-clamp-2">{book.title}</h4>
                       <p className="text-xs text-muted-foreground mt-0.5">{book.author}</p>

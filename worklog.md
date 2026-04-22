@@ -242,3 +242,41 @@ Priority Recommendations for Next Phase:
 6. Add more micro-interactions and haptic feedback
 7. Implement offline caching with service workers
 8. Add push notification support
+
+---
+Task ID: 5-b
+Agent: Frontend Enhancement Agent
+Task: Add Reading Goals Feature + Enhance BorrowedScreen + Enhance globals.css
+
+Work Log:
+- Added Reading Goal card to ProfileScreen.tsx:
+  - Circular SVG progress indicator showing borrowCount vs readingGoal
+  - Default goal of 24 books/year, with "Change" button to reveal picker
+  - Goal picker with 4 preset options (12, 24, 36, 48) with active state highlighting
+  - Dynamic progress message: shows remaining books or celebration when goal achieved
+  - Added `readingGoal` and `showGoalPicker` state variables
+  - Positioned between stats cards and reading stats bar chart
+
+- Enhanced BorrowedScreen.tsx:
+  - Added summary stats bar below tabs showing "X Active · Y Returned" with colored dot indicators (purple for active, emerald for returned)
+  - Added left accent border (gradient from-lib-purple via-lib-purple-light to-lib-purple-300) on active book cards
+  - Made padding conditional: `pl-5` on active cards (to accommodate border), `p-4` on history cards
+  - Added `relative` class to card containers for absolute-positioned accent border
+  - Increased stagger animation delay from 0.05 to 0.07 for more visible staggered entrance
+
+- Enhanced globals.css with:
+  - Dark mode styles for bg-purple-gradient, bg-purple-gradient-subtle, glass-effect, card-hover-effect, custom-scrollbar
+  - Page transition classes (page-transition-enter, page-transition-enter-active)
+  - Focus ring accessibility styles (.focus-ring with purple outline)
+  - Hover lift effect (.hover-lift) with subtle translateY and shadow
+  - Reading progress ring animation (@keyframes progress-fill, .animate-progress-fill)
+  - Skeleton loading shimmer (.skeleton-shimmer) with dark mode variant
+  - Badge pulse animation (.animate-badge-pulse) for notification badges
+  - Success checkmark animation (.animate-checkmark) with stroke-dasharray/dashoffset
+
+Files Modified:
+- `/home/z/my-project/src/components/screens/ProfileScreen.tsx` - Added Reading Goal card with SVG progress, goal picker
+- `/home/z/my-project/src/components/screens/BorrowedScreen.tsx` - Added summary stats bar, left accent borders, staggered animations
+- `/home/z/my-project/src/app/globals.css` - Added dark mode enhancements, animations, accessibility styles
+
+All lint checks pass with zero errors.

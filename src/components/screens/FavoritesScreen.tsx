@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, BookOpen, ArrowLeft, Loader2, Trash2 } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
+import { getResourceCover } from '@/lib/covers'
 
 export default function FavoritesScreen() {
   const { user, favorites, toggleFavorite, setCurrentScreen, setSelectedBookId, goBack } = useAppStore()
@@ -126,9 +127,16 @@ export default function FavoritesScreen() {
                       onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
                       className="flex-shrink-0"
                     >
-                      <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center cover-pattern-overlay shadow-sm">
-                        <BookOpen className="w-5 h-5 text-white/50" />
-                      </div>
+                      {(() => {
+                        const coverSrc = getResourceCover(resource.coverImage, resource.title)
+                        return coverSrc ? (
+                          <img src={coverSrc} alt={resource.title} className="w-14 h-[72px] rounded-lg object-cover shadow-sm" />
+                        ) : (
+                          <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center cover-pattern-overlay shadow-sm">
+                            <BookOpen className="w-5 h-5 text-white/50" />
+                          </div>
+                        )
+                      })()}
                     </button>
                     <div className="flex-1 min-w-0">
                       <button
