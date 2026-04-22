@@ -21,7 +21,8 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
-import { toast } from 'sonner'
+import { useToast } from '@/hooks/use-toast'
+import { useTheme } from 'next-themes'
 
 interface LibrarySettings {
   isOpen: boolean
@@ -37,8 +38,9 @@ export default function SettingsScreen() {
   const [dueDateNotif, setDueDateNotif] = useState(user?.notificationDueDate ?? true)
   const [reservationNotif, setReservationNotif] = useState(user?.notificationReservation ?? true)
   const [announcementNotif, setAnnouncementNotif] = useState(user?.notificationAnnouncements ?? false)
-  const [darkMode, setDarkMode] = useState(false)
+  const { theme, setTheme } = useTheme()
   const [librarySettings, setLibrarySettings] = useState<LibrarySettings | null>(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -64,21 +66,21 @@ export default function SettingsScreen() {
     if (field === 'notificationAnnouncements') setAnnouncementNotif(value)
 
     try {
-      await fetch(`/api/auth/register`, {
+      await fetch('/api/auth/update', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user?.id, [field]: value }),
       })
-      toast.success('Preference updated')
+      toast({ title: 'Preference updated' })
     } catch {
-      toast.error('Failed to update preference')
+      toast({ title: 'Failed to update preference', variant: 'destructive' })
     }
   }
 
   const handleLogout = () => {
     logout()
     setCurrentScreen('login')
-    toast.success('Logged out successfully')
+    toast({ title: 'Logged out successfully' })
   }
 
   const formatTime = (time: string) => {
@@ -210,7 +212,7 @@ export default function SettingsScreen() {
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
-                  {darkMode ? <Moon className="w-4 h-4 text-lib-purple" /> : <Sun className="w-4 h-4 text-lib-purple" />}
+                  {theme === 'dark' ? <Moon className="w-4 h-4 text-lib-purple" /> : <Sun className="w-4 h-4 text-lib-purple" />}
                 </div>
                 <div>
                   <span className="text-sm font-medium text-foreground">Dark Mode</span>
@@ -218,8 +220,8 @@ export default function SettingsScreen() {
                 </div>
               </div>
               <Switch
-                checked={darkMode}
-                onCheckedChange={setDarkMode}
+                checked={theme === 'dark'}
+                onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
                 className="data-[state=checked]:bg-lib-purple"
               />
             </div>

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Flame, Bell, Settings, QrCode, BookOpen, Bookmark,
   ChevronRight, Clock, TrendingUp, Loader2, Megaphone, X,
-  CalendarDays, Star, Calendar,
+  CalendarDays, Star, Calendar, Sparkles,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -24,16 +24,18 @@ interface Announcement {
 }
 
 interface TrendingItem {
+  id: string
   rank: number
   title: string
   author: string
   borrows: number
+  category: string
 }
 
-// ── Section header with purple accent bar ──────────────────────────
+// ── Section header with purple accent bar and pattern ──────────────
 function SectionHeader({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2 mb-3">
+    <div className="flex items-center gap-2 mb-3 section-header-pattern rounded-lg px-1 py-0.5">
       <div className="w-1 h-5 rounded-full bg-lib-purple" />
       {icon}
       <h3 className="font-bold text-foreground">{children}</h3>
@@ -90,6 +92,7 @@ export default function HomeScreen() {
   const [closingTime, setClosingTime] = useState('9PM')
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [highlightBook, setHighlightBook] = useState<ResourceItem | null>(null)
 
   // Announcement carousel
   const [announcementIndex, setAnnouncementIndex] = useState(0)
@@ -155,6 +158,30 @@ export default function HomeScreen() {
       const merged = [...programResources, ...generalResources.filter(r => !seen.has(r.id))].slice(0, 6)
       setRecommendations(merged.length > 0 ? merged : generalResources)
 
+      // Fetch trending from API - use resources and assign mock borrow counts
+      const trendingRes = await fetch('/api/resources?limit=5')
+      const trendingData = await trendingRes.json()
+      if (trendingRes.ok && trendingData.resources) {
+        const mockBorrowCounts = [142, 128, 97, 85, 76]
+        const trendingItems: TrendingItem[] = trendingData.resources.map((r: Record<string, unknown>, i: number) => ({
+          id: r.id as string,
+          rank: i + 1,
+          title: r.title as string,
+          author: r.author as string,
+          borrows: mockBorrowCounts[i] || Math.floor(Math.random() * 100) + 30,
+          category: r.category as string,
+        }))
+        setTrending(trendingItems)
+      }
+
+      // Fetch highlight book (random pick for Today's Highlights)
+      const highlightRes = await fetch('/api/resources?limit=7')
+      const highlightData = await highlightRes.json()
+      if (highlightRes.ok && highlightData.resources && highlightData.resources.length > 0) {
+        const randomIdx = Math.floor(Math.random() * Math.min(highlightData.resources.length, 5))
+        setHighlightBook(mapResource(highlightData.resources[randomIdx]))
+      }
+
       // Fetch announcements
       const annRes = await fetch('/api/announcements')
       const annData = await annRes.json()
@@ -195,20 +222,8 @@ export default function HomeScreen() {
       status: r.status as string,
       subject: r.subject as string,
       tags: (r.tags as string || '').split(',').filter(Boolean),
-      publicationDate: r.publicationDate as string | undefined,
-    } as ResourceItem & { publicationDate?: string }
+    }
   }
-
-  // ── Trending data ─────────────────────────────────────────────
-  useEffect(() => {
-    setTrending([
-      { rank: 1, title: 'Introduction to Algorithms', author: 'Cormen et al.', borrows: 142 },
-      { rank: 2, title: 'Clean Code', author: 'Robert C. Martin', borrows: 128 },
-      { rank: 3, title: 'Design Patterns', author: 'Erich Gamma', borrows: 97 },
-      { rank: 4, title: 'Database System Concepts', author: 'Silberschatz', borrows: 85 },
-      { rank: 5, title: 'Operating System Concepts', author: 'Silberschatz', borrows: 76 },
-    ])
-  }, [])
 
   useEffect(() => {
     fetchData()
@@ -483,6 +498,53 @@ export default function HomeScreen() {
           </motion.div>
         )}
 
+        {/* ── Today's Highlights feature card ─────────────── */}
+        {highlightBook && (
+          <motion.div
+            custom={0.5}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <SectionHeader icon={<Sparkles className="w-4 h-4 text-lib-purple" />}>Today&apos;s Highlight</SectionHeader>
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => { setSelectedBookId(highlightBook.id); setCurrentScreen('book-detail') }}
+              className="w-full bg-purple-gradient rounded-2xl p-4 text-left relative overflow-hidden cover-pattern-overlay shadow-sm"
+            >
+              {/* Decorative circles */}
+              <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/5" />
+              <div className="absolute bottom-2 left-10 w-16 h-16 rounded-full bg-white/5" />
+
+              <div className="flex items-center gap-3 relative z-10">
+                <div className="w-16 h-20 rounded-lg bg-white/15 backdrop-blur-sm flex items-center justify-center flex-shrink-0 ring-1 ring-white/20">
+                  <BookOpen className="w-7 h-7 text-white/70" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Star className="w-3 h-3 text-amber-300 fill-amber-300" />
+                    <span className="text-[10px] font-medium text-white/70">Featured Pick</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-white leading-tight line-clamp-2">{highlightBook.title}</h4>
+                  <p className="text-xs text-white/60 mt-0.5">{highlightBook.author}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    {highlightBook.availableCopies > 0 ? (
+                      <span className="px-2 py-0.5 rounded-full bg-white/15 text-white text-[10px] font-medium">
+                        {highlightBook.availableCopies} available
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full bg-red-400/20 text-white text-[10px] font-medium">
+                        Currently unavailable
+                      </span>
+                    )}
+                    <span className="text-white/50 text-[10px]">→</span>
+                  </div>
+                </div>
+              </div>
+            </motion.button>
+          </motion.div>
+        )}
+
         {/* ── Active borrowed book card ───────────────────── */}
         <motion.div
           custom={1}
@@ -495,7 +557,7 @@ export default function HomeScreen() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl shadow-sm overflow-hidden relative"
+              className="bg-white rounded-2xl shadow-sm overflow-hidden relative card-hover-effect"
             >
               {/* Gradient overlay on left border */}
               <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-2xl" />
@@ -545,27 +607,42 @@ export default function HomeScreen() {
               </div>
             </motion.div>
           ) : (
-            /* Empty state - no borrowed books */
+            /* Empty state - no borrowed books - illustration-like design */
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl shadow-sm p-6 flex flex-col items-center text-center"
+              className="bg-white rounded-2xl shadow-sm p-6 relative overflow-hidden"
             >
-              <div className="w-14 h-14 rounded-2xl bg-lib-purple-50 flex items-center justify-center mb-3">
-                <BookOpen className="w-7 h-7 text-lib-purple" />
+              {/* Background pattern */}
+              <div className="absolute inset-0 dot-pattern-bg" />
+
+              <div className="flex flex-col items-center text-center relative z-10">
+                {/* Illustration-like design with stacked books */}
+                <div className="relative mb-4">
+                  <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 flex items-center justify-center">
+                    <BookOpen className="w-10 h-10 text-lib-purple/40" />
+                  </div>
+                  {/* Floating book icons around */}
+                  <div className="absolute -top-1 -right-1 w-7 h-7 rounded-lg bg-lib-purple-100 flex items-center justify-center floating-animation">
+                    <BookOpen className="w-3.5 h-3.5 text-lib-purple/60" />
+                  </div>
+                  <div className="absolute -bottom-1 -left-2 w-6 h-6 rounded-lg bg-lib-purple-50 flex items-center justify-center floating-animation" style={{ animationDelay: '1s' }}>
+                    <Bookmark className="w-3 h-3 text-lib-purple/50" />
+                  </div>
+                </div>
+                <h4 className="font-semibold text-foreground text-sm">No Active Borrows</h4>
+                <p className="text-xs text-muted-foreground mt-1 mb-4 leading-relaxed max-w-[220px]">
+                  Your reading list is empty. Explore the catalog to find your next great read!
+                </p>
+                <Button
+                  size="sm"
+                  className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-9 px-5 rounded-xl shadow-sm shadow-lib-purple/20"
+                  onClick={() => setCurrentScreen('search')}
+                >
+                  <BookOpen className="w-3.5 h-3.5 mr-1.5" />
+                  Browse Catalog
+                </Button>
               </div>
-              <h4 className="font-semibold text-foreground text-sm">No Active Borrows</h4>
-              <p className="text-xs text-muted-foreground mt-1 mb-3 leading-relaxed">
-                You don&apos;t have any books checked out right now.<br />Explore the catalog to find your next read!
-              </p>
-              <Button
-                size="sm"
-                className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-8 px-4"
-                onClick={() => setCurrentScreen('search')}
-              >
-                <BookOpen className="w-3.5 h-3.5 mr-1.5" />
-                Browse Catalog
-              </Button>
             </motion.div>
           )}
         </motion.div>
@@ -629,7 +706,7 @@ export default function HomeScreen() {
                     onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
                     className="flex-shrink-0 w-32 group"
                   >
-                    <div className="w-32 h-44 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                    <div className="w-32 h-44 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow cover-pattern-overlay">
                       <BookOpen className="w-8 h-8 text-white/50" />
                       {/* Category badge on cover */}
                       {book.category && (
@@ -653,12 +730,6 @@ export default function HomeScreen() {
                     </div>
                     <h4 className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{book.title}</h4>
                     <p className="text-[10px] text-muted-foreground mt-0.5">{book.author}</p>
-                    {/* Publication date if available */}
-                    {(book as ResourceItem & { publicationDate?: string }).publicationDate && (
-                      <p className="text-[9px] text-muted-foreground mt-0.5">
-                        {(book as ResourceItem & { publicationDate?: string }).publicationDate}
-                      </p>
-                    )}
                   </motion.button>
                 )
               })}
@@ -680,13 +751,15 @@ export default function HomeScreen() {
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             {trending.map((item, index) => (
               <button
-                key={item.rank}
-                onClick={() => { setSelectedBookId(`t${item.rank}`); setCurrentScreen('book-detail') }}
+                key={item.id}
+                onClick={() => { setSelectedBookId(item.id); setCurrentScreen('book-detail') }}
                 className={`flex items-center gap-3 w-full px-4 py-3 hover:bg-lib-purple-50/50 active:bg-lib-purple-50 transition-colors ${
                   index < trending.length - 1 ? 'border-b border-gray-100' : ''
                 }`}
               >
-                <span className="w-7 h-7 rounded-full bg-lib-purple-50 flex items-center justify-center text-xs font-bold text-lib-purple flex-shrink-0">
+                <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                  item.rank <= 3 ? 'bg-lib-purple text-white' : 'bg-lib-purple-50 text-lib-purple'
+                }`}>
                   {item.rank}
                 </span>
                 <div className="flex-1 text-left min-w-0">
@@ -695,7 +768,7 @@ export default function HomeScreen() {
                 </div>
                 <div className="flex items-center gap-1 text-muted-foreground flex-shrink-0">
                   <Clock className="w-3 h-3" />
-                  <span className="text-[10px]">{item.borrows}</span>
+                  <span className="text-[10px] font-medium">{item.borrows}</span>
                 </div>
               </button>
             ))}

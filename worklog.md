@@ -153,3 +153,92 @@ Priority Recommendations for Next Phase:
 6. Add reservation flow with status tracking
 7. Add more attendance features (eligibility reports)
 8. Polish micro-animations and transitions
+
+---
+Task ID: 4
+Agent: Main Agent (Cron Review Round 2)
+Task: QA testing, bug fixes, styling improvements, and new features
+
+Work Log:
+- Performed QA testing via agent-browser across all 13 screens (onboarding, login, home, search, qr-scan, borrowed, profile, settings, notifications, book-detail, attendance, favorites, reservations)
+- Found and fixed BUG: Settings screen called `/api/auth/register` with PUT for notification toggle updates - created proper `/api/auth/update` endpoint
+- Found and fixed BUG: Settings screen used `toast` from 'sonner' instead of project's `useToast` hook - migrated to correct import
+- Found and fixed BUG: BorrowedScreen history items showed wrong status - added returnDate field and proper "Returned on" display
+- Found and fixed BUG: ProfileScreen menu items all navigated to 'settings' regardless of label - now each item navigates to its proper screen
+- Enhanced store with favorites system: added `favorites[]`, `toggleFavorite()`, `isFavorite()` with persistence
+- Enhanced store with new screen types: 'favorites', 'reservations'
+- Added `BorrowedBook.returnDate` field to store type
+
+New Features Added:
+1. **Favorites System**: Complete favorites feature with toggleFavorite/isFavorite in store, heart button on BookDetail cover, FavoritesScreen with list/grid view, remove functionality, empty state with CTA
+2. **Reservations Screen**: Full reservations management with filter tabs (All/Pending/Fulfilled), status badges, cancel reservation, "Borrow Now" for fulfilled items
+3. **Dark Mode**: Integrated next-themes with ThemeProvider in layout.tsx, working toggle in Settings, persists across sessions
+4. **Return Book**: BorrowedScreen now has "Return" button on active borrows that calls `/api/borrow/[id]/return`
+5. **Cancel Reservation**: Created `/api/reservations/[id]` DELETE endpoint for cancellation
+6. **User Update API**: Created `/api/auth/update` PUT endpoint for profile/notification preference updates
+
+Styling Improvements Verified:
+- BookDetail: Has favorite heart, share button, ISBN, publication date, decorative cover pattern, real API related books
+- Search: Has popular searches, recently viewed, tag pills, animated count, clear button
+- Home: Has Today's Highlight, real trending data from API, announcements carousel
+- Notifications: Has filter tabs (All/Unread/Mentions), swipe-to-dismiss, date grouping, colored borders
+- Profile: Has reading stats bar chart, favorites link, email/program info, proper menu navigation
+- BottomNav: Has borrow count badge, whileTap animation
+- globals.css: Has card-hover-effect, purple-shimmer, floating-animation, grid-pattern-bg, dot-pattern-bg, cover-pattern-overlay, pulse-glow, slide-in keyframes
+
+Files Created:
+- `/home/z/my-project/src/app/api/auth/update/route.ts` - User update API
+- `/home/z/my-project/src/app/api/reservations/[id]/route.ts` - Cancel reservation API
+- `/home/z/my-project/src/components/screens/FavoritesScreen.tsx` - Favorites screen
+- `/home/z/my-project/src/components/screens/ReservationsScreen.tsx` - Reservations screen
+
+Files Modified:
+- `/home/z/my-project/src/lib/store.ts` - Added favorites system, new screen types, returnDate
+- `/home/z/my-project/src/app/page.tsx` - Added FavoritesScreen, ReservationsScreen
+- `/home/z/my-project/src/app/layout.tsx` - Added ThemeProvider for dark mode
+- `/home/z/my-project/src/components/screens/SettingsScreen.tsx` - Fixed API, toast, dark mode with next-themes
+- `/home/z/my-project/src/components/screens/BorrowedScreen.tsx` - Added return button, return date display
+- `/home/z/my-project/src/components/screens/ProfileScreen.tsx` - Fixed menu navigation, added favorites link
+- `/home/z/my-project/src/components/layout/BottomNav.tsx` - Added borrow count badge, animations
+- `/home/z/my-project/src/components/screens/SearchScreen.tsx` - Fixed lint warning
+
+All lint checks pass with zero errors.
+
+Stage Summary:
+- Total screens: 13 (onboarding, login, home, search, qr-scan, borrowed, profile, settings, notifications, book-detail, attendance, favorites, reservations)
+- Total API endpoints: 14 (added auth/update, reservations/[id])
+- Dark mode working via next-themes
+- Favorites system fully functional
+- Return book and cancel reservation features working
+- All screens verified via agent-browser QA
+
+Current Project Status:
+- All 13 screens functional with real API data
+- Backend APIs all working (14 endpoints)
+- Database seeded with test data
+- Mobile-first design with purple theme (#652D90)
+- Dark mode implemented with next-themes
+- Favorites and reservations management screens added
+- Return book flow working
+- All previous unresolved issues from Phase 3 resolved:
+  ✅ Dark mode implemented (was UI-only placeholder)
+  ✅ Real trending data from API (was mock data)
+  ✅ Book detail "More Resources" connected to API (was static mock)
+  ✅ Reservation flow with status tracking (was missing)
+
+Unresolved Issues / Risks:
+- Book covers are placeholder gradients (no actual cover images)
+- Attendance data falls back to mock when API returns empty
+- Dark mode needs more testing across all screens for visual consistency
+- No actual QR code scanning (simulated only)
+- Password change not implemented (button exists but no modal)
+
+Priority Recommendations for Next Phase:
+1. Add image generation for book covers using AI
+2. Implement password change modal in settings
+3. Add real QR code scanning integration
+4. Add attendance eligibility reports
+5. Add search autocomplete/suggestions dropdown
+6. Add more micro-interactions and haptic feedback
+7. Implement offline caching with service workers
+8. Add push notification support

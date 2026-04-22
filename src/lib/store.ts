@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type AppScreen = 'onboarding' | 'home' | 'search' | 'qr-scan' | 'borrowed' | 'profile' | 'settings' | 'notifications' | 'book-detail' | 'login' | 'attendance'
+export type AppScreen = 'onboarding' | 'home' | 'search' | 'qr-scan' | 'borrowed' | 'profile' | 'settings' | 'notifications' | 'book-detail' | 'login' | 'attendance' | 'favorites' | 'reservations'
 
 export interface UserState {
   id: string
@@ -28,6 +28,7 @@ export interface BorrowedBook {
   coverImage: string | null
   borrowDate: string
   dueDate: string
+  returnDate?: string
   status: 'active' | 'overdue'
   daysLeft: number
 }
@@ -99,6 +100,11 @@ interface AppState {
   // Notifications
   unreadCount: number
   setUnreadCount: (count: number) => void
+
+  // Favorites
+  favorites: string[]
+  toggleFavorite: (id: string) => void
+  isFavorite: (id: string) => boolean
 }
 
 const defaultOnboardingData = {
@@ -171,6 +177,14 @@ export const useAppStore = create<AppState>()(
       // Notifications
       unreadCount: 3,
       setUnreadCount: (count) => set({ unreadCount: count }),
+
+      // Favorites
+      favorites: [],
+      toggleFavorite: (id) => set((state) => {
+        const exists = state.favorites.includes(id)
+        return { favorites: exists ? state.favorites.filter(f => f !== id) : [...state.favorites, id] }
+      }),
+      isFavorite: (id) => get().favorites.includes(id),
     }),
     {
       name: 'liblog-store',
@@ -180,6 +194,7 @@ export const useAppStore = create<AppState>()(
         user: state.user,
         onboardingStep: state.onboardingStep,
         onboardingData: state.onboardingData,
+        favorites: state.favorites,
       }),
     }
   )

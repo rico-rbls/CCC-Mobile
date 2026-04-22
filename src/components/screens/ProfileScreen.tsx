@@ -1,23 +1,36 @@
 'use client'
 
-import { useAppStore } from '@/lib/store'
+import { useAppStore, type AppScreen } from '@/lib/store'
 import { motion } from 'framer-motion'
 import {
   User, BookOpen, Flame, Calendar, Clock,
-  ChevronRight, Edit, Bell, Shield, HelpCircle, Info, LogOut, MapPin
+  ChevronRight, Edit, Bell, Shield, HelpCircle, Info, LogOut, MapPin, Heart, Mail, GraduationCap
 } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
 
 const menuItems = [
-  { id: 'settings', icon: Edit, label: 'Edit Profile', color: 'text-lib-purple' },
-  { id: 'settings', icon: Bell, label: 'Notification Preferences', desc: 'Due dates, reservations', color: 'text-lib-purple' },
-  { id: 'settings', icon: Shield, label: 'Privacy Policy', color: 'text-lib-purple' },
-  { id: 'settings', icon: HelpCircle, label: 'Help & Support', color: 'text-lib-purple' },
-  { id: 'settings', icon: Info, label: 'About', desc: 'v1.0.0', color: 'text-lib-purple' },
+  { id: 'settings', icon: Edit, label: 'Edit Profile', desc: 'Update your information', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+  { id: 'favorites', icon: Heart, label: 'My Favorites', desc: `${0} saved books`, color: 'text-red-500', bg: 'bg-red-50' },
+  { id: 'reservations', icon: BookOpen, label: 'My Reservations', desc: 'Track reserved items', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+  { id: 'settings', icon: Bell, label: 'Notification Preferences', desc: 'Due dates, reservations', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+  { id: 'settings', icon: Shield, label: 'Privacy Policy', desc: 'How we protect your data', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+  { id: 'settings', icon: HelpCircle, label: 'Help & Support', desc: 'FAQs and contact info', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+  { id: 'settings', icon: Info, label: 'About', desc: 'Version 1.0.0', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+]
+
+// Monthly reading data for bar chart
+const monthlyData = [
+  { month: 'Sep', books: 2 },
+  { month: 'Oct', books: 4 },
+  { month: 'Nov', books: 3 },
+  { month: 'Dec', books: 1 },
+  { month: 'Jan', books: 5 },
+  { month: 'Feb', books: 3 },
+  { month: 'Mar', books: 4 },
 ]
 
 export default function ProfileScreen() {
-  const { user, setCurrentScreen, logout } = useAppStore()
+  const { user, setCurrentScreen, logout, favorites } = useAppStore()
   const [borrowCount, setBorrowCount] = useState(0)
   const [attendanceCount, setAttendanceCount] = useState(0)
   const userIdRef = useRef(user?.id)
@@ -58,6 +71,7 @@ export default function ProfileScreen() {
   ]
 
   const roleLabel = user?.role === 'faculty' ? 'Faculty' : user?.role === 'visitor' ? 'Visitor' : 'Student'
+  const maxBooks = Math.max(...monthlyData.map(d => d.books), 1)
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -66,6 +80,7 @@ export default function ProfileScreen() {
         {/* Decorative circles */}
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
         <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/5" />
+        <div className="absolute top-12 right-20 w-16 h-16 rounded-full bg-white/5" />
         
         <div className="flex flex-col items-center relative z-10">
           <motion.div
@@ -77,15 +92,28 @@ export default function ProfileScreen() {
             <span className="text-2xl font-bold text-white">{user?.avatarInitials ?? 'U'}</span>
           </motion.div>
           <h2 className="text-xl font-bold text-white">{user?.fullName ?? 'User'}</h2>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="px-2 py-0.5 rounded-full bg-white/20 text-white/90 text-[10px] font-medium">
+          {/* Email below name */}
+          {user?.email && (
+            <div className="flex items-center gap-1.5 mt-1">
+              <Mail className="w-3 h-3 text-white/50" />
+              <p className="text-white/60 text-xs">{user.email}</p>
+            </div>
+          )}
+          {/* Role badge and program info */}
+          <div className="flex items-center gap-2 mt-1.5">
+            <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white/90 text-[10px] font-medium">
               {roleLabel}
             </span>
-            <p className="text-white/70 text-xs">
-              {[user?.program, user?.yearLevel].filter(Boolean).map(s => s?.charAt(0).toUpperCase() + s?.slice(1)).join(' · ')}
-            </p>
+            {user?.program && (
+              <div className="flex items-center gap-1">
+                <GraduationCap className="w-3 h-3 text-white/50" />
+                <span className="text-white/60 text-[10px]">
+                  {user.program}{user.yearLevel ? ` · ${user.yearLevel}` : ''}
+                </span>
+              </div>
+            )}
           </div>
-          <p className="text-white/50 text-[10px] mt-1 font-mono">ID: {user?.universityId}</p>
+          <p className="text-white/40 text-[10px] mt-1 font-mono">ID: {user?.universityId}</p>
         </div>
       </div>
 
@@ -113,6 +141,74 @@ export default function ProfileScreen() {
         </div>
       </div>
 
+      {/* Reading Stats card with mini bar chart */}
+      <div className="px-4 mt-3">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="bg-white rounded-2xl shadow-sm p-4"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-lib-purple-50 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-lib-purple" />
+              </div>
+              <span className="text-sm font-semibold text-foreground">Reading Stats</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground">Books per month</span>
+          </div>
+          {/* Mini bar chart */}
+          <div className="flex items-end gap-2 h-20">
+            {monthlyData.map((d, i) => (
+              <div key={d.month} className="flex-1 flex flex-col items-center gap-1">
+                <motion.div
+                  initial={{ height: 0 }}
+                  animate={{ height: `${(d.books / maxBooks) * 100}%` }}
+                  transition={{ delay: 0.2 + i * 0.05, duration: 0.4, ease: 'easeOut' }}
+                  className={`w-full rounded-t-md min-h-[4px] ${
+                    i === monthlyData.length - 1 ? 'bg-lib-purple' : 'bg-lib-purple-200'
+                  }`}
+                />
+                <span className={`text-[9px] ${i === monthlyData.length - 1 ? 'text-lib-purple font-bold' : 'text-muted-foreground'}`}>
+                  {d.month}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
+            <span className="text-[10px] text-muted-foreground">
+              Total: {monthlyData.reduce((sum, d) => sum + d.books, 0)} books this year
+            </span>
+            <span className="text-[10px] font-medium text-lib-purple">
+              Avg: {(monthlyData.reduce((sum, d) => sum + d.books, 0) / monthlyData.length).toFixed(1)}/mo
+            </span>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Favorite Books section */}
+      <div className="px-4 mt-3">
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          onClick={() => setCurrentScreen('favorites')}
+          className="w-full bg-white rounded-2xl shadow-sm p-4 flex items-center gap-3 card-hover-effect"
+        >
+          <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+            <Heart className="w-5 h-5 text-red-500 fill-red-500" />
+          </div>
+          <div className="flex-1 text-left">
+            <span className="text-sm font-semibold text-foreground">Favorite Books</span>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              {favorites.length} book{favorites.length !== 1 ? 's' : ''} saved to your collection
+            </p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-gray-300" />
+        </motion.button>
+      </div>
+
       {/* Quick info card */}
       <div className="px-4 mt-3">
         <div className="bg-lib-purple-50 rounded-xl p-3 flex items-center gap-3">
@@ -134,10 +230,10 @@ export default function ProfileScreen() {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                onClick={() => setCurrentScreen('settings')}
+                onClick={() => setCurrentScreen(item.id as AppScreen)}
                 className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/30 active:bg-lib-purple-50/50 transition-colors"
               >
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+                <div className={`w-9 h-9 rounded-xl ${item.bg} flex items-center justify-center`}>
                   <Icon className={`w-4 h-4 ${item.color}`} />
                 </div>
                 <div className="flex-1 text-left">
