@@ -138,9 +138,9 @@ export default function SearchScreen() {
   const isSearchEmpty = !localQuery.trim() && searchCategory === 'all'
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Search header */}
-      <div className="bg-white px-4 pt-4 pb-3 space-y-3 border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3 space-y-3 border-b border-gray-100 dark:border-gray-800">
         <h2 className="font-bold text-foreground text-lg">Search Catalog</h2>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -151,12 +151,12 @@ export default function SearchScreen() {
             onChange={(e) => handleSearchChange(e.target.value)}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-            className="h-11 pl-9 pr-9 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20"
+            className="h-11 pl-9 pr-9 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus:border-lib-purple focus:ring-lib-purple/20"
           />
           {localQuery && (
             <button
               onClick={clearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
               <X className="w-3 h-3 text-gray-500" />
             </button>
@@ -182,7 +182,7 @@ export default function SearchScreen() {
                   <button
                     key={term}
                     onClick={() => handleQuickSearch(term)}
-                    className="px-3 py-1.5 rounded-full bg-lib-purple-50 text-lib-purple text-xs font-medium hover:bg-lib-purple-100 active:bg-lib-purple-200 transition-colors"
+                    className="px-3 py-1.5 rounded-full bg-lib-purple-50 dark:bg-gray-800 text-lib-purple dark:text-gray-300 text-xs font-medium hover:bg-lib-purple-100 dark:hover:bg-gray-700 active:bg-lib-purple-200 transition-colors"
                   >
                     {term}
                   </button>
@@ -204,7 +204,7 @@ export default function SearchScreen() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                   isActive
                     ? 'bg-lib-purple text-white shadow-sm shadow-lib-purple/20'
-                    : 'bg-gray-100 text-gray-600 hover:bg-lib-purple-50'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-lib-purple-50 dark:hover:bg-gray-700'
                 }`}
               >
                 <Icon className="w-3 h-3" />
@@ -299,7 +299,7 @@ export default function SearchScreen() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03 }}
                 onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
-                className="w-full bg-white rounded-xl shadow-sm p-4 flex items-start gap-3 text-left card-hover-effect"
+                className="w-full bg-white dark:bg-gray-900 rounded-xl shadow-sm p-4 flex items-start gap-3 text-left card-hover-effect"
               >
                 {(() => {
                   const coverSrc = getResourceCover(resource.coverImage, resource.title)

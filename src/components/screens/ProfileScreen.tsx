@@ -11,13 +11,13 @@ import { useEffect, useState, useRef } from 'react'
 // Menu items defined as a function to accept dynamic data
 function getMenuItems(favCount: number) {
   return [
-    { id: 'settings', icon: Edit, label: 'Edit Profile', desc: 'Update your information', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-    { id: 'favorites', icon: Heart, label: 'My Favorites', desc: `${favCount} saved book${favCount !== 1 ? 's' : ''}`, color: 'text-red-500', bg: 'bg-red-50' },
-    { id: 'reservations', icon: BookOpen, label: 'My Reservations', desc: 'Track reserved items', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-    { id: 'settings', icon: Bell, label: 'Notification Preferences', desc: 'Due dates, reservations', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-    { id: 'settings', icon: Shield, label: 'Privacy Policy', desc: 'How we protect your data', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-    { id: 'settings', icon: HelpCircle, label: 'Help & Support', desc: 'FAQs and contact info', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-    { id: 'settings', icon: Info, label: 'About', desc: 'Version 1.0.0', color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
+    { id: 'edit-profile' as AppScreen, icon: Edit, label: 'Edit Profile', desc: 'Update your information', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
+    { id: 'favorites', icon: Heart, label: 'My Favorites', desc: `${favCount} saved book${favCount !== 1 ? 's' : ''}`, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
+    { id: 'reservations', icon: BookOpen, label: 'My Reservations', desc: 'Track reserved items', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
+    { id: 'settings', icon: Bell, label: 'Notification Preferences', desc: 'Due dates, reservations', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
+    { id: 'settings', icon: Shield, label: 'Privacy Policy', desc: 'How we protect your data', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
+    { id: 'settings', icon: HelpCircle, label: 'Help & Support', desc: 'FAQs and contact info', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
+    { id: 'settings', icon: Info, label: 'About', desc: 'Version 1.0.0', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
   ]
 }
 
@@ -71,16 +71,16 @@ export default function ProfileScreen() {
   }, [user?.id])
 
   const stats = [
-    { icon: BookOpen, label: 'Borrowed', value: String(borrowCount), color: 'text-lib-purple', bg: 'bg-lib-purple-50' },
-    { icon: MapPin, label: 'Visits', value: String(attendanceCount), color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { icon: Flame, label: 'Streak', value: String(user?.streakCount ?? 0), color: 'text-orange-500', bg: 'bg-orange-50' },
+    { icon: BookOpen, label: 'Borrowed', value: String(borrowCount), color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
+    { icon: MapPin, label: 'Visits', value: String(attendanceCount), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
+    { icon: Flame, label: 'Streak', value: String(user?.streakCount ?? 0), color: 'text-orange-500 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
   ]
 
   const roleLabel = user?.role === 'faculty' ? 'Faculty' : user?.role === 'visitor' ? 'Visitor' : 'Student'
   const maxBooks = Math.max(...monthlyData.map(d => d.books), 1)
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Profile header with gradient */}
       <div className="relative bg-purple-gradient px-6 pt-10 pb-16 rounded-b-[2rem] overflow-hidden">
         {/* Decorative circles */}
@@ -125,7 +125,7 @@ export default function ProfileScreen() {
 
       {/* Stats cards */}
       <div className="px-4 -mt-6">
-        <div className="bg-white rounded-2xl shadow-sm p-4 grid grid-cols-3 gap-3">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4 grid grid-cols-3 gap-3">
           {stats.map((stat, index) => {
             const Icon = stat.icon
             return (
@@ -153,7 +153,7 @@ export default function ProfileScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="bg-white rounded-2xl shadow-sm p-4"
+          className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
         >
           <div className="flex items-center gap-4">
             {/* Circular progress */}
@@ -207,7 +207,7 @@ export default function ProfileScreen() {
                       className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         readingGoal === goal
                           ? 'bg-lib-purple text-white'
-                          : 'bg-lib-purple-50 text-lib-purple hover:bg-lib-purple-100'
+                          : 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-gray-700'
                       }`}
                     >
                       {goal}
@@ -226,11 +226,11 @@ export default function ProfileScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="bg-white rounded-2xl shadow-sm p-4"
+          className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-lib-purple-50 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center">
                 <BookOpen className="w-4 h-4 text-lib-purple" />
               </div>
               <span className="text-sm font-semibold text-foreground">Reading Stats</span>
@@ -246,7 +246,7 @@ export default function ProfileScreen() {
                   animate={{ height: `${(d.books / maxBooks) * 100}%` }}
                   transition={{ delay: 0.2 + i * 0.05, duration: 0.4, ease: 'easeOut' }}
                   className={`w-full rounded-t-md min-h-[4px] ${
-                    i === monthlyData.length - 1 ? 'bg-lib-purple' : 'bg-lib-purple-200'
+                    i === monthlyData.length - 1 ? 'bg-lib-purple' : 'bg-lib-purple-200 dark:bg-gray-700'
                   }`}
                 />
                 <span className={`text-[9px] ${i === monthlyData.length - 1 ? 'text-lib-purple font-bold' : 'text-muted-foreground'}`}>
@@ -255,7 +255,7 @@ export default function ProfileScreen() {
               </div>
             ))}
           </div>
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50 dark:border-gray-800">
             <span className="text-[10px] text-muted-foreground">
               Total: {monthlyData.reduce((sum, d) => sum + d.books, 0)} books this year
             </span>
@@ -273,9 +273,9 @@ export default function ProfileScreen() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           onClick={() => setCurrentScreen('favorites')}
-          className="w-full bg-white rounded-2xl shadow-sm p-4 flex items-center gap-3 card-hover-effect"
+          className="w-full bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4 flex items-center gap-3 card-hover-effect"
         >
-          <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center flex-shrink-0">
             <Heart className="w-5 h-5 text-red-500 fill-red-500" />
           </div>
           <div className="flex-1 text-left">
@@ -284,15 +284,15 @@ export default function ProfileScreen() {
               {favorites.length} book{favorites.length !== 1 ? 's' : ''} saved to your collection
             </p>
           </div>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
+          <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600" />
         </motion.button>
       </div>
 
       {/* Quick info card */}
       <div className="px-4 mt-3">
-        <div className="bg-lib-purple-50 rounded-xl p-3 flex items-center gap-3">
+        <div className="bg-lib-purple-50 dark:bg-gray-800/50 rounded-xl p-3 flex items-center gap-3">
           <Clock className="w-4 h-4 text-lib-purple flex-shrink-0" />
-          <p className="text-xs text-lib-purple-700">
+          <p className="text-xs text-lib-purple-700 dark:text-lib-purple-300">
             Member since {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </p>
         </div>
@@ -300,7 +300,7 @@ export default function ProfileScreen() {
 
       {/* Menu */}
       <div className="flex-1 px-4 pt-4 overflow-y-auto">
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden divide-y divide-gray-50">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden divide-y divide-gray-50 dark:divide-gray-800">
           {getMenuItems(favorites.length).map((item, index) => {
             const Icon = item.icon
             return (
@@ -310,7 +310,7 @@ export default function ProfileScreen() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={() => setCurrentScreen(item.id as AppScreen)}
-                className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/30 active:bg-lib-purple-50/50 transition-colors"
+                className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/30 dark:hover:bg-gray-800 active:bg-lib-purple-50/50 transition-colors"
               >
                 <div className={`w-9 h-9 rounded-xl ${item.bg} flex items-center justify-center`}>
                   <Icon className={`w-4 h-4 ${item.color}`} />
@@ -319,7 +319,7 @@ export default function ProfileScreen() {
                   <span className="text-sm font-medium text-foreground block">{item.label}</span>
                   {item.desc && <span className="text-[10px] text-muted-foreground">{item.desc}</span>}
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-300" />
+                <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600" />
               </motion.button>
             )
           })}
@@ -331,7 +331,7 @@ export default function ProfileScreen() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
           onClick={logout}
-          className="w-full mt-4 flex items-center justify-center gap-2 py-3.5 rounded-2xl border-2 border-red-200 bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 active:bg-red-200 transition-colors"
+          className="w-full mt-4 flex items-center justify-center gap-2 py-3.5 rounded-2xl border-2 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold text-sm hover:bg-red-100 dark:hover:bg-red-900/30 active:bg-red-200 dark:active:bg-red-900/40 transition-colors"
         >
           <LogOut className="w-4 h-4" />
           Log Out

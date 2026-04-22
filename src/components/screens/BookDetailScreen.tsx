@@ -2,12 +2,36 @@
 
 import { useAppStore, type ResourceItem } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, BookOpen, MapPin, Bookmark, ChevronRight, Loader2, Heart, Share2, Calendar, Hash } from 'lucide-react'
+import { ArrowLeft, BookOpen, MapPin, Bookmark, ChevronRight, Loader2, Heart, Share2, Calendar, Hash, Star, MessageSquare, Trash2, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useState, useEffect, useCallback } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { getResourceCover } from '@/lib/covers'
+
+interface ReviewUser {
+  id: string
+  fullName: string
+  avatarInitials: string | null
+  role: string
+}
+
+interface ReviewItem {
+  id: string
+  userId: string
+  resourceId: string
+  rating: number
+  comment: string | null
+  createdAt: string
+  updatedAt: string
+  user: ReviewUser
+}
+
+interface ReviewStats {
+  averageRating: number
+  totalReviews: number
+  distribution: number[]
+}
 
 export default function BookDetailScreen() {
   const { selectedBookId, user, goBack, setCurrentScreen, setSelectedBookId, toggleFavorite, isFavorite } = useAppStore()
@@ -19,6 +43,17 @@ export default function BookDetailScreen() {
   const [hearted, setHearted] = useState(false)
   const [showShareToast, setShowShareToast] = useState(false)
   const { toast } = useToast()
+
+  // Review state
+  const [reviews, setReviews] = useState<ReviewItem[]>([])
+  const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, totalReviews: 0, distribution: [0, 0, 0, 0, 0] })
+  const [showReviewForm, setShowReviewForm] = useState(false)
+  const [reviewRating, setReviewRating] = useState(0)
+  const [reviewComment, setReviewComment] = useState('')
+  const [submittingReview, setSubmittingReview] = useState(false)
+  const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null)
+
+  const userReview = reviews.find(r => r.userId === user?.id)
 
   const fetchBook = useCallback(async () => {
     if (!selectedBookId) return
@@ -80,10 +115,25 @@ export default function BookDetailScreen() {
     }
   }, [selectedBookId])
 
+  const fetchReviews = useCallback(async () => {
+    if (!selectedBookId) return
+    try {
+      const res = await fetch(`/api/reviews?resourceId=${selectedBookId}`)
+      const data = await res.json()
+      if (res.ok) {
+        setReviews(data.reviews || [])
+        setReviewStats(data.stats || { averageRating: 0, totalReviews: 0, distribution: [0, 0, 0, 0, 0] })
+      }
+    } catch (e) {
+      console.error('Failed to fetch reviews:', e)
+    }
+  }, [selectedBookId])
+
   useEffect(() => {
     fetchBook()
     fetchRelated()
-  }, [fetchBook, fetchRelated])
+    fetchReviews()
+  }, [fetchBook, fetchRelated, fetchReviews])
 
   const handleBorrow = async () => {
     if (!user?.id || !book) return
@@ -154,6 +204,70 @@ export default function BookDetailScreen() {
       setShowShareToast(true)
       setTimeout(() => setShowShareToast(false), 2000)
     }
+  }
+
+  const handleSubmitReview = async () => {
+    if (!user?.id || !book || reviewRating === 0) return
+    setSubmittingReview(true)
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          resourceId: book.id,
+          rating: reviewRating,
+          comment: reviewComment.trim() || undefined,
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        toast({ title: 'Error', description: data.error || 'Failed to submit review', variant: 'destructive' })
+        return
+      }
+      toast({ title: userReview ? 'Review Updated!' : 'Review Submitted!', description: 'Thank you for your feedback.' })
+      setShowReviewForm(false)
+      setReviewRating(0)
+      setReviewComment('')
+      fetchReviews()
+    } catch {
+      toast({ title: 'Error', description: 'Something went wrong.', variant: 'destructive' })
+    } finally {
+      setSubmittingReview(false)
+    }
+  }
+
+  const handleDeleteReview = async (reviewId: string) => {
+    setDeletingReviewId(reviewId)
+    try {
+      const res = await fetch(`/api/reviews/${reviewId}`, { method: 'DELETE' })
+      if (!res.ok) {
+        toast({ title: 'Error', description: 'Failed to delete review', variant: 'destructive' })
+        return
+      }
+      toast({ title: 'Review Deleted', description: 'Your review has been removed.' })
+      fetchReviews()
+    } catch {
+      toast({ title: 'Error', description: 'Something went wrong.', variant: 'destructive' })
+    } finally {
+      setDeletingReviewId(null)
+    }
+  }
+
+  const openReviewForm = () => {
+    if (userReview) {
+      setReviewRating(userReview.rating)
+      setReviewComment(userReview.comment || '')
+    } else {
+      setReviewRating(0)
+      setReviewComment('')
+    }
+    setShowReviewForm(true)
+  }
+
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr)
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   }
 
   if (loading) {
@@ -301,6 +415,256 @@ export default function BookDetailScreen() {
                 </span>
               ))}
             </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* ─── Ratings & Reviews Section ─────────────────────────────── */}
+      <div className="px-4 mt-4">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-2xl shadow-sm p-4"
+        >
+          {/* Section Header */}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-5 rounded-full bg-lib-purple" />
+            <h3 className="font-bold text-foreground text-sm">Ratings & Reviews</h3>
+            <span className="text-[10px] text-muted-foreground ml-auto">{reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}</span>
+          </div>
+
+          {/* Rating Summary Card */}
+          <div className="flex gap-4 items-start">
+            {/* Left: big average */}
+            <div className="flex flex-col items-center min-w-[72px]">
+              <span className="text-3xl font-bold text-foreground">
+                {reviewStats.totalReviews > 0 ? reviewStats.averageRating.toFixed(1) : '–'}
+              </span>
+              <div className="flex items-center gap-0.5 mt-1">
+                {[1, 2, 3, 4, 5].map(s => (
+                  <Star
+                    key={s}
+                    className={`w-3.5 h-3.5 ${
+                      s <= Math.round(reviewStats.averageRating)
+                        ? 'text-lib-purple fill-lib-purple'
+                        : 'text-gray-200'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-[10px] text-muted-foreground mt-0.5">
+                {reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}
+              </span>
+            </div>
+
+            {/* Right: distribution bars */}
+            <div className="flex-1 space-y-1.5">
+              {[5, 4, 3, 2, 1].map(star => {
+                const count = reviewStats.distribution[star - 1]
+                const pct = reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0
+                return (
+                  <div key={star} className="flex items-center gap-2">
+                    <span className="text-[10px] text-muted-foreground w-3 text-right">{star}</span>
+                    <Star className="w-2.5 h-2.5 text-lib-purple fill-lib-purple" />
+                    <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${pct}%` }}
+                        transition={{ duration: 0.5, delay: 0.05 * star }}
+                        className="h-full rounded-full bg-lib-purple"
+                      />
+                    </div>
+                    <span className="text-[10px] text-muted-foreground w-4 text-right">{count}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Write a Review / Edit your Review button */}
+          <div className="mt-4">
+            {user && (
+              <Button
+                onClick={openReviewForm}
+                variant="outline"
+                className={`w-full h-10 rounded-xl text-sm font-semibold transition-colors ${
+                  userReview
+                    ? 'border-lib-purple-200 text-lib-purple hover:bg-lib-purple-50'
+                    : 'bg-lib-purple hover:bg-lib-purple-dark text-white border-0'
+                }`}
+              >
+                {userReview ? (
+                  <span className="flex items-center gap-2">
+                    <Pencil className="w-4 h-4" /> Edit your review
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4" /> Write a Review
+                  </span>
+                )}
+              </Button>
+            )}
+
+            {/* Inline Review Form */}
+            <AnimatePresence>
+              {showReviewForm && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-3 p-3 rounded-xl bg-gray-50 border border-gray-100 space-y-3">
+                    {/* Star Selector */}
+                    <div>
+                      <p className="text-xs font-medium text-foreground mb-1.5">Your Rating</p>
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map(s => (
+                          <button
+                            key={s}
+                            onClick={() => setReviewRating(s)}
+                            className="p-0.5 transition-transform active:scale-90"
+                            aria-label={`Rate ${s} star${s > 1 ? 's' : ''}`}
+                          >
+                            <Star
+                              className={`w-7 h-7 transition-colors ${
+                                s <= reviewRating
+                                  ? 'text-lib-purple fill-lib-purple'
+                                  : 'text-gray-200 hover:text-lib-purple-300'
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Comment Textarea */}
+                    <div>
+                      <p className="text-xs font-medium text-foreground mb-1.5">Comment <span className="text-muted-foreground font-normal">(optional)</span></p>
+                      <textarea
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value.slice(0, 200))}
+                        placeholder="Share your thoughts about this book..."
+                        rows={3}
+                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-lib-purple/30 focus:border-lib-purple resize-none transition-colors"
+                      />
+                      <p className="text-[10px] text-muted-foreground text-right mt-0.5">{reviewComment.length}/200</p>
+                    </div>
+
+                    {/* Submit / Cancel */}
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleSubmitReview}
+                        disabled={reviewRating === 0 || submittingReview}
+                        className="flex-1 h-9 rounded-lg bg-lib-purple hover:bg-lib-purple-dark text-white text-xs font-semibold disabled:opacity-50"
+                      >
+                        {submittingReview ? (
+                          <span className="flex items-center gap-1.5">
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Submitting...
+                          </span>
+                        ) : (
+                          'Submit Review'
+                        )}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setShowReviewForm(false)
+                          setReviewRating(0)
+                          setReviewComment('')
+                        }}
+                        variant="outline"
+                        className="h-9 px-4 rounded-lg text-xs"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Reviews List */}
+          <div className="mt-4 max-h-96 overflow-y-auto custom-scrollbar">
+            {reviews.length > 0 ? (
+              <div className="space-y-3">
+                {reviews.map((review, index) => (
+                  <motion.div
+                    key={review.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 * index }}
+                    className="p-3 rounded-xl bg-gray-50 border border-gray-100 relative"
+                  >
+                    <div className="flex items-start gap-2.5">
+                      {/* Avatar initials circle */}
+                      <div className="w-8 h-8 rounded-full bg-lib-purple/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-[10px] font-bold text-lib-purple">
+                          {review.user.avatarInitials || review.user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        </span>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        {/* Name + role badge */}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-semibold text-foreground">{review.user.fullName}</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${
+                            review.user.role === 'faculty'
+                              ? 'bg-amber-50 text-amber-700'
+                              : review.user.role === 'student'
+                              ? 'bg-blue-50 text-blue-700'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {review.user.role.charAt(0).toUpperCase() + review.user.role.slice(1)}
+                          </span>
+                        </div>
+
+                        {/* Star rating */}
+                        <div className="flex items-center gap-0.5 mt-0.5">
+                          {[1, 2, 3, 4, 5].map(s => (
+                            <Star
+                              key={s}
+                              className={`w-3 h-3 ${
+                                s <= review.rating ? 'text-lib-purple fill-lib-purple' : 'text-gray-200'
+                              }`}
+                            />
+                          ))}
+                          <span className="text-[10px] text-muted-foreground ml-1">{formatDate(review.createdAt)}</span>
+                        </div>
+
+                        {/* Comment */}
+                        {review.comment && (
+                          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{review.comment}</p>
+                        )}
+                      </div>
+
+                      {/* Delete button for own review */}
+                      {user?.id === review.userId && (
+                        <button
+                          onClick={() => handleDeleteReview(review.id)}
+                          disabled={deletingReviewId === review.id}
+                          className="p-1.5 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0"
+                          aria-label="Delete review"
+                        >
+                          {deletingReviewId === review.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <MessageSquare className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-xs text-muted-foreground">No reviews yet. Be the first to review!</p>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>

@@ -298,3 +298,105 @@ Stage Summary:
 - Comprehensive documentation of all 13 screens, 19 API endpoints, 8 DB models
 - Serves as single source of truth for feature inventory
 - Includes changelog table for tracking updates over time
+
+---
+Task ID: 7-a
+Agent: Change Password Agent
+Task: Implement Change Password modal in Settings screen
+
+Work Log:
+- Read SettingsScreen.tsx and found the Change Password modal was already partially implemented (state, handler, AnimatePresence modal structure)
+- Identified 3 missing/inconsistent features vs. requirements and onboarding style:
+  1. Confirm New Password field lacked a show/hide toggle (instruction: "Each field has a show/hide toggle")
+  2. Password strength meter used `transition-all` without `duration-300` (onboarding uses `duration-300`)
+  3. "Passwords match" text lacked Check icon (onboarding uses `<Check className="w-3 h-3" /> Passwords match`)
+- Verified `showConfirmPwd` state already existed but was unused in JSX
+- Added `Check` to lucide-react imports
+- Added show/hide toggle (Eye/EyeOff button with `hover:text-lib-purple transition-colors`) to Confirm New Password field, wrapping Input in a `relative` div with `pr-10` padding
+- Added `duration-300` to strength meter bar transition (`transition-all duration-300`)
+- Changed "Passwords match" text to include Check icon: `<Check className="w-3 h-3" /> Passwords match`
+- Confirmed all existing features were already correct: bg-emerald-400 for "Good" strength, purple-themed hover on eye toggles, spring animation for modal, API call to PUT /api/auth/update, inline error messages, success toast
+- Ran `bun run lint` — zero errors
+
+Stage Summary:
+- Change Password modal now fully matches onboarding password UI style
+- All 3 password fields have show/hide toggles with purple hover effect
+- Password strength meter has smooth 300ms transitions matching onboarding
+- Confirm password shows green Check icon + "Passwords match" on match
+- Modal slides up from bottom with spring animation (damping: 25, stiffness: 300)
+- PUT /api/auth/update integration works with currentPassword verification
+- Lint passes with zero errors
+
+---
+Task ID: 8-a
+Agent: Reviews UI Agent
+Task: Add Reviews/Ratings UI to BookDetailScreen + seed data
+
+Work Log:
+- Added `prisma.review.deleteMany()` to seed cleanup section to avoid unique constraint errors on re-seed
+- Added 10 sample reviews to prisma/seed.ts covering 6 different resources with ratings from 2-5 and realistic comments
+- Added `db:seed` script and `prisma.seed` config to package.json for proper seed execution
+- Ran `npx prisma db seed` successfully — 10 reviews created
+- Completely rewrote BookDetailScreen.tsx with a full Ratings & Reviews section:
+  1. **Rating Summary Card**: Large average rating number, filled star row, total reviews count, 5-row distribution bars (5★→1★) with animated purple fill proportional to percentage and count labels
+  2. **Write/Edit Review Button**: Purple primary button for new review, outline variant with Pencil icon for editing existing review; toggles inline form below
+  3. **Inline Review Form**: 5-star selector (tap to select, purple fill), optional comment textarea (200 char limit with counter), Submit button (calls POST /api/reviews with upsert), Cancel button to collapse; AnimatePresence slide animation
+  4. **Reviews List**: Each card has avatar initials circle, user name, role badge (color-coded: amber=faculty, blue=student, gray=visitor), small star rating row, date, comment text; staggered animation (0.05s delay per card); max-h-96 overflow with custom scrollbar
+  5. **Delete Review**: Small trash button on user's own review, calls DELETE /api/reviews/[id], loading spinner during deletion
+  6. **Empty State**: MessageSquare icon + "No reviews yet. Be the first to review!" message when no reviews exist
+- Added new imports: Star, MessageSquare, Trash2, Pencil from lucide-react
+- Added new state: reviews, reviewStats, showReviewForm, reviewRating, reviewComment, submittingReview, deletingReviewId
+- Added new functions: fetchReviews, handleSubmitReview, handleDeleteReview, openReviewForm, formatDate
+- Reviews section positioned between book details card and action buttons
+- Purple theme (#652D90) used for stars, distribution bars, buttons, and accents
+- All Framer Motion animations applied (staggered review cards, animated distribution bars, AnimatePresence form toggle)
+- Mobile-first design, max 430px optimized
+- `bun run lint` passes with zero errors
+
+Stage Summary:
+- 10 sample review records seeded across 6 resources (Introduction to Algorithms: 3 reviews, Deep Learning: 2, Clean Code: 1, AI: A Modern Approach: 1, The Pragmatic Programmer: 2, Database System Concepts: 1)
+- Ratings & Reviews section fully functional on BookDetailScreen with summary, form, and list
+- Review API integration working (GET /api/reviews, POST /api/reviews with upsert, DELETE /api/reviews/[id])
+- Purple-themed star ratings, distribution bars, and form elements match app design
+- Staggered animations on review cards and distribution bars
+- Own-review detection for edit/delete functionality
+
+---
+Task ID: 8-c
+Agent: Dark Mode Agent
+Task: Add dark mode classes to screens that are missing them
+
+Work Log:
+- Read worklog.md and all 7 target screen files to assess current dark: class coverage
+- Applied systematic dark mode classes to all 7 screens following the specified rules:
+  - Card backgrounds: `dark:bg-gray-900`
+  - Page backgrounds: `dark:bg-gray-950`
+  - Borders: `dark:border-gray-800` or `dark:border-gray-700`
+  - Colored backgrounds: `dark:bg-{color}-900/20` or `dark:bg-gray-800`
+  - Hover states: `dark:hover:bg-gray-800`
+  - Text: `dark:text-gray-400`, `dark:text-{color}-400` for secondary text
+
+1. **BorrowedScreen.tsx**: Added dark: to emerald status badge (bg-emerald-50 → dark:bg-emerald-900/30, text-emerald-700 → dark:text-emerald-400), View button hover (dark:hover:bg-gray-800)
+
+2. **ProfileScreen.tsx**: Added dark: to bar chart inactive bars (bg-lib-purple-200 → dark:bg-gray-700), chart border (border-gray-50 → dark:border-gray-800), chevron icons (text-gray-300 → dark:text-gray-600), member-since card (bg-lib-purple-50 → dark:bg-gray-800/50, text-lib-purple-700 → dark:text-lib-purple-300), logout button (full dark variants for border, bg, text, hover, active states)
+
+3. **NotificationsScreen.tsx**: Added dark: to typeConfig objects (due_date: dark:bg-orange-900/20, dark:text-orange-400; reservation: dark:bg-gray-800, dark:text-lib-purple-300; announcement: dark:bg-blue-900/20, dark:text-blue-400), read notification border (border-l-gray-200 → dark:border-l-gray-700), back button hover (dark:hover:bg-gray-800), empty state icon (dark:bg-gray-800)
+
+4. **HomeScreen.tsx**: Added dark: to quick action configs (bg-lib-purple-50 → dark:bg-gray-800), header button hovers (dark:hover:bg-gray-800), library status badges (bg-green-50 → dark:bg-green-900/20, border-green-200 → dark:border-green-800, same for red), library text colors (text-green-700 → dark:text-green-400, text-red-700 → dark:text-red-400), announcement card (dark:bg-gray-800/50, dark:border-gray-700, dark:text-lib-purple-300), status badges (dark:bg-red-900/30, dark:bg-yellow-900/30, dark:text variants), category badge (dark:bg-gray-800, dark:border-gray-700), empty state icons (dark:bg-gray-800, dark:bg-gray-700), action buttons (dark:hover:bg-gray-800), trending items (dark hover/active states, rank badge dark variant), recommendation cover badges (dark:bg-gray-800/90)
+
+5. **AttendanceScreen.tsx**: Full dark mode overhaul - page bg (dark:bg-gray-950), header (dark:bg-gray-900, dark:border-gray-800, dark:hover:bg-gray-800), summary cards (dark:bg-gray-900, dark:bg-gray-800, dark:bg-orange-900/20), calendar card (dark:bg-gray-900), calendar cells (dark:bg-gray-800 for future/empty), legend (dark:border-gray-800, dark:bg-gray-800, dark:bg-gray-900), recent visits card (dark:bg-gray-900), visit borders (dark:border-gray-800), icon backgrounds (dark:bg-gray-800)
+
+6. **FavoritesScreen.tsx**: Full dark mode overhaul - page bg (dark:bg-gray-950), header (dark:bg-gray-900, dark:border-gray-800, dark:hover:bg-gray-800), heart icon bg (dark:bg-red-900/20), empty state (dark:bg-gray-800), book cards (dark:bg-gray-900), category colors (book: dark:bg-gray-800; research: dark:bg-blue-900/20, dark:text-blue-400; magazine: dark:bg-orange-900/20, dark:text-orange-400), default category (dark:bg-gray-800, dark:text-gray-400), remove button (dark hover/active states)
+
+7. **ReservationsScreen.tsx**: Full dark mode overhaul - statusConfig (all statuses: dark:bg variants, dark:text variants for color, bg, badgeClass), page bg (dark:bg-gray-950), header (dark:bg-gray-900, dark:border-gray-800, dark:hover:bg-gray-800), bookmark icon (dark:bg-gray-800), filter tabs (dark:bg-gray-800, dark:text-lib-purple-300, dark:hover:bg-gray-700), empty state (dark:bg-gray-800), reservation cards (dark:bg-gray-900), cancel button (dark:text-red-400, dark:hover:text-red-300, dark:hover:bg-red-900/20), borrow button (dark:hover:bg-gray-800)
+
+Files Modified:
+- `/home/z/my-project/src/components/screens/BorrowedScreen.tsx` - Dark mode for emerald badge, View button
+- `/home/z/my-project/src/components/screens/ProfileScreen.tsx` - Dark mode for chart, chevrons, member card, logout
+- `/home/z/my-project/src/components/screens/NotificationsScreen.tsx` - Dark mode for typeConfig, borders, hovers
+- `/home/z/my-project/src/components/screens/HomeScreen.tsx` - Dark mode for badges, cards, buttons, trending
+- `/home/z/my-project/src/components/screens/AttendanceScreen.tsx` - Full dark mode overhaul
+- `/home/z/my-project/src/components/screens/FavoritesScreen.tsx` - Full dark mode overhaul
+- `/home/z/my-project/src/components/screens/ReservationsScreen.tsx` - Full dark mode overhaul
+
+All lint checks pass with zero errors. Dev server compiles successfully.

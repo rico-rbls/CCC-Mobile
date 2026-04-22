@@ -11,6 +11,7 @@ async function main() {
   console.log('🌱 Seeding database...')
 
   // Clean existing data
+  await prisma.review.deleteMany()
   await prisma.notification.deleteMany()
   await prisma.reservation.deleteMany()
   await prisma.borrowRecord.deleteMany()
@@ -513,6 +514,73 @@ async function main() {
     },
   })
   console.log('✅ Sample attendance records created')
+
+  // ─── Reviews ───────────────────────────────────────────────────
+  await prisma.review.createMany({
+    data: [
+      {
+        userId: student.id,
+        resourceId: resources[0].id, // Introduction to Algorithms
+        rating: 5,
+        comment: 'Excellent textbook for algorithms! Clear explanations and comprehensive coverage of every topic.',
+      },
+      {
+        userId: faculty.id,
+        resourceId: resources[0].id, // Introduction to Algorithms
+        rating: 5,
+        comment: 'The gold standard for algorithm textbooks. I use this in every course I teach.',
+      },
+      {
+        userId: visitor.id,
+        resourceId: resources[0].id, // Introduction to Algorithms
+        rating: 4,
+        comment: 'Very thorough but can be dense. Great as a reference book.',
+      },
+      {
+        userId: student.id,
+        resourceId: resources[3].id, // Deep Learning
+        rating: 5,
+        comment: 'Great for deep learning fundamentals. The math sections are rigorous yet accessible.',
+      },
+      {
+        userId: faculty.id,
+        resourceId: resources[3].id, // Deep Learning
+        rating: 4,
+        comment: 'A solid foundation for understanding neural networks. Some chapters feel outdated now.',
+      },
+      {
+        userId: student.id,
+        resourceId: resources[1].id, // Clean Code
+        rating: 4,
+        comment: 'Changed the way I write code. Practical advice every developer should follow.',
+      },
+      {
+        userId: student.id,
+        resourceId: resources[8].id, // AI: A Modern Approach
+        rating: 5,
+        comment: 'The most comprehensive AI textbook available. Covers everything from search to deep learning.',
+      },
+      {
+        userId: faculty.id,
+        resourceId: resources[4].id, // The Pragmatic Programmer
+        rating: 5,
+        comment: 'Timeless wisdom for programmers. I recommend this to all my students.',
+      },
+      {
+        userId: visitor.id,
+        resourceId: resources[4].id, // The Pragmatic Programmer
+        rating: 3,
+        comment: 'Good insights but some advice feels obvious if you have industry experience.',
+      },
+      {
+        userId: student.id,
+        resourceId: resources[5].id, // Database System Concepts
+        rating: 2,
+        comment: 'Dense and hard to follow in some chapters. Better alternatives exist for self-study.',
+      },
+    ],
+  })
+  console.log('✅ Reviews created (10)')
 
   console.log('\n🎉 Seeding complete!')
   console.log(`\n📋 Test Accounts:`)

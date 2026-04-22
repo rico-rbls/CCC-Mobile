@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type AppScreen = 'onboarding' | 'home' | 'search' | 'qr-scan' | 'borrowed' | 'profile' | 'settings' | 'notifications' | 'book-detail' | 'login' | 'attendance' | 'favorites' | 'reservations'
+export type AppScreen = 'onboarding' | 'home' | 'search' | 'qr-scan' | 'borrowed' | 'profile' | 'settings' | 'notifications' | 'book-detail' | 'login' | 'attendance' | 'favorites' | 'reservations' | 'edit-profile'
 
 export interface UserState {
   id: string

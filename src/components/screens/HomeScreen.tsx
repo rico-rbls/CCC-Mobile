@@ -47,7 +47,7 @@ function SectionHeader({ children, icon }: { children: React.ReactNode; icon?: R
 // ── Shimmer / skeleton card ────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4 space-y-3">
       <Skeleton className="h-4 w-3/4" />
       <Skeleton className="h-3 w-1/2" />
       <Skeleton className="h-1.5 w-full" />
@@ -301,16 +301,16 @@ export default function HomeScreen() {
   // ── Quick actions config ──────────────────────────────────────
   const quickActions = [
     { label: 'Scan QR', subtitle: 'Attendance', icon: QrCode, bg: 'bg-lib-purple', text: 'text-white', screen: 'qr-scan' as const },
-    { label: 'My Loans', subtitle: 'View history', icon: BookOpen, bg: 'bg-lib-purple-50', text: 'text-lib-purple', screen: 'borrowed' as const },
-    { label: 'Reservations', subtitle: 'Track items', icon: Bookmark, bg: 'bg-lib-purple-50', text: 'text-lib-purple', screen: 'borrowed' as const },
-    { label: 'Attendance', subtitle: 'Check in', icon: Calendar, bg: 'bg-lib-purple-50', text: 'text-lib-purple', screen: 'home' as const },
+    { label: 'My Loans', subtitle: 'View history', icon: BookOpen, bg: 'bg-lib-purple-50 dark:bg-gray-800', text: 'text-lib-purple', screen: 'borrowed' as const },
+    { label: 'Reservations', subtitle: 'Track items', icon: Bookmark, bg: 'bg-lib-purple-50 dark:bg-gray-800', text: 'text-lib-purple', screen: 'borrowed' as const },
+    { label: 'Attendance', subtitle: 'Check in', icon: Calendar, bg: 'bg-lib-purple-50 dark:bg-gray-800', text: 'text-lib-purple', screen: 'home' as const },
   ]
 
   // ── Loading state ─────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50">
-        <div className="bg-white px-4 pt-4 pb-3">
+      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+        <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3">
           <div className="flex items-center justify-between mb-3">
             <Skeleton className="h-5 w-28" />
             <div className="flex gap-2">
@@ -338,7 +338,7 @@ export default function HomeScreen() {
   // ── Render ────────────────────────────────────────────────────
   return (
     <div
-      className="flex flex-col min-h-screen bg-gray-50"
+      className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -361,7 +361,7 @@ export default function HomeScreen() {
       </AnimatePresence>
 
       {/* ── Top section ─────────────────────────────────────── */}
-      <div className="bg-white px-4 pt-4 pb-3">
+      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3">
         {/* Top bar */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-1.5">
@@ -372,7 +372,7 @@ export default function HomeScreen() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentScreen('notifications')}
-              className="relative p-2 rounded-full hover:bg-lib-purple-50 transition-colors"
+              className="relative p-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors"
               aria-label="Notifications"
             >
               <Bell className="w-5 h-5 text-foreground" />
@@ -384,7 +384,7 @@ export default function HomeScreen() {
             </button>
             <button
               onClick={() => setCurrentScreen('settings')}
-              className="p-2 rounded-full hover:bg-lib-purple-50 transition-colors"
+              className="p-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors"
               aria-label="Settings"
             >
               <Settings className="w-5 h-5 text-foreground" />
@@ -420,11 +420,11 @@ export default function HomeScreen() {
         <div className="flex items-center justify-between mb-1">
           <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${
             libraryOpen
-              ? 'bg-green-50 border-green-200'
-              : 'bg-red-50 border-red-200'
+              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
           }`}>
             <span className={`w-2 h-2 rounded-full ${libraryOpen ? 'bg-green-500' : 'bg-red-500'}`} />
-            <span className={`text-xs font-medium ${libraryOpen ? 'text-green-700' : 'text-red-700'}`}>
+            <span className={`text-xs font-medium ${libraryOpen ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
               Library {libraryOpen ? 'Open' : 'Closed'} · {libraryOpen ? `Closes ${closingTime}` : 'Opens tomorrow'}
             </span>
           </div>
@@ -438,7 +438,7 @@ export default function HomeScreen() {
       </div>
 
       {/* ── Subtle divider ──────────────────────────────────── */}
-      <div className="h-px bg-gradient-to-r from-transparent via-lib-purple-200 to-transparent" />
+      <div className="h-px bg-gradient-to-r from-transparent via-lib-purple-200 dark:via-gray-800 to-transparent" />
 
       {/* ── Main content ─────────────────────────────────────── */}
       <div className="flex-1 px-4 py-4 space-y-5 overflow-y-auto custom-scrollbar">
@@ -459,7 +459,7 @@ export default function HomeScreen() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="bg-lib-purple-50 border border-lib-purple-200 rounded-2xl p-4 relative"
+                className="bg-lib-purple-50 dark:bg-gray-800/50 border border-lib-purple-200 dark:border-gray-700 rounded-2xl p-4 relative"
               >
                 <button
                   onClick={() => {
@@ -477,7 +477,7 @@ export default function HomeScreen() {
                   </div>
                   <div className="min-w-0">
                     <h4 className="font-semibold text-lib-purple text-sm leading-tight">{currentAnnouncement.title}</h4>
-                    <p className="text-xs text-lib-purple-700 mt-1 leading-relaxed">{currentAnnouncement.message}</p>
+                    <p className="text-xs text-lib-purple-700 dark:text-lib-purple-300 mt-1 leading-relaxed">{currentAnnouncement.message}</p>
                   </div>
                 </div>
                 {/* Carousel dots */}
@@ -559,7 +559,7 @@ export default function HomeScreen() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl shadow-sm overflow-hidden relative card-hover-effect"
+              className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden relative card-hover-effect"
             >
               {/* Gradient overlay on left border */}
               <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-2xl" />
@@ -572,10 +572,10 @@ export default function HomeScreen() {
                   </div>
                   <div className={`px-2 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 ml-2 ${
                     activeBook.status === 'overdue'
-                      ? 'bg-red-100 text-red-700'
+                      ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                       : activeBook.daysLeft <= 3
-                      ? 'bg-yellow-100 text-yellow-700'
-                      : 'bg-lib-purple-50 text-lib-purple'
+                      ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
+                      : 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple'
                   }`}>
                     {activeBook.status === 'overdue'
                       ? `${Math.abs(activeBook.daysLeft)} days overdue`
@@ -586,7 +586,7 @@ export default function HomeScreen() {
 
                 {/* Category badge */}
                 {activeBook.category && (
-                  <Badge variant="secondary" className="mb-2 text-[10px] h-5 bg-lib-purple-50 text-lib-purple border-lib-purple-200">
+                  <Badge variant="secondary" className="mb-2 text-[10px] h-5 bg-lib-purple-50 dark:bg-gray-800 text-lib-purple border-lib-purple-200 dark:border-gray-700">
                     {activeBook.category}
                   </Badge>
                 )}
@@ -601,7 +601,7 @@ export default function HomeScreen() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="mt-2 h-7 px-2 text-lib-purple hover:text-lib-purple-light hover:bg-lib-purple-50 text-xs font-medium p-0"
+                  className="mt-2 h-7 px-2 text-lib-purple hover:text-lib-purple-light hover:bg-lib-purple-50 dark:hover:bg-gray-800 text-xs font-medium p-0"
                   onClick={() => { setSelectedBookId(activeBook.id); setCurrentScreen('book-detail') }}
                 >
                   View Details <ChevronRight className="w-3 h-3 ml-0.5" />
@@ -613,7 +613,7 @@ export default function HomeScreen() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl shadow-sm p-6 relative overflow-hidden"
+              className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6 relative overflow-hidden"
             >
               {/* Background pattern */}
               <div className="absolute inset-0 dot-pattern-bg" />
@@ -621,14 +621,14 @@ export default function HomeScreen() {
               <div className="flex flex-col items-center text-center relative z-10">
                 {/* Illustration-like design with stacked books */}
                 <div className="relative mb-4">
-                  <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center">
                     <BookOpen className="w-10 h-10 text-lib-purple/40" />
                   </div>
                   {/* Floating book icons around */}
-                  <div className="absolute -top-1 -right-1 w-7 h-7 rounded-lg bg-lib-purple-100 flex items-center justify-center floating-animation">
+                  <div className="absolute -top-1 -right-1 w-7 h-7 rounded-lg bg-lib-purple-100 dark:bg-gray-700 flex items-center justify-center floating-animation">
                     <BookOpen className="w-3.5 h-3.5 text-lib-purple/60" />
                   </div>
-                  <div className="absolute -bottom-1 -left-2 w-6 h-6 rounded-lg bg-lib-purple-50 flex items-center justify-center floating-animation" style={{ animationDelay: '1s' }}>
+                  <div className="absolute -bottom-1 -left-2 w-6 h-6 rounded-lg bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center floating-animation" style={{ animationDelay: '1s' }}>
                     <Bookmark className="w-3 h-3 text-lib-purple/50" />
                   </div>
                 </div>
@@ -657,14 +657,14 @@ export default function HomeScreen() {
           animate="visible"
         >
           <SectionHeader>Quick Actions</SectionHeader>
-          <div className="bg-white rounded-2xl shadow-sm p-3">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-3">
             <div className="grid grid-cols-4 gap-2">
               {quickActions.map((action) => (
                 <motion.button
                   key={action.label}
                   whileTap={{ scale: 0.93 }}
                   onClick={() => setCurrentScreen(action.screen)}
-                  className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl hover:bg-lib-purple-50/50 transition-colors"
+                  className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl hover:bg-lib-purple-50/50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <div className={`w-10 h-10 rounded-xl ${action.bg} flex items-center justify-center`}>
                     <action.icon className={`w-5 h-5 ${action.text}`} />
@@ -678,7 +678,7 @@ export default function HomeScreen() {
         </motion.div>
 
         {/* ── Subtle divider ──────────────────────────────── */}
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-800 to-transparent" />
 
         {/* ── Recommended for You ──────────────────────────── */}
         {recommendations.length > 0 && (
@@ -715,7 +715,7 @@ export default function HomeScreen() {
                           <img src={coverSrc} alt={book.title} className="w-full h-full object-cover" />
                           {/* Category badge on cover */}
                           {book.category && (
-                            <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-gray-800/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
                               {book.category}
                             </span>
                           )}
@@ -732,7 +732,7 @@ export default function HomeScreen() {
                           <BookOpen className="w-8 h-8 text-white/50" />
                           {/* Category badge on cover */}
                           {book.category && (
-                            <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-gray-800/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
                               {book.category}
                             </span>
                           )}
@@ -762,7 +762,7 @@ export default function HomeScreen() {
         )}
 
         {/* ── Subtle divider ──────────────────────────────── */}
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-800 to-transparent" />
 
         {/* ── Trending in Your Department ──────────────────── */}
         <motion.div
@@ -772,17 +772,17 @@ export default function HomeScreen() {
           animate="visible"
         >
           <SectionHeader icon={<TrendingUp className="w-4 h-4 text-lib-purple" />}>Trending in Your Department</SectionHeader>
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden">
             {trending.map((item, index) => (
               <button
                 key={item.id}
                 onClick={() => { setSelectedBookId(item.id); setCurrentScreen('book-detail') }}
-                className={`flex items-center gap-3 w-full px-4 py-3 hover:bg-lib-purple-50/50 active:bg-lib-purple-50 transition-colors ${
-                  index < trending.length - 1 ? 'border-b border-gray-100' : ''
+                className={`flex items-center gap-3 w-full px-4 py-3 hover:bg-lib-purple-50/50 dark:hover:bg-gray-800 active:bg-lib-purple-50 dark:active:bg-gray-800/50 transition-colors ${
+                  index < trending.length - 1 ? 'border-b border-gray-100 dark:border-gray-800' : ''
                 }`}
               >
                 <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                  item.rank <= 3 ? 'bg-lib-purple text-white' : 'bg-lib-purple-50 text-lib-purple'
+                  item.rank <= 3 ? 'bg-lib-purple text-white' : 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple'
                 }`}>
                   {item.rank}
                 </span>

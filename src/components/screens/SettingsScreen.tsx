@@ -21,6 +21,7 @@ import {
   EyeOff,
   Loader2,
   X,
+  Check,
 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
@@ -56,6 +57,7 @@ export default function SettingsScreen() {
   const [changingPassword, setChangingPassword] = useState(false)
   const [showCurrentPwd, setShowCurrentPwd] = useState(false)
   const [showNewPwd, setShowNewPwd] = useState(false)
+  const [showConfirmPwd, setShowConfirmPwd] = useState(false)
   const [passwordError, setPasswordError] = useState('')
 
   useEffect(() => {
@@ -152,7 +154,7 @@ export default function SettingsScreen() {
     const hasSpecial = /[^A-Za-z0-9]/.test(p)
     const score = [hasUpper, hasNum, hasSpecial].filter(Boolean).length
     if (score >= 2) return { level: 4, label: 'Strong', color: 'bg-green-500' }
-    return { level: 3, label: 'Good', color: 'bg-blue-400' }
+    return { level: 3, label: 'Good', color: 'bg-emerald-400' }
   }
 
   const strength = getPasswordStrength()
@@ -448,7 +450,7 @@ export default function SettingsScreen() {
                     <button
                       type="button"
                       onClick={() => setShowCurrentPwd(!showCurrentPwd)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
                     >
                       {showCurrentPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -470,7 +472,7 @@ export default function SettingsScreen() {
                     <button
                       type="button"
                       onClick={() => setShowNewPwd(!showNewPwd)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
                     >
                       {showNewPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -481,7 +483,7 @@ export default function SettingsScreen() {
                         {[1, 2, 3, 4].map(i => (
                           <div
                             key={i}
-                            className={`h-1 flex-1 rounded-full transition-all ${
+                            className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                               i <= strength.level ? strength.color : 'bg-gray-200'
                             }`}
                           />
@@ -495,19 +497,30 @@ export default function SettingsScreen() {
                 {/* Confirm New Password */}
                 <div className="space-y-2">
                   <Label htmlFor="confirmNewPwd" className="text-sm font-medium">Confirm New Password</Label>
-                  <Input
-                    id="confirmNewPwd"
-                    type="password"
-                    placeholder="Re-enter new password"
-                    value={confirmNewPassword}
-                    onChange={(e) => setConfirmNewPassword(e.target.value)}
-                    className="h-11 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirmNewPwd"
+                      type={showConfirmPwd ? 'text' : 'password'}
+                      placeholder="Re-enter new password"
+                      value={confirmNewPassword}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
+                      className="h-11 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPwd(!showConfirmPwd)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
+                    >
+                      {showConfirmPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                   {confirmNewPassword.length > 0 && confirmNewPassword !== newPassword && (
                     <p className="text-xs text-red-500">Passwords do not match</p>
                   )}
                   {confirmNewPassword.length > 0 && confirmNewPassword === newPassword && (
-                    <p className="text-xs text-green-600">Passwords match</p>
+                    <p className="text-xs text-green-600 flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Passwords match
+                    </p>
                   )}
                 </div>
 

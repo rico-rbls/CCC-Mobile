@@ -100,19 +100,19 @@ export default function BorrowedScreen() {
   const books = activeTab === 'active' ? activeBooks : historyBooks
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Header with gradient accent */}
-      <div className="bg-white px-4 pt-4 pb-3 border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3 border-b border-gray-100 dark:border-gray-800">
         <h2 className="font-bold text-foreground text-lg mb-3">My Loans</h2>
-        <div className="flex bg-lib-purple-50 rounded-xl p-1">
+        <div className="flex bg-lib-purple-50 dark:bg-gray-800 rounded-xl p-1">
           {(['active', 'history'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === tab
-                  ? 'bg-white shadow-sm text-lib-purple'
-                  : 'text-lib-purple-400 hover:text-lib-purple-600'
+                  ? 'bg-white dark:bg-gray-700 shadow-sm text-lib-purple dark:text-white'
+                  : 'text-lib-purple-400 dark:text-gray-400 hover:text-lib-purple-600 dark:hover:text-gray-300'
               }`}
             >
               {tab === 'active' ? `Active (${activeBooks.length})` : `History (${historyBooks.length})`}
@@ -145,7 +145,7 @@ export default function BorrowedScreen() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-16"
           >
-            <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 flex items-center justify-center mb-4">
+            <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center mb-4">
               <BookOpen className="w-10 h-10 text-lib-purple" />
             </div>
             <h3 className="font-bold text-foreground mb-1">No books yet</h3>
@@ -176,7 +176,7 @@ export default function BorrowedScreen() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.07 }}
-                  className="bg-white rounded-2xl shadow-sm overflow-hidden relative"
+                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden relative"
                 >
                   {activeTab === 'active' && (
                     <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-2xl" />
@@ -203,10 +203,10 @@ export default function BorrowedScreen() {
                         <div className="flex items-center justify-between mt-2">
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                             book.status === 'overdue'
-                              ? 'bg-red-100 text-red-700'
+                              ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                               : book.daysLeft <= 3
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-green-100 text-green-700'
+                              ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
+                              : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                           }`}>
                             <Clock className="w-3 h-3" />
                             {book.status === 'overdue'
@@ -219,7 +219,7 @@ export default function BorrowedScreen() {
                             size="sm"
                             onClick={() => handleReturn(book.id, book.title)}
                             disabled={returningId === book.id}
-                            className="h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 font-medium"
+                            className="h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-gray-800 font-medium"
                           >
                             {returningId === book.id ? (
                               <Loader2 className="w-3 h-3 animate-spin" />
@@ -232,7 +232,7 @@ export default function BorrowedScreen() {
                       )}
                       {activeTab === 'history' && (
                         <div className="flex items-center justify-between mt-2">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
                             <CheckCircle2 className="w-3 h-3" />
                             Returned{book.returnDate ? ` on ${book.returnDate}` : ''}
                           </span>
@@ -240,7 +240,7 @@ export default function BorrowedScreen() {
                             variant="ghost"
                             size="sm"
                             onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
-                            className="h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 font-medium"
+                            className="h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-gray-800 font-medium"
                           >
                             View <ChevronRight className="w-3 h-3" />
                           </Button>

@@ -16,6 +16,7 @@ import BookDetailScreen from '@/components/screens/BookDetailScreen'
 import AttendanceScreen from '@/components/screens/AttendanceScreen'
 import FavoritesScreen from '@/components/screens/FavoritesScreen'
 import ReservationsScreen from '@/components/screens/ReservationsScreen'
+import EditProfileScreen from '@/components/screens/EditProfileScreen'
 import BottomNav from '@/components/layout/BottomNav'
 
 const screenComponents: Record<string, React.ComponentType> = {
@@ -32,6 +33,7 @@ const screenComponents: Record<string, React.ComponentType> = {
   attendance: AttendanceScreen,
   favorites: FavoritesScreen,
   reservations: ReservationsScreen,
+  'edit-profile': EditProfileScreen,
 }
 
 // Screens that should NOT show bottom nav
@@ -51,8 +53,8 @@ export default function Home() {
   const showNav = !noNavScreens.has(displayScreen) && isAuthenticated
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center">
-      <div className="w-full max-w-[430px] min-h-screen bg-white relative flex flex-col shadow-xl">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex justify-center">
+      <div className="w-full max-w-[430px] min-h-screen bg-white dark:bg-gray-950 relative flex flex-col shadow-xl">
         {/* Screen content */}
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
           <AnimatePresence mode="wait">

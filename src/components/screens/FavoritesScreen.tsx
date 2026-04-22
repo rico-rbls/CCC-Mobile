@@ -63,23 +63,23 @@ export default function FavoritesScreen() {
   }
 
   const categoryColors: Record<string, string> = {
-    book: 'bg-lib-purple-50 text-lib-purple',
-    research: 'bg-blue-50 text-blue-700',
-    magazine: 'bg-orange-50 text-orange-700',
+    book: 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple',
+    research: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
+    magazine: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Header */}
-      <div className="bg-white px-4 pt-4 pb-3 flex items-center gap-3 border-b border-gray-100">
-        <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 transition-colors">
+      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800">
+        <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div className="flex-1">
           <h2 className="font-bold text-foreground text-lg">My Favorites</h2>
           <p className="text-xs text-muted-foreground">{resources.length} saved resource{resources.length !== 1 ? 's' : ''}</p>
         </div>
-        <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
+        <div className="w-9 h-9 rounded-xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
           <Heart className="w-4 h-4 text-red-500 fill-red-500" />
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function FavoritesScreen() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-16"
           >
-            <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 flex items-center justify-center mb-4">
+            <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center mb-4">
               <Heart className="w-10 h-10 text-lib-purple" />
             </div>
             <h3 className="font-bold text-foreground mb-1">No favorites yet</h3>
@@ -120,7 +120,7 @@ export default function FavoritesScreen() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -100, height: 0, marginBottom: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-white rounded-2xl shadow-sm overflow-hidden"
+                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"
                 >
                   <div className="p-4 flex items-start gap-3">
                     <button
@@ -147,7 +147,7 @@ export default function FavoritesScreen() {
                         <p className="text-xs text-muted-foreground mt-0.5">{resource.author}</p>
                       </button>
                       <div className="flex items-center gap-2 mt-2 flex-wrap">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${categoryColors[resource.category] || 'bg-gray-100 text-gray-600'}`}>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${categoryColors[resource.category] || 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
                           {resource.category.charAt(0).toUpperCase() + resource.category.slice(1)}
                         </span>
                         <span className={`flex items-center gap-1 text-[10px] font-medium ${
@@ -160,7 +160,7 @@ export default function FavoritesScreen() {
                     </div>
                     <button
                       onClick={() => handleRemove(resource.id, resource.title)}
-                      className="p-2 rounded-xl hover:bg-red-50 active:bg-red-100 transition-colors flex-shrink-0 group"
+                      className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 active:bg-red-100 dark:active:bg-red-900/30 transition-colors flex-shrink-0 group"
                       aria-label="Remove from favorites"
                     >
                       <Trash2 className="w-4 h-4 text-gray-300 group-hover:text-red-400 transition-colors" />

@@ -1,6 +1,6 @@
 # LibLog — Digital Library Logbook Management System
 
-> **Feature Documentation** — Last updated: 2026-03-05
+> **Feature Documentation** — Last updated: 2026-04-22
 > This document is the single source of truth for all features. Update it whenever the system is modified.
 
 ---
@@ -135,6 +135,11 @@ Detailed resource view with borrow/reserve actions:
 - **Metadata:** Title, author, availability badge (green/red), shelf location (MapPin icon), ISBN badge, publication date badge, subject badge
 - **Description:** "About this book" section
 - **Tags** as pills
+- **Ratings & Reviews section:**
+  - Rating summary card with average rating, star count, review count, distribution bars (5★→1★)
+  - Write/Edit review button with inline form: star selector (1-5), comment textarea (200 char max), Submit/Cancel
+  - Reviews list with avatar initials, name, role badge, star rating, date, comment; delete button on own reviews
+  - Empty state: "No reviews yet. Be the first to review!"
 - **Action buttons:** Borrow (when available) or Reserve (when unavailable) + Share button
 - **"More Resources"** related books section
 - **Share toast:** "Copied to clipboard!" notification
@@ -173,7 +178,7 @@ User profile, statistics, reading goals, and menu:
 - **Reading Stats card:** Mini bar chart (7 months), total books, average per month
 - **Favorite Books card** (navigates to favorites screen)
 - **Quick info:** "Member since" card
-- **Menu items:** Edit Profile, My Favorites, My Reservations, Notification Preferences, Privacy Policy, Help & Support, About (v1.0.0)
+- **Menu items:** Edit Profile (→ Edit Profile screen), My Favorites, My Reservations, Notification Preferences, Privacy Policy, Help & Support, About (v1.0.0)
 - **Logout button** (red themed)
 
 **Reading Goal Picker:** Toggle overlay to select from 12/24/36/48 annual goal.
@@ -290,7 +295,7 @@ App settings and account management:
 |--------|----------|-------------|
 | POST | `/api/auth/login` | Login with email + password. Returns user object (SHA-256 hash verification). |
 | POST | `/api/auth/register` | Register new user. Validates required fields, checks email + universityId uniqueness, hashes password, generates avatar initials. |
-| PUT | `/api/auth/update` | Update user profile, notification preferences, or change password (verifies current password before allowing change). |
+| PUT | `/api/auth/update` | Update user profile (fullName, program, department, yearLevel), notification preferences, or change password (verifies current password before allowing change). |
 
 ### Resources (Catalog)
 
@@ -337,6 +342,14 @@ App settings and account management:
 | PUT | `/api/settings` | Update library settings. |
 | GET | `/api/announcements` | List active announcements. Ordered by newest first. |
 
+### Reviews
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/reviews` | Get reviews for a resource. Query param: `resourceId` (required). Returns reviews with user info + stats (averageRating, totalReviews, distribution). |
+| POST | `/api/reviews` | Create or update a review. Body: `{ userId, resourceId, rating (1-5), comment? }`. Upserts (one review per user per resource). |
+| DELETE | `/api/reviews/[id]` | Delete a review. |
+
 ### Health Check
 
 | Method | Endpoint | Description |
@@ -370,7 +383,7 @@ App settings and account management:
 | createdAt | DateTime | Auto |
 | updatedAt | DateTime | Auto |
 
-**Relations:** borrowedBooks (BorrowRecord[]), attendance (Attendance[]), reservations (Reservation[]), notifications (Notification[])
+**Relations:** borrowedBooks (BorrowRecord[]), attendance (Attendance[]), reservations (Reservation[]), notifications (Notification[]), reviews (Review[])
 
 ---
 
@@ -396,7 +409,7 @@ App settings and account management:
 | createdAt | DateTime | Auto |
 | updatedAt | DateTime | Auto |
 
-**Relations:** borrowRecords (BorrowRecord[]), reservations (Reservation[])
+**Relations:** borrowRecords (BorrowRecord[]), reservations (Reservation[]), reviews (Review[])
 
 ---
 
@@ -497,6 +510,23 @@ App settings and account management:
 | isActive | Boolean | Default: true |
 | createdAt | DateTime | Auto |
 | updatedAt | DateTime | Auto |
+
+---
+
+### Review
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | String @id | cuid() |
+| userId | String | FK → User |
+| resourceId | String | FK → Resource |
+| rating | Int | 1–5 stars |
+| comment | String? | Optional review text |
+| createdAt | DateTime | Auto |
+| updatedAt | DateTime | Auto |
+
+**Relations:** user (User), resource (Resource)
+**Unique constraint:** `@@unique([userId, resourceId])` — one review per user per resource
 
 ---
 

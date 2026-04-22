@@ -19,9 +19,9 @@ interface ReservationItem {
 }
 
 const statusConfig: Record<string, { icon: typeof Clock; color: string; bg: string; badgeClass: string; label: string }> = {
-  pending: { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50', badgeClass: 'bg-yellow-100 text-yellow-700', label: 'Pending' },
-  fulfilled: { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', badgeClass: 'bg-green-100 text-green-700', label: 'Fulfilled' },
-  cancelled: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-50', badgeClass: 'bg-red-100 text-red-600', label: 'Cancelled' },
+  pending: { icon: Clock, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20', badgeClass: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400', label: 'Pending' },
+  fulfilled: { icon: CheckCircle2, color: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20', badgeClass: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', label: 'Fulfilled' },
+  cancelled: { icon: XCircle, color: 'text-red-500 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20', badgeClass: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400', label: 'Cancelled' },
 }
 
 export default function ReservationsScreen() {
@@ -84,18 +84,18 @@ export default function ReservationsScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Header */}
-      <div className="bg-white px-4 pt-4 pb-3 border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3 border-b border-gray-100 dark:border-gray-800">
         <div className="flex items-center gap-3 mb-3">
-          <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 transition-colors">
+          <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <div className="flex-1">
             <h2 className="font-bold text-foreground text-lg">My Reservations</h2>
             <p className="text-xs text-muted-foreground">{pendingCount} active reservation{pendingCount !== 1 ? 's' : ''}</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center">
             <Bookmark className="w-4 h-4 text-lib-purple" />
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function ReservationsScreen() {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all ${
                 activeFilter === tab
                   ? 'bg-lib-purple text-white shadow-sm shadow-lib-purple/20'
-                  : 'bg-lib-purple-50 text-lib-purple hover:bg-lib-purple-100'
+                  : 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-gray-700'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -137,7 +137,7 @@ export default function ReservationsScreen() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-16"
           >
-            <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 flex items-center justify-center mb-4">
+            <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center mb-4">
               <Bookmark className="w-10 h-10 text-lib-purple" />
             </div>
             <h3 className="font-bold text-foreground mb-1">
@@ -166,7 +166,7 @@ export default function ReservationsScreen() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-white rounded-2xl shadow-sm overflow-hidden"
+                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"
                 >
                   <div className="p-4 flex items-start gap-3">
                     <button
@@ -206,7 +206,7 @@ export default function ReservationsScreen() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleCancel(reservation.id)}
-                          className="mt-2 h-7 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 font-medium"
+                          className="mt-2 h-7 px-2 text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium"
                         >
                           <XCircle className="w-3 h-3 mr-1" />
                           Cancel
@@ -217,7 +217,7 @@ export default function ReservationsScreen() {
                           variant="ghost"
                           size="sm"
                           onClick={() => { setSelectedBookId(reservation.resourceId); setCurrentScreen('book-detail') }}
-                          className="mt-2 h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 font-medium"
+                          className="mt-2 h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-gray-800 font-medium"
                         >
                           Borrow Now
                         </Button>
