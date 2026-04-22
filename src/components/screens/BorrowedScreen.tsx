@@ -23,8 +23,9 @@ export default function BorrowedScreen() {
       // Active borrows
       const activeRes = await fetch(`/api/borrow?userId=${user.id}&status=active`)
       const activeData = await activeRes.json()
-      if (activeRes.ok && activeData.records) {
-        const books: BorrowedBook[] = activeData.records.map((r: Record<string, unknown>) => {
+      const activeRecords = Array.isArray(activeData) ? activeData : (activeData.records || [])
+      if (activeRes.ok && activeRecords.length > 0) {
+        const books: BorrowedBook[] = activeRecords.map((r: Record<string, unknown>) => {
           const dueDate = new Date(r.dueDate as string)
           const now = new Date()
           const diffMs = dueDate.getTime() - now.getTime()
@@ -47,8 +48,9 @@ export default function BorrowedScreen() {
       // History
       const historyRes = await fetch(`/api/borrow?userId=${user.id}&status=returned`)
       const historyData = await historyRes.json()
-      if (historyRes.ok && historyData.records) {
-        const books: BorrowedBook[] = historyData.records.map((r: Record<string, unknown>) => {
+      const historyRecords = Array.isArray(historyData) ? historyData : (historyData.records || [])
+      if (historyRes.ok && historyRecords.length > 0) {
+        const books: BorrowedBook[] = historyRecords.map((r: Record<string, unknown>) => {
           const dueDate = new Date(r.dueDate as string)
           const returnDate = r.returnDate ? new Date(r.returnDate as string) : null
           return {

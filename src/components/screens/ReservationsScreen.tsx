@@ -35,8 +35,9 @@ export default function ReservationsScreen() {
     try {
       const res = await fetch(`/api/reservations?userId=${user.id}`)
       const data = await res.json()
-      if (res.ok && data.reservations) {
-        const items: ReservationItem[] = data.reservations.map((r: Record<string, unknown>) => ({
+      const reservationRecords = Array.isArray(data) ? data : (data.reservations || [])
+      if (res.ok && reservationRecords.length > 0) {
+        const items: ReservationItem[] = reservationRecords.map((r: Record<string, unknown>) => ({
           id: r.id as string,
           resourceId: (r.resource as Record<string, unknown>)?.id as string || r.resourceId as string,
           resourceTitle: (r.resource as Record<string, unknown>)?.title as string || 'Unknown',

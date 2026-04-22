@@ -2,7 +2,7 @@
 
 import { useAppStore } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
-import { GraduationCap, Briefcase, User, ArrowLeft, ArrowRight, Eye, EyeOff, Check, BookOpen, Bell, Calendar, Megaphone } from 'lucide-react'
+import { GraduationCap, Briefcase, User, ArrowLeft, ArrowRight, Eye, EyeOff, Check, BookOpen, Bell, Calendar, Megaphone, Sparkles, ShieldCheck, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,9 +11,9 @@ import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 
 const roleCards = [
-  { id: 'student' as const, icon: GraduationCap, label: 'Student', desc: 'Currently enrolled' },
-  { id: 'faculty' as const, icon: Briefcase, label: 'Faculty', desc: 'Teaching staff' },
-  { id: 'visitor' as const, icon: User, label: 'Visitor', desc: 'Guest access' },
+  { id: 'student' as const, icon: GraduationCap, label: 'Student', desc: 'Currently enrolled', emoji: '🎓' },
+  { id: 'faculty' as const, icon: Briefcase, label: 'Faculty', desc: 'Teaching staff', emoji: '📋' },
+  { id: 'visitor' as const, icon: User, label: 'Visitor', desc: 'Guest access', emoji: '🧑‍💼' },
 ]
 
 const programs = [
@@ -28,6 +28,18 @@ const departments = [
   'Engineering', 'Arts & Sciences', 'Psychology', 'Mathematics'
 ]
 
+// Step icons for progress indicator
+const stepIcons = [Sparkles, User, GraduationCap, ShieldCheck, Bell]
+
+// Background patterns per step
+const stepBgPatterns = [
+  'radial-gradient(circle at 20% 80%, rgba(101,45,144,0.04) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(155,91,191,0.04) 0%, transparent 50%)',
+  'radial-gradient(circle at 80% 80%, rgba(101,45,144,0.04) 0%, transparent 50%), radial-gradient(circle at 20% 20%, rgba(155,91,191,0.04) 0%, transparent 50%)',
+  'radial-gradient(circle at 50% 80%, rgba(101,45,144,0.04) 0%, transparent 50%), radial-gradient(circle at 50% 20%, rgba(155,91,191,0.04) 0%, transparent 50%)',
+  'radial-gradient(circle at 20% 50%, rgba(101,45,144,0.04) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(155,91,191,0.04) 0%, transparent 50%)',
+  'radial-gradient(circle at 80% 80%, rgba(101,45,144,0.06) 0%, transparent 50%), radial-gradient(circle at 20% 20%, rgba(155,91,191,0.06) 0%, transparent 50%)',
+]
+
 export default function OnboardingScreen() {
   const {
     onboardingStep, setOnboardingStep,
@@ -39,6 +51,7 @@ export default function OnboardingScreen() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
   const { toast } = useToast()
 
   const totalSteps = 5
@@ -60,8 +73,12 @@ export default function OnboardingScreen() {
   const handleContinue = async () => {
     if (step < totalSteps - 1) {
       setOnboardingStep(step + 1)
+      // Show confetti on step 4 (notification prefs - final step before submit)
+      if (step === 3) {
+        setShowConfetti(true)
+        setTimeout(() => setShowConfetti(false), 2000)
+      }
     } else {
-      // Complete onboarding - register via API
       setIsSubmitting(true)
       try {
         const res = await fetch('/api/auth/register', {
@@ -124,7 +141,7 @@ export default function OnboardingScreen() {
     const hasSpecial = /[^A-Za-z0-9]/.test(p)
     const score = [hasUpper, hasNum, hasSpecial].filter(Boolean).length
     if (score >= 2) return { level: 4, label: 'Strong', color: 'bg-green-500' }
-    return { level: 3, label: 'Good', color: 'bg-blue-400' }
+    return { level: 3, label: 'Good', color: 'bg-emerald-400' }
   }
 
   const strength = getPasswordStrength()
@@ -136,15 +153,57 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Progress bar with gradient background */}
-      <div className="bg-lib-purple-50/50 px-6 pt-5 pb-4">
+    <div className="flex flex-col min-h-screen bg-white relative">
+      {/* Confetti overlay */}
+      <AnimatePresence>
+        {showConfetti && (
+          <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
+            {Array.from({ length: 20 }).map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{
+                  x: Math.random() * 400,
+                  y: -20,
+                  opacity: 1,
+                  rotate: 0,
+                  scale: 1,
+                }}
+                animate={{
+                  y: 600,
+                  opacity: 0,
+                  rotate: Math.random() * 720 - 360,
+                  scale: 0.5,
+                }}
+                transition={{
+                  duration: 1.5 + Math.random() * 1,
+                  delay: Math.random() * 0.5,
+                  ease: 'easeOut',
+                }}
+                className="absolute"
+                style={{
+                  width: Math.random() > 0.5 ? 8 : 6,
+                  height: Math.random() > 0.5 ? 8 : 6,
+                  borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+                  backgroundColor: ['#652D90', '#9B5BBF', '#B87DD4', '#E8D5F3', '#F59E0B', '#10B981'][i % 6],
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Progress bar with gradient background and step icons */}
+      <div className="bg-lib-purple-50/50 px-6 pt-5 pb-4 relative overflow-hidden" style={{ backgroundImage: stepBgPatterns[step] }}>
         <div className="flex items-center gap-1.5 mb-3">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div
               key={i}
               className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                i < step ? 'bg-lib-purple' : i === step ? 'bg-lib-purple shadow-sm shadow-lib-purple/30' : 'bg-lib-purple-200'
+                i < step
+                  ? 'bg-lib-purple'
+                  : i === step
+                  ? 'bg-gradient-to-r from-lib-purple to-lib-purple-light shadow-sm shadow-lib-purple/30'
+                  : 'bg-lib-purple-200'
               }`}
             />
           ))}
@@ -157,15 +216,30 @@ export default function OnboardingScreen() {
           ) : (
             <div className="w-9" />
           )}
-          <div className="flex items-center gap-1.5">
-            {Array.from({ length: totalSteps }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                  i === step ? 'bg-lib-purple scale-125' : i < step ? 'bg-lib-purple-400' : 'bg-lib-purple-200'
-                }`}
-              />
-            ))}
+          {/* Step dots with icons */}
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalSteps }).map((_, i) => {
+              const StepIcon = stepIcons[i]
+              return (
+                <motion.div
+                  key={i}
+                  animate={{
+                    scale: i === step ? 1.2 : 1,
+                    backgroundColor: i <= step ? '#652D90' : '#E8D5F3',
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                    i === step ? 'shadow-sm shadow-lib-purple/30' : ''
+                  }`}
+                >
+                  {i < step ? (
+                    <Check className="w-3.5 h-3.5 text-white" />
+                  ) : (
+                    <StepIcon className={`w-3.5 h-3.5 ${i === step ? 'text-white' : 'text-lib-purple-400'}`} />
+                  )}
+                </motion.div>
+              )
+            })}
           </div>
           <div className="w-9" />
         </div>
@@ -190,9 +264,9 @@ export default function OnboardingScreen() {
                   initial={{ scale: 0, rotate: -90 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                  className="w-24 h-24 rounded-3xl bg-purple-gradient flex items-center justify-center mb-5 shadow-lg shadow-lib-purple/25"
+                  className="w-24 h-24 rounded-3xl bg-purple-gradient flex items-center justify-center mb-5 shadow-lg shadow-lib-purple/25 gradient-border"
                 >
-                  <BookOpen className="w-12 h-12 text-white" />
+                  <Sparkles className="w-12 h-12 text-white" />
                 </motion.div>
                 <h2 className="text-2xl font-bold text-foreground mb-1">Welcome to LibLog</h2>
                 <p className="text-sm text-muted-foreground mb-6 text-center max-w-[260px]">
@@ -209,25 +283,31 @@ export default function OnboardingScreen() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.1 }}
                         whileTap={{ scale: 0.98 }}
+                        whileHover={{ y: -2 }}
                         onClick={() => setOnboardingData({ role: r.id })}
                         className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 ${
                           selected
-                            ? 'border-lib-purple bg-lib-purple-50 shadow-md shadow-lib-purple/10'
+                            ? 'border-lib-purple bg-lib-purple-50 shadow-md shadow-lib-purple/10 gradient-border'
                             : 'border-gray-200 bg-white hover:border-lib-purple-200 hover:shadow-sm'
                         }`}
                       >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                          selected ? 'bg-lib-purple' : 'bg-lib-purple-50'
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                          selected ? 'bg-lib-purple scale-110' : 'bg-lib-purple-50'
                         }`}>
-                          <Icon className={`w-6 h-6 ${selected ? 'text-white' : 'text-lib-purple'}`} />
+                          <Icon className={`w-6 h-6 transition-colors duration-200 ${selected ? 'text-white' : 'text-lib-purple'}`} />
                         </div>
-                        <div className="text-left">
+                        <div className="text-left flex-1">
                           <div className="font-semibold text-foreground">{r.label}</div>
                           <div className="text-xs text-muted-foreground">{r.desc}</div>
                         </div>
-                        {selected && (
-                          <Check className="w-5 h-5 text-lib-purple ml-auto" />
-                        )}
+                        <motion.div
+                          animate={{ scale: selected ? 1 : 0, opacity: selected ? 1 : 0 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                        >
+                          <div className="w-6 h-6 rounded-full bg-lib-purple flex items-center justify-center">
+                            <Check className="w-3.5 h-3.5 text-white" />
+                          </div>
+                        </motion.div>
                       </motion.button>
                     )
                   })}
@@ -237,9 +317,14 @@ export default function OnboardingScreen() {
 
             {step === 1 && (
               <div className="flex flex-col">
-                <div className="w-16 h-16 rounded-full bg-purple-gradient flex items-center justify-center mb-4 self-center">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center shadow-md shadow-lib-purple/20"
+                >
                   <User className="w-8 h-8 text-white" />
-                </div>
+                </motion.div>
                 <h2 className="text-xl font-bold text-foreground mb-1 text-center">Personal Information</h2>
                 <p className="text-sm text-muted-foreground mb-6 text-center">
                   Tell us about yourself
@@ -252,7 +337,7 @@ export default function OnboardingScreen() {
                       placeholder="Juan Dela Cruz"
                       value={onboardingData.fullName}
                       onChange={(e) => setOnboardingData({ fullName: e.target.value })}
-                      className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20"
+                      className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 transition-all duration-200"
                     />
                   </div>
                   <div className="space-y-2">
@@ -262,7 +347,7 @@ export default function OnboardingScreen() {
                       placeholder="e.g. 2024-00001"
                       value={onboardingData.universityId}
                       onChange={(e) => setOnboardingData({ universityId: e.target.value })}
-                      className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20"
+                      className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -271,9 +356,14 @@ export default function OnboardingScreen() {
 
             {step === 2 && (
               <div className="flex flex-col">
-                <div className="w-16 h-16 rounded-full bg-purple-gradient flex items-center justify-center mb-4 self-center">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center shadow-md shadow-lib-purple/20"
+                >
                   <GraduationCap className="w-8 h-8 text-white" />
-                </div>
+                </motion.div>
                 <h2 className="text-xl font-bold text-foreground mb-1 text-center">Academic Information</h2>
                 <p className="text-sm text-muted-foreground mb-6 text-center">
                   {onboardingData.role === 'faculty' ? 'Your department details' : 'Your program and year'}
@@ -285,7 +375,7 @@ export default function OnboardingScreen() {
                       <select
                         value={onboardingData.program}
                         onChange={(e) => setOnboardingData({ program: e.target.value })}
-                        className="w-full h-12 rounded-xl border border-gray-200 px-3 text-sm bg-white focus:border-lib-purple focus:ring-lib-purple/20 focus:outline-none"
+                        className="w-full h-12 rounded-xl border border-gray-200 px-3 text-sm bg-white focus:border-lib-purple focus:ring-lib-purple/20 focus:outline-none transition-all duration-200"
                       >
                         <option value="">Select program</option>
                         {programs.map(p => <option key={p} value={p}>{p}</option>)}
@@ -298,7 +388,7 @@ export default function OnboardingScreen() {
                       <select
                         value={onboardingData.department}
                         onChange={(e) => setOnboardingData({ department: e.target.value })}
-                        className="w-full h-12 rounded-xl border border-gray-200 px-3 text-sm bg-white focus:border-lib-purple focus:ring-lib-purple/20 focus:outline-none"
+                        className="w-full h-12 rounded-xl border border-gray-200 px-3 text-sm bg-white focus:border-lib-purple focus:ring-lib-purple/20 focus:outline-none transition-all duration-200"
                       >
                         <option value="">Select department</option>
                         {departments.map(d => <option key={d} value={d}>{d}</option>)}
@@ -310,23 +400,25 @@ export default function OnboardingScreen() {
                       <Label className="text-sm font-medium">Year Level</Label>
                       <div className="grid grid-cols-3 gap-2">
                         {yearLevels.map(y => (
-                          <button
+                          <motion.button
                             key={y}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => setOnboardingData({ yearLevel: y })}
-                            className={`py-3 rounded-xl text-sm font-medium border-2 transition-all ${
+                            className={`py-3 rounded-xl text-sm font-medium border-2 transition-all duration-200 ${
                               onboardingData.yearLevel === y
-                                ? 'border-lib-purple bg-lib-purple-50 text-lib-purple'
+                                ? 'border-lib-purple bg-lib-purple-50 text-lib-purple shadow-sm shadow-lib-purple/10'
                                 : 'border-gray-200 text-gray-500 hover:border-lib-purple-200'
                             }`}
                           >
                             {y}
-                          </button>
+                          </motion.button>
                         ))}
                       </div>
                     </div>
                   )}
                   {onboardingData.role === 'visitor' && (
-                    <div className="bg-lib-purple-50 rounded-xl p-4 text-center">
+                    <div className="bg-lib-purple-50 rounded-xl p-4 text-center border border-lib-purple-100">
+                      <Info className="w-5 h-5 text-lib-purple mx-auto mb-2" />
                       <p className="text-sm text-lib-purple">As a visitor, you can browse the catalog and use the QR check-in feature.</p>
                     </div>
                   )}
@@ -336,9 +428,14 @@ export default function OnboardingScreen() {
 
             {step === 3 && (
               <div className="flex flex-col">
-                <div className="w-16 h-16 rounded-full bg-purple-gradient flex items-center justify-center mb-4 self-center">
-                  <Check className="w-8 h-8 text-white" />
-                </div>
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center shadow-md shadow-lib-purple/20"
+                >
+                  <ShieldCheck className="w-8 h-8 text-white" />
+                </motion.div>
                 <h2 className="text-xl font-bold text-foreground mb-1 text-center">Account Setup</h2>
                 <p className="text-sm text-muted-foreground mb-6 text-center">
                   Create your login credentials
@@ -352,7 +449,7 @@ export default function OnboardingScreen() {
                       placeholder="you@university.edu"
                       value={onboardingData.email}
                       onChange={(e) => setOnboardingData({ email: e.target.value })}
-                      className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20"
+                      className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 transition-all duration-200"
                     />
                   </div>
                   <div className="space-y-2">
@@ -364,12 +461,12 @@ export default function OnboardingScreen() {
                         placeholder="Min. 6 characters"
                         value={onboardingData.password}
                         onChange={(e) => setOnboardingData({ password: e.target.value })}
-                        className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
+                        className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 pr-10 transition-all duration-200"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -380,7 +477,7 @@ export default function OnboardingScreen() {
                           {[1, 2, 3, 4].map(i => (
                             <div
                               key={i}
-                              className={`h-1 flex-1 rounded-full transition-all ${
+                              className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                                 i <= strength.level ? strength.color : 'bg-gray-200'
                               }`}
                             />
@@ -399,12 +496,12 @@ export default function OnboardingScreen() {
                         placeholder="Re-enter password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
+                        className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 pr-10 transition-all duration-200"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirm(!showConfirm)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
                       >
                         {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -413,7 +510,9 @@ export default function OnboardingScreen() {
                       <p className="text-xs text-red-500">Passwords do not match</p>
                     )}
                     {confirmPassword.length > 0 && confirmPassword === onboardingData.password && (
-                      <p className="text-xs text-green-600">Passwords match</p>
+                      <p className="text-xs text-green-600 flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Passwords match
+                      </p>
                     )}
                   </div>
                 </div>
@@ -422,18 +521,28 @@ export default function OnboardingScreen() {
 
             {step === 4 && (
               <div className="flex flex-col">
-                <div className="w-16 h-16 rounded-full bg-purple-gradient flex items-center justify-center mb-4 self-center">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center shadow-md shadow-lib-purple/20 animate-micro-pulse-glow"
+                >
                   <Bell className="w-8 h-8 text-white" />
-                </div>
-                <h2 className="text-xl font-bold text-foreground mb-1 text-center">Notification Preferences</h2>
+                </motion.div>
+                <h2 className="text-xl font-bold text-foreground mb-1 text-center">Almost Done!</h2>
                 <p className="text-sm text-muted-foreground mb-6 text-center">
                   Choose what notifications you&apos;d like to receive
                 </p>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white">
+                <div className="space-y-3">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white hover:shadow-sm transition-shadow"
+                  >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-lib-purple-50 flex items-center justify-center">
-                        <Calendar className="w-5 h-5 text-lib-purple" />
+                      <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
+                        <Calendar className="w-5 h-5 text-orange-500" />
                       </div>
                       <div>
                         <div className="font-medium text-sm">Due Date Reminders</div>
@@ -443,9 +552,15 @@ export default function OnboardingScreen() {
                     <Switch
                       checked={onboardingData.notificationDueDate}
                       onCheckedChange={(v) => setOnboardingData({ notificationDueDate: v })}
+                      className="data-[state=checked]:bg-lib-purple"
                     />
-                  </div>
-                  <div className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white">
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white hover:shadow-sm transition-shadow"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-lib-purple-50 flex items-center justify-center">
                         <BookOpen className="w-5 h-5 text-lib-purple" />
@@ -458,9 +573,15 @@ export default function OnboardingScreen() {
                     <Switch
                       checked={onboardingData.notificationReservation}
                       onCheckedChange={(v) => setOnboardingData({ notificationReservation: v })}
+                      className="data-[state=checked]:bg-lib-purple"
                     />
-                  </div>
-                  <div className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white">
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white opacity-60"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-lib-purple-50 flex items-center justify-center">
                         <Megaphone className="w-5 h-5 text-lib-purple" />
@@ -474,7 +595,7 @@ export default function OnboardingScreen() {
                       checked={false}
                       disabled
                     />
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             )}
@@ -487,7 +608,11 @@ export default function OnboardingScreen() {
         <Button
           onClick={handleContinue}
           disabled={!canContinue() || isSubmitting}
-          className="w-full h-12 rounded-xl bg-lib-purple hover:bg-lib-purple-dark text-white font-semibold text-base disabled:opacity-50"
+          className={`w-full h-12 rounded-xl text-white font-semibold text-base disabled:opacity-50 transition-all active:scale-[0.98] ${
+            step === totalSteps - 1
+              ? 'bg-gradient-to-r from-lib-purple via-lib-purple-light to-lib-purple shadow-lg shadow-lib-purple/30'
+              : 'bg-lib-purple hover:bg-lib-purple-dark'
+          }`}
         >
           {isSubmitting ? (
             <span className="flex items-center gap-2">
@@ -495,7 +620,10 @@ export default function OnboardingScreen() {
               Creating Account...
             </span>
           ) : step === totalSteps - 1 ? (
-            'Get Started'
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Get Started
+            </span>
           ) : (
             <span className="flex items-center gap-2">
               Continue <ArrowRight className="w-4 h-4" />

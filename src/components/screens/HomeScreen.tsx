@@ -110,8 +110,9 @@ export default function HomeScreen() {
       // Fetch borrowed books
       const borrowRes = await fetch(`/api/borrow?userId=${user.id}&status=active`)
       const borrowData = await borrowRes.json()
-      if (borrowRes.ok && borrowData.records) {
-        const books: BorrowedBook[] = borrowData.records.map((r: Record<string, unknown>) => {
+      const borrowRecords = Array.isArray(borrowData) ? borrowData : (borrowData.records || [])
+      if (borrowRes.ok && borrowRecords.length > 0) {
+        const books: BorrowedBook[] = borrowRecords.map((r: Record<string, unknown>) => {
           const dueDate = new Date(r.dueDate as string)
           const now = new Date()
           const diffMs = dueDate.getTime() - now.getTime()

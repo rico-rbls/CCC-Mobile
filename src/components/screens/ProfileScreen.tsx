@@ -57,10 +57,11 @@ export default function ProfileScreen() {
         const activeData = await activeRes.json()
         const historyData = await historyRes.json()
         const attendanceData = await attendanceRes.json()
-        const activeCount = activeData.records?.length || 0
-        const historyCount = historyData.records?.length || 0
-        setBorrowCount(activeCount + historyCount)
-        setAttendanceCount(attendanceData.records?.length || 0)
+        const activeRecords = Array.isArray(activeData) ? activeData : (activeData.records || [])
+        const historyRecords = Array.isArray(historyData) ? historyData : (historyData.records || [])
+        const attendanceRecords = Array.isArray(attendanceData) ? attendanceData : (attendanceData.records || [])
+        setBorrowCount(activeRecords.length + historyRecords.length)
+        setAttendanceCount(attendanceRecords.length)
       } catch {
         // silently fail
       }

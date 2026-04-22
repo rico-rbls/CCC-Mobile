@@ -1,12 +1,12 @@
 'use client'
 
 import { useAppStore } from '@/lib/store'
-import { BookOpen, Eye, EyeOff, Loader2, GraduationCap, Library } from 'lucide-react'
+import { BookOpen, Eye, EyeOff, Loader2, GraduationCap, Library, BookMarked, Bookmark } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useToast } from '@/hooks/use-toast'
 
 export default function LoginScreen() {
@@ -15,6 +15,8 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [emailFocused, setEmailFocused] = useState(false)
+  const [passwordFocused, setPasswordFocused] = useState(false)
   const { toast } = useToast()
 
   const handleLogin = async () => {
@@ -65,10 +67,34 @@ export default function LoginScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Header with decorative elements */}
-      <div className="relative bg-purple-gradient px-6 pt-14 pb-20 rounded-b-[2rem] overflow-hidden">
-        {/* Decorative background elements */}
+    <div className="flex flex-col min-h-screen bg-white relative overflow-hidden">
+      {/* Animated gradient background with floating icons */}
+      <div className="relative bg-purple-gradient px-6 pt-14 pb-20 rounded-b-[2.5rem] overflow-hidden">
+        {/* Animated gradient overlay */}
+        <div className="absolute inset-0 opacity-30" style={{
+          background: 'linear-gradient(135deg, rgba(155,91,191,0.4) 0%, transparent 40%, rgba(184,125,212,0.3) 70%, transparent 100%)',
+          animation: 'gradient-shift 6s ease infinite',
+          backgroundSize: '200% 200%',
+        }} />
+
+        {/* Decorative floating book icons */}
+        <div className="absolute top-8 left-4 animate-float-icon" style={{ animationDelay: '0s' }}>
+          <BookMarked className="w-6 h-6 text-white/10" />
+        </div>
+        <div className="absolute top-16 right-8 animate-float-icon" style={{ animationDelay: '1.5s' }}>
+          <Bookmark className="w-5 h-5 text-white/8" />
+        </div>
+        <div className="absolute top-28 left-12 animate-float-icon" style={{ animationDelay: '3s' }}>
+          <BookOpen className="w-4 h-4 text-white/6" />
+        </div>
+        <div className="absolute bottom-16 right-4 animate-float-icon" style={{ animationDelay: '2s' }}>
+          <Library className="w-7 h-7 text-white/6" />
+        </div>
+        <div className="absolute bottom-24 left-8 animate-float-icon" style={{ animationDelay: '4s' }}>
+          <BookMarked className="w-5 h-5 text-white/8" />
+        </div>
+
+        {/* Decorative circles */}
         <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-white/5" />
         <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-white/5" />
         <div className="absolute top-20 right-10 w-20 h-20 rounded-full bg-white/5" />
@@ -79,11 +105,12 @@ export default function LoginScreen() {
           transition={{ duration: 0.5 }}
           className="flex flex-col items-center relative z-10"
         >
+          {/* App logo with glow */}
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-            className="w-20 h-20 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mb-4 shadow-lg shadow-black/10 ring-1 ring-white/20"
+            className="w-20 h-20 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mb-4 shadow-lg shadow-black/10 ring-1 ring-white/20 animate-micro-pulse-glow"
           >
             <BookOpen className="w-10 h-10 text-white" />
           </motion.div>
@@ -108,21 +135,31 @@ export default function LoginScreen() {
       </div>
 
       {/* Form card */}
-      <div className="flex-1 px-6 -mt-10">
+      <div className="flex-1 px-6 -mt-10 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-xl p-6 ring-1 ring-black/5"
+          className="bg-white rounded-2xl shadow-xl p-6 ring-1 ring-black/5 glass-card"
         >
           <h2 className="text-lg font-bold text-foreground mb-1">Welcome back</h2>
           <p className="text-xs text-muted-foreground mb-5">Sign in to your library account</p>
           <div className="space-y-4">
+            {/* Email field with animated label */}
             <div className="space-y-2">
-              <Label htmlFor="loginEmail" className="text-sm font-medium">Email</Label>
+              <Label
+                htmlFor="loginEmail"
+                className={`text-sm font-medium transition-colors duration-200 ${
+                  emailFocused ? 'text-lib-purple' : 'text-foreground'
+                }`}
+              >
+                Email
+              </Label>
               <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
+                  emailFocused ? 'text-lib-purple' : 'text-muted-foreground'
+                }`}>
+                  <GraduationCap className="w-4 h-4" />
                 </div>
                 <Input
                   id="loginEmail"
@@ -130,13 +167,28 @@ export default function LoginScreen() {
                   placeholder="you@university.edu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 pl-10 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20"
+                  onFocus={() => setEmailFocused(true)}
+                  onBlur={() => setEmailFocused(false)}
+                  className={`h-12 pl-10 rounded-xl transition-all duration-200 ${
+                    emailFocused
+                      ? 'border-lib-purple ring-2 ring-lib-purple/20 shadow-sm shadow-lib-purple/5'
+                      : 'border-gray-200'
+                  }`}
                 />
               </div>
             </div>
+
+            {/* Password field with animated label */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="loginPassword" className="text-sm font-medium">Password</Label>
+                <Label
+                  htmlFor="loginPassword"
+                  className={`text-sm font-medium transition-colors duration-200 ${
+                    passwordFocused ? 'text-lib-purple' : 'text-foreground'
+                  }`}
+                >
+                  Password
+                </Label>
                 <button className="text-xs text-lib-purple font-medium hover:text-lib-purple-dark transition-colors">
                   Forgot password?
                 </button>
@@ -149,23 +201,59 @@ export default function LoginScreen() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                  className="h-12 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
+                  className={`h-12 rounded-xl transition-all duration-200 pr-10 ${
+                    passwordFocused
+                      ? 'border-lib-purple ring-2 ring-lib-purple/20 shadow-sm shadow-lib-purple/5'
+                      : 'border-gray-200'
+                  }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
+
+            {/* Login button with gradient and loading animation */}
             <Button
               onClick={handleLogin}
               disabled={loading || !email || !password}
-              className="w-full h-12 rounded-xl bg-lib-purple hover:bg-lib-purple-dark text-white font-semibold text-base disabled:opacity-50 shadow-lg shadow-lib-purple/20 active:scale-[0.98] transition-all"
+              className="w-full h-12 rounded-xl bg-lib-purple hover:bg-lib-purple-dark text-white font-semibold text-base disabled:opacity-50 shadow-lg shadow-lib-purple/25 active:scale-[0.98] transition-all relative overflow-hidden"
             >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Sign In'}
+              <AnimatePresence mode="wait">
+                {loading ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <div className="relative w-5 h-5">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    </div>
+                    <span>Signing in...</span>
+                  </motion.div>
+                ) : (
+                  <motion.span
+                    key="idle"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    Sign In
+                  </motion.span>
+                )}
+              </AnimatePresence>
+              {/* Shimmer effect on button when not loading */}
+              {!loading && (email && password) && (
+                <div className="absolute inset-0 shimmer-loading rounded-xl" />
+              )}
             </Button>
           </div>
 
@@ -181,7 +269,7 @@ export default function LoginScreen() {
 
           <button
             onClick={handleDemoLogin}
-            className="w-full py-3 rounded-xl border-2 border-dashed border-lib-purple-200 bg-lib-purple-50/50 text-lib-purple text-sm font-medium hover:bg-lib-purple-50 hover:border-lib-purple-300 active:bg-lib-purple-100 transition-all"
+            className="w-full py-3 rounded-xl border-2 border-dashed border-lib-purple-200 bg-lib-purple-50/50 text-lib-purple text-sm font-medium hover:bg-lib-purple-50 hover:border-lib-purple-300 active:bg-lib-purple-100 transition-all press-effect"
           >
             <span className="flex items-center justify-center gap-2">
               <BookOpen className="w-4 h-4" />

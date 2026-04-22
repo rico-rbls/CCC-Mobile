@@ -24,7 +24,8 @@ export default function BottomNav() {
         const res = await fetch(`/api/borrow?userId=${user.id}&status=active`)
         if (res.ok) {
           const data = await res.json()
-          setActiveBorrows(data.records?.length || 0)
+          const records = Array.isArray(data) ? data : (data.records || [])
+          setActiveBorrows(records.length)
         }
       } catch {
         // silently fail
