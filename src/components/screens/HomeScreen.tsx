@@ -4,8 +4,8 @@ import { useAppStore, type BorrowedBook, type ResourceItem } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Bell, Settings, BookOpen,
-  ChevronRight, TrendingUp, Loader2, Megaphone, X,
-  CalendarDays, Star, Sparkles, Flame,
+  ChevronRight, Loader2, Megaphone, X,
+  Star, Flame,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -277,14 +277,12 @@ export default function HomeScreen() {
     return 'Good evening'
   }
 
-  const formatFullDate = () => {
+  const formatShortDate = () => {
     const d = new Date()
-    return d.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    const day = d.getDate()
+    const month = d.toLocaleDateString('en-US', { month: 'long' })
+    const weekday = d.toLocaleDateString('en-US', { weekday: 'long' })
+    return `${weekday.toUpperCase()}, ${month.toUpperCase()} ${day}`
   }
 
   const activeBook = borrowedBooks[0]
@@ -346,18 +344,17 @@ export default function HomeScreen() {
         {/* Top bar: streak card + action buttons */}
         <div className="flex items-center justify-between mb-5">
           {/* Streak in a rounded card */}
-          <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/50">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800">
             <Flame className="w-4 h-4 text-orange-500" />
-            <span className="font-bold text-sm text-foreground">{user?.streakCount ?? 0}</span>
-            <span className="text-xs text-orange-600 dark:text-orange-400">day streak</span>
+            <span className="text-sm font-bold text-foreground">x{user?.streakCount ?? 0} day streak!</span>
           </div>
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setCurrentScreen('notifications')}
-              className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="relative p-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors"
               aria-label="Notifications"
             >
-              <Bell className="w-5 h-5 text-foreground" />
+              <Bell className="w-5 h-5 text-lib-purple" />
               {unreadCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white flex items-center justify-center font-bold">
                   {unreadCount}
@@ -366,13 +363,18 @@ export default function HomeScreen() {
             </button>
             <button
               onClick={() => setCurrentScreen('settings')}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors"
               aria-label="Settings"
             >
-              <Settings className="w-5 h-5 text-foreground" />
+              <Settings className="w-5 h-5 text-lib-purple" />
             </button>
           </div>
         </div>
+
+        {/* Date above greeting */}
+        <p className="text-[11px] font-bold text-muted-foreground tracking-wide uppercase mb-1">
+          {formatShortDate()}
+        </p>
 
         {/* Greeting - large header */}
         <AnimatePresence mode="wait">
@@ -387,12 +389,9 @@ export default function HomeScreen() {
             {greeting()}, {user?.fullName?.split(' ')[0] ?? 'User'}!
           </motion.h1>
         </AnimatePresence>
-        <p className="text-xs text-muted-foreground mt-1">
-          {[user?.program, user?.yearLevel, user?.role].filter(Boolean).map(s => s?.charAt(0).toUpperCase() + s?.slice(1)).join(' · ')}
-        </p>
 
-        {/* Library status + date */}
-        <div className="flex items-center justify-between mt-4">
+        {/* Library status */}
+        <div className="mt-4">
           <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${
             libraryOpen
               ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
@@ -410,10 +409,6 @@ export default function HomeScreen() {
               Library {libraryOpen ? 'Open' : 'Closed'} · {libraryOpen ? `Closes ${closingTime}` : 'Opens tomorrow'}
             </span>
           </div>
-          <div className="flex items-center gap-1">
-            <CalendarDays className="w-3 h-3 text-lib-purple" />
-            <span className="text-[10px] text-muted-foreground font-medium">{formatFullDate()}</span>
-          </div>
         </div>
       </div>
 
@@ -429,9 +424,8 @@ export default function HomeScreen() {
             animate="visible"
             className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
           >
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3">
               <SectionHeader>Announcements</SectionHeader>
-              <Megaphone className="w-4 h-4 text-lib-purple" />
             </div>
             <AnimatePresence mode="wait">
               <motion.div
@@ -490,9 +484,8 @@ export default function HomeScreen() {
             animate="visible"
             className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
           >
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3">
               <SectionHeader>Today&apos;s Highlight</SectionHeader>
-              <Sparkles className="w-4 h-4 text-lib-purple" />
             </div>
             <motion.button
               whileTap={{ scale: 0.98 }}
@@ -540,7 +533,9 @@ export default function HomeScreen() {
           animate="visible"
           className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
         >
-          <SectionHeader>Current Borrow</SectionHeader>
+          <div className="mb-3">
+            <SectionHeader>Current Borrow</SectionHeader>
+          </div>
           {activeBook ? (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -713,9 +708,8 @@ export default function HomeScreen() {
             animate="visible"
             className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
           >
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3">
               <SectionHeader>Trending in Your Department</SectionHeader>
-              <TrendingUp className="w-4 h-4 text-lib-purple" />
             </div>
             <div className="space-y-0">
               {trending.map((item, index) => (
