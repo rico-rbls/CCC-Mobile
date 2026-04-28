@@ -214,7 +214,7 @@ export default function BorrowedScreen() {
   const books = activeTab === 'active' ? activeBooks : historyBooks
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Success celebration overlay */}
       <AnimatePresence>
         {showSuccess && (
@@ -222,7 +222,7 @@ export default function BorrowedScreen() {
         )}
       </AnimatePresence>
       {/* Header with gradient accent */}
-      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3 border-b border-gray-100 dark:border-gray-800">
+      <div className="bg-card px-4 pt-4 pb-3 border-b border-gray-100 dark:border-gray-800">
         <h2 className="font-bold text-foreground text-lg mb-3">My Loans</h2>
         <div className="flex bg-lib-purple-50 dark:bg-gray-800 rounded-xl p-1">
           {(['active', 'history'] as const).map((tab) => (
@@ -271,7 +271,7 @@ export default function BorrowedScreen() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-16"
           >
-            <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center mb-4">
+            <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-4">
               <BookOpen className="w-10 h-10 text-lib-purple" />
             </div>
             <h3 className="font-bold text-foreground mb-1">No books yet</h3>
@@ -338,7 +338,7 @@ export default function BorrowedScreen() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.07 }}
-                    className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden relative"
+                    className="bg-card rounded-[22px] shadow-sm overflow-hidden relative"
                   >
                     {activeTab === 'active' && (
                       <div className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl ${

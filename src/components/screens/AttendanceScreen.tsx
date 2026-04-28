@@ -129,10 +129,10 @@ export default function AttendanceScreen() {
   )
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800">
-        <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors">
+      <div className="bg-card px-4 pt-4 pb-3 flex items-center gap-3 border-b border-gray-100 dark:border-white/5">
+        <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-white/5 transition-colors">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h2 className="font-bold text-foreground text-lg">Library Attendance</h2>
@@ -146,21 +146,21 @@ export default function AttendanceScreen() {
           transition={{ delay: 0.05 }}
           className="grid grid-cols-3 gap-3"
         >
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-3 text-center">
-            <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center mx-auto mb-2">
+          <div className="bg-card rounded-[22px] shadow-sm p-3 text-center">
+            <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mx-auto mb-2">
               <MapPin className="w-4 h-4 text-lib-purple" />
             </div>
             <p className="text-xl font-bold text-foreground">{totalVisits}</p>
             <p className="text-[10px] text-muted-foreground font-medium">Total Visits</p>
           </div>
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-3 text-center">
-            <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center mx-auto mb-2">
+          <div className="bg-card rounded-[22px] shadow-sm p-3 text-center">
+            <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mx-auto mb-2">
               <Clock className="w-4 h-4 text-lib-purple" />
             </div>
             <p className="text-xl font-bold text-foreground">{totalHours}</p>
             <p className="text-[10px] text-muted-foreground font-medium">Total Hours</p>
           </div>
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-3 text-center">
+          <div className="bg-card rounded-[22px] shadow-sm p-3 text-center">
             <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center mx-auto mb-2">
               <Flame className="w-4 h-4 text-orange-500" />
             </div>
@@ -174,7 +174,7 @@ export default function AttendanceScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
+          className="bg-card rounded-[22px] shadow-sm p-4"
         >
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
@@ -219,8 +219,8 @@ export default function AttendanceScreen() {
                     isAttended
                       ? 'bg-lib-purple text-white'
                       : isFuture
-                        ? 'bg-gray-50 dark:bg-gray-800 text-muted-foreground/40'
-                        : 'bg-gray-100 dark:bg-gray-800 text-muted-foreground'
+                        ? 'bg-gray-50 dark:bg-white/5 text-muted-foreground/40'
+                        : 'bg-gray-100 dark:bg-white/10 text-muted-foreground'
                   }`}
                 >
                   {day}
@@ -233,7 +233,7 @@ export default function AttendanceScreen() {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center justify-center gap-4 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex items-center justify-center gap-4 mt-3 pt-3 border-t border-gray-100 dark:border-white/5">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-sm bg-lib-purple" />
               <span className="text-[10px] text-muted-foreground">Attended</span>
@@ -258,7 +258,7 @@ export default function AttendanceScreen() {
           <h3 className="text-xs font-semibold text-lib-purple uppercase tracking-wider mb-2 px-1">
             Recent Visits
           </h3>
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
             {loading ? (
               <div className="px-4 py-8 text-center text-sm text-muted-foreground">
                 Loading attendance records...
@@ -272,10 +272,10 @@ export default function AttendanceScreen() {
                 <div
                   key={record.id}
                   className={`flex items-center gap-3 px-4 py-3 ${
-                    idx < recentRecords.length - 1 ? 'border-b border-gray-100 dark:border-gray-800' : ''
+                    idx < recentRecords.length - 1 ? 'border-b border-gray-50 dark:border-white/5' : ''
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
                     <Calendar className="w-4 h-4 text-lib-purple" />
                   </div>
                   <div className="flex-1 min-w-0">

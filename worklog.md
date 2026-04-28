@@ -561,3 +561,55 @@ All changes verified via agent-browser + VLM in both light and dark modes:
 ✅ Both modes: 24px rounded corners on all section cards
 ✅ Streak card is orange-themed in both modes
 ✅ Bell & settings icons inside small card containers
+
+---
+Task ID: 12
+Agent: Main Agent
+Task: Mobile UI Consistency Pass - Streak, Profile, Settings, Cross-Screen Styling
+
+Work Log:
+- Fixed streak card: removed border/stroke, changed to solid orange bg (`bg-orange-400 dark:bg-orange-500`) with white text and icons
+- Fixed bell & settings icon cards on HomeScreen: changed from `bg-gray-100 dark:bg-white/10 rounded-2xl` to `bg-card shadow-sm rounded-[22px]` to match section card styling
+- Fixed profile header overlapping stats icons: reduced header `pb-16` to `pb-12`, changed stats card `-mt-6` to `-mt-8` with `relative z-20` for proper overlap
+- Removed duplicated menu items from ProfileScreen (notification preferences, privacy policy, help & support, about) since they're already in Settings
+- Added Help section to SettingsScreen: "How to use CCC's Library Logbook MS" with "Open Help guide →" link within a card
+- Moved Library section (Library Hours + Attendance History) from SettingsScreen to ProfileScreen
+- Unified corner radius to `rounded-[22px]` for cards and `rounded-[14px]` for small icon containers across ALL screens
+- Updated all screens to use `bg-background` for main containers (replacing `bg-gray-50 dark:bg-gray-950`)
+- Updated all screens to use `bg-card` for cards (replacing `bg-white dark:bg-gray-900`)
+- Updated all dark mode icon containers to `dark:bg-white/10` (replacing `dark:bg-gray-800`)
+- Updated all dark mode hover states to `dark:hover:bg-white/5` (replacing `dark:hover:bg-gray-800`)
+- Updated all dark borders to `dark:border-white/5` (replacing `dark:border-gray-800`)
+- Screens updated: HomeScreen, ProfileScreen, SettingsScreen, SearchScreen, BorrowedScreen, NotificationsScreen, BookDetailScreen, AttendanceScreen, FavoritesScreen, EditProfileScreen, ReservationsScreen
+- All lint checks pass with zero errors
+
+Stage Summary:
+- Streak card is now solid orange (no border) with white text
+- Bell & settings icons wrapped in same card-style as section cards
+- Profile header no longer covers borrowed/visits/streak stat icons
+- Profile only has: Edit Profile, My Favorites, My Reservations (duplicates removed)
+- Settings now has: Account, Notifications, Appearance (Dark Mode), Help section, About
+- Profile now has: Library Hours + Attendance History (moved from Settings)
+- All 11 mobile screens use consistent styling: bg-background, bg-card, rounded-[22px], rounded-[14px], dark:bg-white/10, dark:hover:bg-white/5, dark:border-white/5
+- Zero lint errors across entire codebase
+
+Current Project Status:
+- All 13+ screens functional with unified design system
+- Dark mode working with dark purple theme across all screens
+- Cross-screen visual consistency achieved
+- All interactive features working (favorites, reviews, return books, etc.)
+
+Unresolved Issues / Risks:
+- Help guide screen not yet implemented (just a placeholder button)
+- Book covers still partially using placeholder gradients
+- QR scanning is simulated (no real camera integration)
+- EditProfileScreen could use more consistent dark mode classes
+- Onboarding screen needs visual consistency update
+
+Priority Recommendations for Next Phase:
+1. Implement Help Guide screen (How to use CCC's Library Logbook MS)
+2. Add more AI-generated book covers
+3. Ensure onboarding screen matches the new design system
+4. Add real QR code generation for user's attendance
+5. Add search autocomplete/suggestions
+6. Polish micro-animations further

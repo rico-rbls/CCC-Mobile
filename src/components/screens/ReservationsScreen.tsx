@@ -84,18 +84,18 @@ export default function ReservationsScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3 border-b border-gray-100 dark:border-gray-800">
+      <div className="bg-card px-4 pt-4 pb-3 border-b border-gray-100 dark:border-white/5">
         <div className="flex items-center gap-3 mb-3">
-          <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-white/5 transition-colors">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <div className="flex-1">
             <h2 className="font-bold text-foreground text-lg">My Reservations</h2>
             <p className="text-xs text-muted-foreground">{pendingCount} active reservation{pendingCount !== 1 ? 's' : ''}</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
             <Bookmark className="w-4 h-4 text-lib-purple" />
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function ReservationsScreen() {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all ${
                 activeFilter === tab
                   ? 'bg-lib-purple text-white shadow-sm shadow-lib-purple/20'
-                  : 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-gray-700'
+                  : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-white/5'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -137,7 +137,7 @@ export default function ReservationsScreen() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-16"
           >
-            <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center mb-4">
+            <div className="w-20 h-20 rounded-[22px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-4">
               <Bookmark className="w-10 h-10 text-lib-purple" />
             </div>
             <h3 className="font-bold text-foreground mb-1">
@@ -166,7 +166,7 @@ export default function ReservationsScreen() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"
+                  className="bg-card rounded-[22px] shadow-sm overflow-hidden"
                 >
                   <div className="p-4 flex items-start gap-3">
                     <button
@@ -217,7 +217,7 @@ export default function ReservationsScreen() {
                           variant="ghost"
                           size="sm"
                           onClick={() => { setSelectedBookId(reservation.resourceId); setCurrentScreen('book-detail') }}
-                          className="mt-2 h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-gray-800 font-medium"
+                          className="mt-2 h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
                         >
                           Borrow Now
                         </Button>

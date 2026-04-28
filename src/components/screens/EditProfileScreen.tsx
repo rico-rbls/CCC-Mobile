@@ -77,7 +77,7 @@ export default function EditProfileScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
       <div className="bg-purple-gradient px-4 pt-4 pb-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/5 -translate-y-1/2 translate-x-1/2" />
@@ -117,7 +117,7 @@ export default function EditProfileScreen() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 space-y-4"
+          className="bg-card rounded-[22px] shadow-sm border border-gray-100 dark:border-white/5 p-5 space-y-4"
         >
           {/* Full Name */}
           <div className="space-y-1.5">

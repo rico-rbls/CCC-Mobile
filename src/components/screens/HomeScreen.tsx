@@ -332,15 +332,15 @@ export default function HomeScreen() {
         {/* Top bar: streak card + action buttons */}
         <div className="flex items-center justify-between mb-5">
           {/* Streak card - orange theme */}
-          <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-700/50">
-            <Flame className="w-4 h-4 text-orange-500" />
-            <span className="text-sm font-bold text-foreground">x{user?.streakCount ?? 0} day streak!</span>
+          <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-orange-400 dark:bg-orange-500">
+            <Flame className="w-4 h-4 text-white" />
+            <span className="text-sm font-bold text-white">x{user?.streakCount ?? 0} day streak!</span>
           </div>
           <div className="flex items-center gap-2">
             {/* Bell icon inside small card */}
             <button
               onClick={() => setCurrentScreen('notifications')}
-              className="relative p-2.5 rounded-2xl bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 transition-colors"
+              className="relative p-2.5 rounded-[22px] bg-card shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
               aria-label="Notifications"
             >
               <Bell className="w-4.5 h-4.5 text-lib-purple" />
@@ -353,7 +353,7 @@ export default function HomeScreen() {
             {/* Settings icon inside small card */}
             <button
               onClick={() => setCurrentScreen('settings')}
-              className="p-2.5 rounded-2xl bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 transition-colors"
+              className="p-2.5 rounded-[22px] bg-card shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
               aria-label="Settings"
             >
               <Settings className="w-4.5 h-4.5 text-lib-purple" />

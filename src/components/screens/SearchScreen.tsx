@@ -151,9 +151,9 @@ export default function SearchScreen() {
   const isSearchEmpty = !localQuery.trim() && searchCategory === 'all'
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Search header */}
-      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3 space-y-3 border-b border-gray-100 dark:border-gray-800">
+      <div className="bg-card px-4 pt-4 pb-3 space-y-3 border-b border-gray-100 dark:border-gray-800">
         <h2 className="font-bold text-foreground text-lg">Search Catalog</h2>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -195,7 +195,7 @@ export default function SearchScreen() {
                   <button
                     key={term}
                     onClick={() => handleQuickSearch(term)}
-                    className="px-3 py-1.5 rounded-full bg-lib-purple-50 dark:bg-gray-800 text-lib-purple dark:text-gray-300 text-xs font-medium hover:bg-lib-purple-100 dark:hover:bg-gray-700 active:bg-lib-purple-200 transition-colors"
+                    className="px-3 py-1.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-gray-300 text-xs font-medium hover:bg-lib-purple-100 dark:hover:bg-white/5 active:bg-lib-purple-200 transition-colors"
                   >
                     {term}
                   </button>
@@ -219,7 +219,7 @@ export default function SearchScreen() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                   isActive
                     ? 'bg-lib-purple text-white shadow-sm shadow-lib-purple/20'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-lib-purple-50 dark:hover:bg-gray-700'
+                    : 'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 hover:bg-lib-purple-50 dark:hover:bg-white/5'
                 }`}
               >
                 <motion.span
@@ -247,7 +247,7 @@ export default function SearchScreen() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
-                className="bg-white dark:bg-gray-900 rounded-xl shadow-sm p-4 flex items-start gap-3"
+                className="bg-card rounded-[22px] shadow-sm p-4 flex items-start gap-3"
               >
                 <Skeleton className="w-14 h-[72px] rounded-lg flex-shrink-0" />
                 <div className="flex-1 space-y-2">
@@ -263,7 +263,7 @@ export default function SearchScreen() {
           </div>
         ) : filtered.length === 0 && localQuery.trim() ? (
           <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-16 h-16 rounded-full bg-lib-purple-50 flex items-center justify-center mb-3">
+            <div className="w-16 h-16 rounded-full bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-3">
               <Search className="w-8 h-8 text-lib-purple" />
             </div>
             <h3 className="font-semibold text-foreground mb-1">No results found</h3>
@@ -352,7 +352,7 @@ export default function SearchScreen() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03 }}
                 onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
-                className="w-full bg-white dark:bg-gray-900 rounded-xl shadow-sm p-4 flex items-start gap-3 text-left card-hover-effect"
+                className="w-full bg-card rounded-[22px] shadow-sm p-4 flex items-start gap-3 text-left card-hover-effect"
               >
                 {(() => {
                   const coverSrc = getResourceCover(resource.coverImage, resource.title)
@@ -375,12 +375,12 @@ export default function SearchScreen() {
                     </span>
                     {/* Subject/tag pills */}
                     {resource.tags.slice(0, 2).map(tag => (
-                      <span key={tag} className="px-2 py-0.5 rounded-full bg-lib-purple-50 text-lib-purple text-[10px] font-medium">
+                      <span key={tag} className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple text-[10px] font-medium">
                         {tag}
                       </span>
                     ))}
                     {resource.subject && resource.tags.length === 0 && (
-                      <span className="px-2 py-0.5 rounded-full bg-lib-purple-50 text-lib-purple text-[10px] font-medium">
+                      <span className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple text-[10px] font-medium">
                         {resource.subject}
                       </span>
                     )}

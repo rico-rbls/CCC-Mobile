@@ -272,7 +272,7 @@ export default function BookDetailScreen() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 items-center justify-center">
+      <div className="flex flex-col min-h-screen bg-background items-center justify-center">
         <Loader2 className="w-8 h-8 text-lib-purple animate-spin" />
       </div>
     )
@@ -280,7 +280,7 @@ export default function BookDetailScreen() {
 
   if (!book) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 items-center justify-center">
+      <div className="flex flex-col min-h-screen bg-background items-center justify-center">
         <p className="text-muted-foreground">Book not found</p>
         <button onClick={goBack} className="text-lib-purple mt-2 text-sm font-medium">Go back</button>
       </div>
@@ -290,7 +290,7 @@ export default function BookDetailScreen() {
   const isAvailable = book.availableCopies > 0
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header with decorative pattern */}
       <div className="bg-purple-gradient px-4 pt-4 pb-16 relative overflow-hidden">
         {/* Decorative elements */}
@@ -320,7 +320,7 @@ export default function BookDetailScreen() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-sm overflow-hidden"
+          className="bg-card rounded-[22px] shadow-sm overflow-hidden"
         >
           {/* Cover with image or decorative pattern overlay */}
           {(() => {
@@ -383,19 +383,19 @@ export default function BookDetailScreen() {
             {/* ISBN and Publication Date */}
             <div className="mt-3 flex flex-wrap gap-2">
               {book.isbn && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 dark:bg-white/5 text-xs text-muted-foreground">
                   <Hash className="w-3 h-3" />
                   <span className="font-medium">ISBN:</span> {book.isbn}
                 </div>
               )}
               {book.publicationDate && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 dark:bg-white/5 text-xs text-muted-foreground">
                   <Calendar className="w-3 h-3" />
                   <span className="font-medium">Published:</span> {book.publicationDate}
                 </div>
               )}
               {book.subject && (
-                <div className="px-2.5 py-1 rounded-lg bg-lib-purple-50 text-xs text-lib-purple font-medium">
+                <div className="px-2.5 py-1 rounded-lg bg-lib-purple-50 dark:bg-white/10 text-xs text-lib-purple font-medium">
                   {book.subject}
                 </div>
               )}
@@ -410,7 +410,7 @@ export default function BookDetailScreen() {
             {/* Tags */}
             <div className="flex flex-wrap gap-1.5 mt-3">
               {book.tags.map(tag => (
-                <span key={tag} className="px-2 py-0.5 rounded-full bg-lib-purple-50 text-lib-purple text-[10px] font-medium">
+                <span key={tag} className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple text-[10px] font-medium">
                   {tag}
                 </span>
               ))}
@@ -425,7 +425,7 @@ export default function BookDetailScreen() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-sm p-4"
+          className="bg-card rounded-[22px] shadow-sm p-4"
         >
           {/* Section Header */}
           <div className="flex items-center gap-2 mb-4">
@@ -467,7 +467,7 @@ export default function BookDetailScreen() {
                   <div key={star} className="flex items-center gap-2">
                     <span className="text-[10px] text-muted-foreground w-3 text-right">{star}</span>
                     <Star className="w-2.5 h-2.5 text-lib-purple fill-lib-purple" />
-                    <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
+                    <div className="flex-1 h-2 rounded-full bg-gray-100 dark:bg-white/10 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${pct}%` }}
@@ -516,7 +516,7 @@ export default function BookDetailScreen() {
                   transition={{ duration: 0.25 }}
                   className="overflow-hidden"
                 >
-                  <div className="mt-3 p-3 rounded-xl bg-gray-50 border border-gray-100 space-y-3">
+                  <div className="mt-3 p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 space-y-3">
                     {/* Star Selector */}
                     <div>
                       <p className="text-xs font-medium text-foreground mb-1.5">Your Rating</p>
@@ -596,11 +596,11 @@ export default function BookDetailScreen() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.05 * index }}
-                    className="p-3 rounded-xl bg-gray-50 border border-gray-100 relative"
+                    className="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 relative"
                   >
                     <div className="flex items-start gap-2.5">
                       {/* Avatar initials circle */}
-                      <div className="w-8 h-8 rounded-full bg-lib-purple/10 flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-lib-purple/10 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
                         <span className="text-[10px] font-bold text-lib-purple">
                           {review.user.avatarInitials || review.user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </span>
@@ -707,14 +707,14 @@ export default function BookDetailScreen() {
       {/* Related books from API */}
       <div className="px-4 mt-6 flex-1 overflow-y-auto">
         <h3 className="font-bold text-foreground mb-3">More Resources</h3>
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
           {relatedBooks.length > 0 ? (
             relatedBooks.map((relBook, index) => (
               <button
                 key={relBook.id}
                 onClick={() => { setSelectedBookId(relBook.id); setCurrentScreen('book-detail') }}
                 className={`flex items-center gap-3 w-full px-4 py-3 hover:bg-lib-purple-50/50 active:bg-lib-purple-50 transition-colors ${
-                  index < relatedBooks.length - 1 ? 'border-b border-gray-100' : ''
+                  index < relatedBooks.length - 1 ? 'border-b border-gray-50 dark:border-white/5' : ''
                 }`}
               >
                 <div className="w-10 h-10 rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 cover-pattern-overlay">

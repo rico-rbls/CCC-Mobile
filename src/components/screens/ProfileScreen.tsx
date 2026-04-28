@@ -3,21 +3,17 @@
 import { useAppStore, type AppScreen } from '@/lib/store'
 import { motion } from 'framer-motion'
 import {
-  User, BookOpen, Flame, Calendar, Clock,
-  ChevronRight, Edit, Bell, Shield, HelpCircle, Info, LogOut, MapPin, Heart, Mail, GraduationCap
+  BookOpen, Flame, Clock,
+  ChevronRight, Edit, LogOut, MapPin, Heart, Mail, GraduationCap, FileText
 } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
 
-// Menu items defined as a function to accept dynamic data
+// Menu items - only Edit Profile, Favorites, Reservations (removed items now in Settings)
 function getMenuItems(favCount: number) {
   return [
-    { id: 'edit-profile' as AppScreen, icon: Edit, label: 'Edit Profile', desc: 'Update your information', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
+    { id: 'edit-profile' as AppScreen, icon: Edit, label: 'Edit Profile', desc: 'Update your information', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-white/10' },
     { id: 'favorites', icon: Heart, label: 'My Favorites', desc: `${favCount} saved book${favCount !== 1 ? 's' : ''}`, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
-    { id: 'reservations', icon: BookOpen, label: 'My Reservations', desc: 'Track reserved items', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
-    { id: 'settings', icon: Bell, label: 'Notification Preferences', desc: 'Due dates, reservations', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
-    { id: 'settings', icon: Shield, label: 'Privacy Policy', desc: 'How we protect your data', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
-    { id: 'settings', icon: HelpCircle, label: 'Help & Support', desc: 'FAQs and contact info', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
-    { id: 'settings', icon: Info, label: 'About', desc: 'Version 1.0.0', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
+    { id: 'reservations', icon: BookOpen, label: 'My Reservations', desc: 'Track reserved items', color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-white/10' },
   ]
 }
 
@@ -32,12 +28,19 @@ const monthlyData = [
   { month: 'Mar', books: 4 },
 ]
 
+interface LibrarySettings {
+  isOpen: boolean
+  openingTime: string
+  closingTime: string
+}
+
 export default function ProfileScreen() {
   const { user, setCurrentScreen, logout, favorites } = useAppStore()
   const [borrowCount, setBorrowCount] = useState(0)
   const [attendanceCount, setAttendanceCount] = useState(0)
   const [readingGoal, setReadingGoal] = useState(24)
   const [showGoalPicker, setShowGoalPicker] = useState(false)
+  const [librarySettings, setLibrarySettings] = useState<LibrarySettings | null>(null)
   const userIdRef = useRef(user?.id)
 
   useEffect(() => {
@@ -70,8 +73,23 @@ export default function ProfileScreen() {
     return () => { cancelled = true }
   }, [user?.id])
 
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch('/api/settings')
+        if (res.ok) {
+          const data = await res.json()
+          setLibrarySettings(data)
+        }
+      } catch {
+        // silently fail
+      }
+    }
+    fetchSettings()
+  }, [])
+
   const stats = [
-    { icon: BookOpen, label: 'Borrowed', value: String(borrowCount), color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-gray-800' },
+    { icon: BookOpen, label: 'Borrowed', value: String(borrowCount), color: 'text-lib-purple', bg: 'bg-lib-purple-50 dark:bg-white/10' },
     { icon: MapPin, label: 'Visits', value: String(attendanceCount), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
     { icon: Flame, label: 'Streak', value: String(user?.streakCount ?? 0), color: 'text-orange-500 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
   ]
@@ -79,10 +97,18 @@ export default function ProfileScreen() {
   const roleLabel = user?.role === 'faculty' ? 'Faculty' : user?.role === 'visitor' ? 'Visitor' : 'Student'
   const maxBooks = Math.max(...monthlyData.map(d => d.books), 1)
 
+  const formatTime = (time: string) => {
+    const [h, m] = time.split(':')
+    const hour = parseInt(h)
+    const ampm = hour >= 12 ? 'PM' : 'AM'
+    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour
+    return `${displayHour}:${m} ${ampm}`
+  }
+
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Profile header with gradient */}
-      <div className="relative bg-purple-gradient px-6 pt-10 pb-16 rounded-b-[2rem] overflow-hidden">
+      <div className="relative bg-purple-gradient px-6 pt-10 pb-12 rounded-b-[22px] overflow-hidden">
         {/* Decorative circles */}
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
         <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/5" />
@@ -123,9 +149,9 @@ export default function ProfileScreen() {
         </div>
       </div>
 
-      {/* Stats cards */}
-      <div className="px-4 -mt-6">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4 grid grid-cols-3 gap-3">
+      {/* Stats cards - overlapping header */}
+      <div className="px-4 -mt-8 relative z-20">
+        <div className="bg-card rounded-[22px] shadow-sm p-4 grid grid-cols-3 gap-3">
           {stats.map((stat, index) => {
             const Icon = stat.icon
             return (
@@ -136,7 +162,7 @@ export default function ProfileScreen() {
                 transition={{ delay: index * 0.1 }}
                 className="flex flex-col items-center gap-1.5"
               >
-                <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center`}>
+                <div className={`w-10 h-10 rounded-[14px] ${stat.bg} flex items-center justify-center`}>
                   <Icon className={`w-5 h-5 ${stat.color}`} />
                 </div>
                 <span className="text-lg font-bold text-foreground">{stat.value}</span>
@@ -153,7 +179,7 @@ export default function ProfileScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
+          className="bg-card rounded-[22px] shadow-sm p-4"
         >
           <div className="flex items-center gap-4">
             {/* Circular progress */}
@@ -204,10 +230,10 @@ export default function ProfileScreen() {
                     <button
                       key={goal}
                       onClick={() => { setReadingGoal(goal); setShowGoalPicker(false) }}
-                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      className={`flex-1 py-1.5 rounded-[14px] text-xs font-medium transition-all ${
                         readingGoal === goal
                           ? 'bg-lib-purple text-white'
-                          : 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-gray-700'
+                          : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-white/15'
                       }`}
                     >
                       {goal}
@@ -226,15 +252,10 @@ export default function ProfileScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
+          className="bg-card rounded-[22px] shadow-sm p-4"
         >
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center">
-                <BookOpen className="w-4 h-4 text-lib-purple" />
-              </div>
-              <span className="text-sm font-semibold text-foreground">Reading Stats</span>
-            </div>
+            <span className="text-sm font-semibold text-foreground">Reading Stats</span>
             <span className="text-[10px] text-muted-foreground">Books per month</span>
           </div>
           {/* Mini bar chart */}
@@ -246,7 +267,7 @@ export default function ProfileScreen() {
                   animate={{ height: `${(d.books / maxBooks) * 100}%` }}
                   transition={{ delay: 0.2 + i * 0.05, duration: 0.4, ease: 'easeOut' }}
                   className={`w-full rounded-t-md min-h-[4px] ${
-                    i === monthlyData.length - 1 ? 'bg-lib-purple' : 'bg-lib-purple-200 dark:bg-gray-700'
+                    i === monthlyData.length - 1 ? 'bg-lib-purple' : 'bg-lib-purple-200 dark:bg-white/20'
                   }`}
                 />
                 <span className={`text-[9px] ${i === monthlyData.length - 1 ? 'text-lib-purple font-bold' : 'text-muted-foreground'}`}>
@@ -255,7 +276,7 @@ export default function ProfileScreen() {
               </div>
             ))}
           </div>
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50 dark:border-gray-800">
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50 dark:border-white/5">
             <span className="text-[10px] text-muted-foreground">
               Total: {monthlyData.reduce((sum, d) => sum + d.books, 0)} books this year
             </span>
@@ -266,6 +287,46 @@ export default function ProfileScreen() {
         </motion.div>
       </div>
 
+      {/* Library section (moved from Settings) */}
+      <div className="px-4 mt-3">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18 }}
+          className="bg-card rounded-[22px] shadow-sm overflow-hidden"
+        >
+          <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-lib-purple" />
+            </div>
+            <div className="flex-1">
+              <span className="text-sm font-medium text-foreground">Library Hours</span>
+              <p className="text-xs text-muted-foreground">
+                {librarySettings
+                  ? `${formatTime(librarySettings.openingTime)} – ${formatTime(librarySettings.closingTime)}`
+                  : 'Loading...'}
+              </p>
+            </div>
+            <span className={`text-xs font-medium ${librarySettings?.isOpen ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+              {librarySettings?.isOpen ? 'Open Now' : 'Closed'}
+            </span>
+          </div>
+          <button
+            onClick={() => setCurrentScreen('attendance')}
+            className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors"
+          >
+            <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+              <FileText className="w-4 h-4 text-lib-purple" />
+            </div>
+            <div className="flex-1 text-left">
+              <span className="text-sm font-medium text-foreground">Attendance History</span>
+              <p className="text-xs text-muted-foreground">View your library visit records</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
+        </motion.div>
+      </div>
+
       {/* Favorite Books section */}
       <div className="px-4 mt-3">
         <motion.button
@@ -273,9 +334,9 @@ export default function ProfileScreen() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           onClick={() => setCurrentScreen('favorites')}
-          className="w-full bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4 flex items-center gap-3 card-hover-effect"
+          className="w-full bg-card rounded-[22px] shadow-sm p-4 flex items-center gap-3"
         >
-          <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-[14px] bg-red-50 dark:bg-red-900/20 flex items-center justify-center flex-shrink-0">
             <Heart className="w-5 h-5 text-red-500 fill-red-500" />
           </div>
           <div className="flex-1 text-left">
@@ -284,13 +345,13 @@ export default function ProfileScreen() {
               {favorites.length} book{favorites.length !== 1 ? 's' : ''} saved to your collection
             </p>
           </div>
-          <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </motion.button>
       </div>
 
       {/* Quick info card */}
       <div className="px-4 mt-3">
-        <div className="bg-lib-purple-50 dark:bg-gray-800/50 rounded-xl p-3 flex items-center gap-3">
+        <div className="bg-lib-purple-50 dark:bg-white/5 rounded-[22px] p-3 flex items-center gap-3">
           <Clock className="w-4 h-4 text-lib-purple flex-shrink-0" />
           <p className="text-xs text-lib-purple-700 dark:text-lib-purple-300">
             Member since {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -298,9 +359,9 @@ export default function ProfileScreen() {
         </div>
       </div>
 
-      {/* Menu */}
+      {/* Menu - only Edit Profile, Favorites, Reservations */}
       <div className="flex-1 px-4 pt-4 overflow-y-auto">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden divide-y divide-gray-50 dark:divide-gray-800">
+        <div className="bg-card rounded-[22px] shadow-sm overflow-hidden divide-y divide-gray-50 dark:divide-white/5">
           {getMenuItems(favorites.length).map((item, index) => {
             const Icon = item.icon
             return (
@@ -310,16 +371,16 @@ export default function ProfileScreen() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={() => setCurrentScreen(item.id as AppScreen)}
-                className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/30 dark:hover:bg-gray-800 active:bg-lib-purple-50/50 transition-colors"
+                className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/30 dark:hover:bg-white/5 active:bg-lib-purple-50/50 transition-colors"
               >
-                <div className={`w-9 h-9 rounded-xl ${item.bg} flex items-center justify-center`}>
+                <div className={`w-9 h-9 rounded-[14px] ${item.bg} flex items-center justify-center`}>
                   <Icon className={`w-4 h-4 ${item.color}`} />
                 </div>
                 <div className="flex-1 text-left">
                   <span className="text-sm font-medium text-foreground block">{item.label}</span>
                   {item.desc && <span className="text-[10px] text-muted-foreground">{item.desc}</span>}
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </motion.button>
             )
           })}
@@ -331,7 +392,7 @@ export default function ProfileScreen() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
           onClick={logout}
-          className="w-full mt-4 flex items-center justify-center gap-2 py-3.5 rounded-2xl border-2 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold text-sm hover:bg-red-100 dark:hover:bg-red-900/30 active:bg-red-200 dark:active:bg-red-900/40 transition-colors"
+          className="w-full mt-4 flex items-center justify-center gap-2 py-3.5 rounded-[22px] border-2 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold text-sm hover:bg-red-100 dark:hover:bg-red-900/30 active:bg-red-200 dark:active:bg-red-900/40 transition-colors"
         >
           <LogOut className="w-4 h-4" />
           Log Out

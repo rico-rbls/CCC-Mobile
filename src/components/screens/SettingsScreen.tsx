@@ -12,16 +12,16 @@ import {
   LogOut,
   Moon,
   Sun,
-  Clock,
   User,
   Shield,
   FileText,
-  BookOpen,
   Eye,
   EyeOff,
   Loader2,
   X,
   Check,
+  HelpCircle,
+  ChevronRight,
 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
@@ -31,22 +31,12 @@ import { useState, useEffect } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { useTheme } from 'next-themes'
 
-interface LibrarySettings {
-  isOpen: boolean
-  openingTime: string
-  closingTime: string
-  maxBorrowStudent: number
-  maxBorrowFaculty: number
-  maxBorrowVisitor: number
-}
-
 export default function SettingsScreen() {
   const { user, setCurrentScreen, goBack, logout } = useAppStore()
   const [dueDateNotif, setDueDateNotif] = useState(user?.notificationDueDate ?? true)
   const [reservationNotif, setReservationNotif] = useState(user?.notificationReservation ?? true)
   const [announcementNotif, setAnnouncementNotif] = useState(user?.notificationAnnouncements ?? false)
   const { theme, setTheme } = useTheme()
-  const [librarySettings, setLibrarySettings] = useState<LibrarySettings | null>(null)
   const { toast } = useToast()
 
   // Password modal state
@@ -59,21 +49,6 @@ export default function SettingsScreen() {
   const [showNewPwd, setShowNewPwd] = useState(false)
   const [showConfirmPwd, setShowConfirmPwd] = useState(false)
   const [passwordError, setPasswordError] = useState('')
-
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const res = await fetch('/api/settings')
-        if (res.ok) {
-          const data = await res.json()
-          setLibrarySettings(data)
-        }
-      } catch {
-        // silently fail
-      }
-    }
-    fetchSettings()
-  }, [])
 
   const handleToggle = async (
     field: 'notificationDueDate' | 'notificationReservation' | 'notificationAnnouncements',
@@ -159,34 +134,26 @@ export default function SettingsScreen() {
 
   const strength = getPasswordStrength()
 
-  const formatTime = (time: string) => {
-    const [h, m] = time.split(':')
-    const hour = parseInt(h)
-    const ampm = hour >= 12 ? 'PM' : 'AM'
-    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour
-    return `${displayHour}:${m} ${ampm}`
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
       <div className="bg-card px-4 pt-4 pb-3 flex items-center gap-3 border-b border-border">
-        <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 transition-colors">
+        <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-white/5 transition-colors">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h2 className="font-bold text-foreground text-lg">Settings</h2>
       </div>
 
-      <div className="flex-1 px-4 py-4 overflow-y-auto space-y-5">
+      <div className="flex-1 px-4 py-4 overflow-y-auto space-y-4">
         {/* Account section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
           <h3 className="text-xs font-semibold text-lib-purple uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
             <User className="w-3.5 h-3.5" />
             Account
           </h3>
-          <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
+          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
             <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-              <div className="w-10 h-10 rounded-xl bg-lib-purple flex items-center justify-center">
+              <div className="w-10 h-10 rounded-[14px] bg-lib-purple flex items-center justify-center">
                 <span className="text-white font-bold text-sm">
                   {user?.avatarInitials || user?.fullName?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'U'}
                 </span>
@@ -200,7 +167,7 @@ export default function SettingsScreen() {
               onClick={() => setShowPasswordModal(true)}
               className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-border hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors"
             >
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                 <Lock className="w-4 h-4 text-lib-purple" />
               </div>
               <div className="flex-1 text-left">
@@ -209,8 +176,8 @@ export default function SettingsScreen() {
               </div>
               <span className="text-xs text-muted-foreground">••••</span>
             </button>
-            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+            <div className="flex items-center gap-3 px-4 py-3.5">
+              <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                 <Mail className="w-4 h-4 text-lib-purple" />
               </div>
               <div className="flex-1">
@@ -228,10 +195,10 @@ export default function SettingsScreen() {
             <Bell className="w-3.5 h-3.5" />
             Notifications
           </h3>
-          <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
+          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                   <Bell className="w-4 h-4 text-lib-purple" />
                 </div>
                 <div>
@@ -247,7 +214,7 @@ export default function SettingsScreen() {
             </div>
             <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                   <Bell className="w-4 h-4 text-lib-purple" />
                 </div>
                 <div>
@@ -263,7 +230,7 @@ export default function SettingsScreen() {
             </div>
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                   <Bell className="w-4 h-4 text-lib-purple" />
                 </div>
                 <div>
@@ -286,10 +253,10 @@ export default function SettingsScreen() {
             <Palette className="w-3.5 h-3.5" />
             Appearance
           </h3>
-          <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
+          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                   {theme === 'dark' ? <Moon className="w-4 h-4 text-lib-purple" /> : <Sun className="w-4 h-4 text-lib-purple" />}
                 </div>
                 <div>
@@ -306,41 +273,48 @@ export default function SettingsScreen() {
           </div>
         </motion.div>
 
-        {/* Library section */}
+        {/* Help section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <h3 className="text-xs font-semibold text-lib-purple uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
-            <BookOpen className="w-3.5 h-3.5" />
-            Library
+            <HelpCircle className="w-3.5 h-3.5" />
+            Help
           </h3>
-          <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
-            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                <Clock className="w-4 h-4 text-lib-purple" />
-              </div>
-              <div className="flex-1">
-                <span className="text-sm font-medium text-foreground">Library Hours</span>
-                <p className="text-xs text-muted-foreground">
-                  {librarySettings
-                    ? `${formatTime(librarySettings.openingTime)} – ${formatTime(librarySettings.closingTime)}`
-                    : 'Loading...'}
-                </p>
-              </div>
-              <span className={`text-xs font-medium ${librarySettings?.isOpen ? 'text-green-600' : 'text-red-500'}`}>
-                {librarySettings?.isOpen ? 'Open Now' : 'Closed'}
-              </span>
-            </div>
+          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
             <button
-              onClick={() => setCurrentScreen('attendance')}
-              className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors"
+              onClick={() => {/* TODO: Open help guide */}}
+              className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-border hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors"
             >
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+                <HelpCircle className="w-4 h-4 text-lib-purple" />
+              </div>
+              <div className="flex-1 text-left">
+                <span className="text-sm font-medium text-foreground">How to use CCC&apos;s Library Logbook MS</span>
+                <p className="text-xs text-muted-foreground">Learn how to navigate the system</p>
+              </div>
+              <div className="flex items-center gap-1 text-lib-purple text-xs font-medium">
+                Open Help guide
+                <ChevronRight className="w-3.5 h-3.5" />
+              </div>
+            </button>
+            <button className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-border hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors">
+              <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+                <Shield className="w-4 h-4 text-lib-purple" />
+              </div>
+              <div className="flex-1 text-left">
+                <span className="text-sm font-medium text-foreground">Privacy Policy</span>
+                <p className="text-xs text-muted-foreground">How we protect your data</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </button>
+            <button className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors">
+              <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                 <FileText className="w-4 h-4 text-lib-purple" />
               </div>
               <div className="flex-1 text-left">
-                <span className="text-sm font-medium text-foreground">Attendance History</span>
-                <p className="text-xs text-muted-foreground">View your library visit records</p>
+                <span className="text-sm font-medium text-foreground">Terms of Service</span>
+                <p className="text-xs text-muted-foreground">Usage terms and conditions</p>
               </div>
-              <span className="text-muted-foreground text-sm">→</span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
         </motion.div>
@@ -351,30 +325,16 @@ export default function SettingsScreen() {
             <Info className="w-3.5 h-3.5" />
             About
           </h3>
-          <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
+          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                   <Info className="w-4 h-4 text-lib-purple" />
                 </div>
                 <span className="text-sm font-medium text-foreground">App Version</span>
               </div>
               <span className="text-xs text-muted-foreground">1.0.0</span>
             </div>
-            <button className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-border hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors">
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                <Shield className="w-4 h-4 text-lib-purple" />
-              </div>
-              <span className="text-sm font-medium text-foreground flex-1 text-left">Privacy Policy</span>
-              <span className="text-muted-foreground text-sm">→</span>
-            </button>
-            <button className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors">
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                <FileText className="w-4 h-4 text-lib-purple" />
-              </div>
-              <span className="text-sm font-medium text-foreground flex-1 text-left">Terms of Service</span>
-              <span className="text-muted-foreground text-sm">→</span>
-            </button>
           </div>
         </motion.div>
 
@@ -383,7 +343,7 @@ export default function SettingsScreen() {
           <Button
             onClick={handleLogout}
             variant="outline"
-            className="w-full border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300 rounded-3xl py-6 text-sm font-semibold"
+            className="w-full border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300 rounded-[22px] py-6 text-sm font-semibold"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Log Out
@@ -408,16 +368,16 @@ export default function SettingsScreen() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 300, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-white dark:bg-[#1a0e2e] rounded-t-3xl w-full max-w-[430px] p-6 pb-8"
+              className="bg-card rounded-t-[22px] w-full max-w-[430px] p-6 pb-8"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Handle bar */}
-              <div className="w-10 h-1 rounded-full bg-gray-300 mx-auto mb-4" />
+              <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600 mx-auto mb-4" />
               
               {/* Header */}
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                     <Lock className="w-5 h-5 text-lib-purple" />
                   </div>
                   <div>
@@ -427,7 +387,7 @@ export default function SettingsScreen() {
                 </div>
                 <button
                   onClick={() => setShowPasswordModal(false)}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                 >
                   <X className="w-4 h-4 text-muted-foreground" />
                 </button>
@@ -445,7 +405,7 @@ export default function SettingsScreen() {
                       placeholder="Enter current password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="h-11 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
+                      className="h-11 rounded-[14px] border-gray-200 dark:border-gray-700 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
                     />
                     <button
                       type="button"
@@ -467,7 +427,7 @@ export default function SettingsScreen() {
                       placeholder="Min. 6 characters"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="h-11 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
+                      className="h-11 rounded-[14px] border-gray-200 dark:border-gray-700 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
                     />
                     <button
                       type="button"
@@ -484,7 +444,7 @@ export default function SettingsScreen() {
                           <div
                             key={i}
                             className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                              i <= strength.level ? strength.color : 'bg-gray-200'
+                              i <= strength.level ? strength.color : 'bg-gray-200 dark:bg-gray-700'
                             }`}
                           />
                         ))}
@@ -504,7 +464,7 @@ export default function SettingsScreen() {
                       placeholder="Re-enter new password"
                       value={confirmNewPassword}
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
-                      className="h-11 rounded-xl border-gray-200 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
+                      className="h-11 rounded-[14px] border-gray-200 dark:border-gray-700 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
                     />
                     <button
                       type="button"
@@ -529,7 +489,7 @@ export default function SettingsScreen() {
                   <motion.div
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-600"
+                    className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-[14px] p-3 text-xs text-red-600 dark:text-red-400"
                   >
                     {passwordError}
                   </motion.div>
@@ -540,14 +500,14 @@ export default function SettingsScreen() {
                   <Button
                     variant="outline"
                     onClick={() => setShowPasswordModal(false)}
-                    className="flex-1 h-11 rounded-xl border-gray-200 text-sm font-medium"
+                    className="flex-1 h-11 rounded-[14px] border-gray-200 dark:border-gray-700 text-sm font-medium"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleChangePassword}
                     disabled={changingPassword || !currentPassword || !newPassword || !confirmNewPassword}
-                    className="flex-1 h-11 rounded-xl bg-lib-purple hover:bg-lib-purple-dark text-white text-sm font-semibold disabled:opacity-50"
+                    className="flex-1 h-11 rounded-[14px] bg-lib-purple hover:bg-lib-purple-dark text-white text-sm font-semibold disabled:opacity-50"
                   >
                     {changingPassword ? (
                       <span className="flex items-center gap-2">

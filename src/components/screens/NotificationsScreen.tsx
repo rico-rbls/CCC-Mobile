@@ -61,7 +61,7 @@ function NotificationCard({
         dragElastic={0.7}
         onDragEnd={handleDragEnd}
         animate={controls}
-        className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm p-4 flex items-start gap-3 border-l-4 ${
+        className={`bg-card rounded-[22px] shadow-sm p-4 flex items-start gap-3 border-l-4 ${
           notif.isRead ? 'border-l-gray-200 dark:border-l-gray-700' : config.borderColor
         } touch-pan-y`}
       >
@@ -184,9 +184,9 @@ export default function NotificationsScreen() {
   const hasUnread = notifications.some(n => !n.isRead)
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-0">
+      <div className="bg-card px-4 pt-4 pb-0">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800">
@@ -239,7 +239,7 @@ export default function NotificationsScreen() {
           </div>
         ) : filteredNotifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-16 h-16 rounded-full bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center mb-3">
+            <div className="w-16 h-16 rounded-full bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-3">
               <BookOpen className="w-8 h-8 text-lib-purple" />
             </div>
             <h3 className="font-semibold text-foreground mb-1">
