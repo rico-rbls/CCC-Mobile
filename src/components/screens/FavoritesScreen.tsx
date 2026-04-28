@@ -63,7 +63,7 @@ export default function FavoritesScreen() {
   }
 
   const categoryColors: Record<string, string> = {
-    book: 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple',
+    book: 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple',
     research: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
     magazine: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
   }
@@ -163,7 +163,7 @@ export default function FavoritesScreen() {
                       className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 active:bg-red-100 dark:active:bg-red-900/30 transition-colors flex-shrink-0 group"
                       aria-label="Remove from favorites"
                     >
-                      <Trash2 className="w-4 h-4 text-gray-300 group-hover:text-red-400 transition-colors" />
+                      <Trash2 className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-red-400 transition-colors" />
                     </button>
                   </div>
                 </motion.div>

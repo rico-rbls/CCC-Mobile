@@ -372,7 +372,7 @@ export default function SettingsScreen() {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Handle bar */}
-              <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600 mx-auto mb-4" />
+              <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-white/20 mx-auto mb-4" />
               
               {/* Header */}
               <div className="flex items-center justify-between mb-5">
@@ -405,7 +405,7 @@ export default function SettingsScreen() {
                       placeholder="Enter current password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="h-11 rounded-[14px] border-gray-200 dark:border-gray-700 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
+                      className="h-11 rounded-[14px] border-gray-200 dark:border-white/10 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
                     />
                     <button
                       type="button"
@@ -427,7 +427,7 @@ export default function SettingsScreen() {
                       placeholder="Min. 6 characters"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="h-11 rounded-[14px] border-gray-200 dark:border-gray-700 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
+                      className="h-11 rounded-[14px] border-gray-200 dark:border-white/10 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
                     />
                     <button
                       type="button"
@@ -444,7 +444,7 @@ export default function SettingsScreen() {
                           <div
                             key={i}
                             className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                              i <= strength.level ? strength.color : 'bg-gray-200 dark:bg-gray-700'
+                              i <= strength.level ? strength.color : 'bg-gray-200 dark:bg-white/10'
                             }`}
                           />
                         ))}
@@ -464,7 +464,7 @@ export default function SettingsScreen() {
                       placeholder="Re-enter new password"
                       value={confirmNewPassword}
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
-                      className="h-11 rounded-[14px] border-gray-200 dark:border-gray-700 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
+                      className="h-11 rounded-[14px] border-gray-200 dark:border-white/10 focus:border-lib-purple focus:ring-lib-purple/20 pr-10"
                     />
                     <button
                       type="button"
@@ -500,7 +500,7 @@ export default function SettingsScreen() {
                   <Button
                     variant="outline"
                     onClick={() => setShowPasswordModal(false)}
-                    className="flex-1 h-11 rounded-[14px] border-gray-200 dark:border-gray-700 text-sm font-medium"
+                    className="flex-1 h-11 rounded-[14px] border-gray-200 dark:border-white/10 text-sm font-medium"
                   >
                     Cancel
                   </Button>

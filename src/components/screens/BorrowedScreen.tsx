@@ -222,16 +222,16 @@ export default function BorrowedScreen() {
         )}
       </AnimatePresence>
       {/* Header with gradient accent */}
-      <div className="bg-card px-4 pt-4 pb-3 border-b border-gray-100 dark:border-gray-800">
+      <div className="bg-card px-4 pt-4 pb-3 border-b border-gray-100 dark:border-white/5">
         <h2 className="font-bold text-foreground text-lg mb-3">My Loans</h2>
-        <div className="flex bg-lib-purple-50 dark:bg-gray-800 rounded-xl p-1">
+        <div className="flex bg-lib-purple-50 dark:bg-white/10 rounded-xl p-1">
           {(['active', 'history'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === tab
-                  ? 'bg-white dark:bg-gray-700 shadow-sm text-lib-purple dark:text-white'
+                  ? 'bg-white dark:bg-[#1a0e2e] shadow-sm text-lib-purple dark:text-white'
                   : 'text-lib-purple-400 dark:text-gray-400 hover:text-lib-purple-600 dark:hover:text-gray-300'
               }`}
             >
@@ -388,7 +388,7 @@ export default function BorrowedScreen() {
                                 size="sm"
                                 onClick={() => handleReturn(book.id, book.title)}
                                 disabled={returningId === book.id}
-                                className="h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-gray-800 font-medium"
+                                className="h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
                               >
                                 {returningId === book.id ? (
                                   <Loader2 className="w-3 h-3 animate-spin" />
@@ -436,7 +436,7 @@ export default function BorrowedScreen() {
                               variant="ghost"
                               size="sm"
                               onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
-                              className="h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-gray-800 font-medium"
+                              className="h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
                             >
                               View <ChevronRight className="w-3 h-3" />
                             </Button>

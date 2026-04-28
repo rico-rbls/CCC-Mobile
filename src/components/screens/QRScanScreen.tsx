@@ -207,21 +207,21 @@ export default function QRScanScreen() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-              className="bg-white rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl"
+              className="bg-white dark:bg-[#1a0e2e] rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl"
             >
               {/* Success icon */}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.2 }}
-                className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5"
+                className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-5"
               >
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.4 }}
                 >
-                  <CheckCircle2 className="w-10 h-10 text-green-600" />
+                  <CheckCircle2 className="w-10 h-10 text-green-600 dark:text-green-400" />
                 </motion.div>
               </motion.div>
 
@@ -267,7 +267,7 @@ export default function QRScanScreen() {
                 <Button
                   onClick={handleRetry}
                   variant="outline"
-                  className="flex-1 rounded-xl py-5 border-gray-200"
+                  className="flex-1 rounded-xl py-5 border-gray-200 dark:border-gray-700"
                 >
                   Scan Again
                 </Button>

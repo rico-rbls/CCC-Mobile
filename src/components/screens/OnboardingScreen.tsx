@@ -153,7 +153,7 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-950 relative">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0d0618] relative">
       {/* Confetti overlay */}
       <AnimatePresence>
         {showConfetti && (
@@ -288,11 +288,11 @@ export default function OnboardingScreen() {
                         className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 ${
                           selected
                             ? 'border-lib-purple bg-lib-purple-50 dark:bg-lib-purple-900/30 shadow-md shadow-lib-purple/10 gradient-border'
-                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-lib-purple-200 dark:hover:border-lib-purple-700 hover:shadow-sm'
+                            : 'border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] hover:border-lib-purple-200 dark:hover:border-lib-purple-700 hover:shadow-sm'
                         }`}
                       >
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
-                          selected ? 'bg-lib-purple scale-110' : 'bg-lib-purple-50 dark:bg-lib-purple-900/40'
+                          selected ? 'bg-lib-purple scale-110' : 'bg-lib-purple-50 dark:bg-white/10'
                         }`}>
                           <Icon className={`w-6 h-6 transition-colors duration-200 ${selected ? 'text-white' : 'text-lib-purple'}`} />
                         </div>
@@ -337,7 +337,7 @@ export default function OnboardingScreen() {
                       placeholder="Juan Dela Cruz"
                       value={onboardingData.fullName}
                       onChange={(e) => setOnboardingData({ fullName: e.target.value })}
-                      className="h-12 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 focus:border-lib-purple focus:ring-lib-purple/20 transition-all duration-200"
+                      className="h-12 rounded-xl border-gray-200 dark:border-white/10 dark:bg-[#1a0e2e] dark:text-gray-100 dark:placeholder:text-gray-500 focus:border-lib-purple focus:ring-lib-purple/20 transition-all duration-200"
                     />
                   </div>
                   <div className="space-y-2">
@@ -347,7 +347,7 @@ export default function OnboardingScreen() {
                       placeholder="e.g. 2024-00001"
                       value={onboardingData.universityId}
                       onChange={(e) => setOnboardingData({ universityId: e.target.value })}
-                      className="h-12 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 focus:border-lib-purple focus:ring-lib-purple/20 transition-all duration-200"
+                      className="h-12 rounded-xl border-gray-200 dark:border-white/10 dark:bg-[#1a0e2e] dark:text-gray-100 dark:placeholder:text-gray-500 focus:border-lib-purple focus:ring-lib-purple/20 transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -375,7 +375,7 @@ export default function OnboardingScreen() {
                       <select
                         value={onboardingData.program}
                         onChange={(e) => setOnboardingData({ program: e.target.value })}
-                        className="w-full h-12 rounded-xl border border-gray-200 dark:border-gray-700 px-3 text-sm bg-white dark:bg-gray-800 dark:text-gray-100 focus:border-lib-purple focus:ring-lib-purple/20 focus:outline-none transition-all duration-200"
+                        className="w-full h-12 rounded-xl border border-gray-200 dark:border-white/10 px-3 text-sm bg-white dark:bg-[#1a0e2e] dark:text-gray-100 focus:border-lib-purple focus:ring-lib-purple/20 focus:outline-none transition-all duration-200"
                       >
                         <option value="">Select program</option>
                         {programs.map(p => <option key={p} value={p}>{p}</option>)}
@@ -388,7 +388,7 @@ export default function OnboardingScreen() {
                       <select
                         value={onboardingData.department}
                         onChange={(e) => setOnboardingData({ department: e.target.value })}
-                        className="w-full h-12 rounded-xl border border-gray-200 dark:border-gray-700 px-3 text-sm bg-white dark:bg-gray-800 dark:text-gray-100 focus:border-lib-purple focus:ring-lib-purple/20 focus:outline-none transition-all duration-200"
+                        className="w-full h-12 rounded-xl border border-gray-200 dark:border-white/10 px-3 text-sm bg-white dark:bg-[#1a0e2e] dark:text-gray-100 focus:border-lib-purple focus:ring-lib-purple/20 focus:outline-none transition-all duration-200"
                       >
                         <option value="">Select department</option>
                         {departments.map(d => <option key={d} value={d}>{d}</option>)}
@@ -407,7 +407,7 @@ export default function OnboardingScreen() {
                             className={`py-3 rounded-xl text-sm font-medium border-2 transition-all duration-200 ${
                               onboardingData.yearLevel === y
                                 ? 'border-lib-purple bg-lib-purple-50 dark:bg-lib-purple-900/30 text-lib-purple shadow-sm shadow-lib-purple/10'
-                                : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-lib-purple-200 dark:hover:border-lib-purple-700'
+                                : 'border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-lib-purple-200 dark:hover:border-lib-purple-700'
                             }`}
                           >
                             {y}
@@ -449,7 +449,7 @@ export default function OnboardingScreen() {
                       placeholder="you@university.edu"
                       value={onboardingData.email}
                       onChange={(e) => setOnboardingData({ email: e.target.value })}
-                      className="h-12 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 focus:border-lib-purple focus:ring-lib-purple/20 transition-all duration-200"
+                      className="h-12 rounded-xl border-gray-200 dark:border-white/10 dark:bg-[#1a0e2e] dark:text-gray-100 dark:placeholder:text-gray-500 focus:border-lib-purple focus:ring-lib-purple/20 transition-all duration-200"
                     />
                   </div>
                   <div className="space-y-2">
@@ -461,7 +461,7 @@ export default function OnboardingScreen() {
                         placeholder="Min. 6 characters"
                         value={onboardingData.password}
                         onChange={(e) => setOnboardingData({ password: e.target.value })}
-                        className="h-12 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 focus:border-lib-purple focus:ring-lib-purple/20 pr-10 transition-all duration-200"
+                        className="h-12 rounded-xl border-gray-200 dark:border-white/10 dark:bg-[#1a0e2e] dark:text-gray-100 dark:placeholder:text-gray-500 focus:border-lib-purple focus:ring-lib-purple/20 pr-10 transition-all duration-200"
                       />
                       <button
                         type="button"
@@ -478,7 +478,7 @@ export default function OnboardingScreen() {
                             <div
                               key={i}
                               className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                                i <= strength.level ? strength.color : 'bg-gray-200 dark:bg-gray-700'
+                                i <= strength.level ? strength.color : 'bg-gray-200 dark:bg-white/10'
                               }`}
                             />
                           ))}
@@ -496,7 +496,7 @@ export default function OnboardingScreen() {
                         placeholder="Re-enter password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="h-12 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 focus:border-lib-purple focus:ring-lib-purple/20 pr-10 transition-all duration-200"
+                        className="h-12 rounded-xl border-gray-200 dark:border-white/10 dark:bg-[#1a0e2e] dark:text-gray-100 dark:placeholder:text-gray-500 focus:border-lib-purple focus:ring-lib-purple/20 pr-10 transition-all duration-200"
                       />
                       <button
                         type="button"
@@ -538,7 +538,7 @@ export default function OnboardingScreen() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.05 }}
-                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow-sm transition-shadow"
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] hover:shadow-sm transition-shadow"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center">
@@ -559,10 +559,10 @@ export default function OnboardingScreen() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow-sm transition-shadow"
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] hover:shadow-sm transition-shadow"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-lib-purple-50 dark:bg-lib-purple-900/30 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                         <BookOpen className="w-5 h-5 text-lib-purple" />
                       </div>
                       <div>
@@ -580,10 +580,10 @@ export default function OnboardingScreen() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15 }}
-                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 opacity-60"
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] opacity-60"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-lib-purple-50 dark:bg-lib-purple-900/30 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                         <Megaphone className="w-5 h-5 text-lib-purple" />
                       </div>
                       <div>

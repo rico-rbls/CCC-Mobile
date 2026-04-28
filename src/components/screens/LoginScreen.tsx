@@ -73,7 +73,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white relative overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0d0618] relative overflow-hidden">
       {/* Animated gradient background with floating icons — living gradient */}
       <div className="relative bg-purple-gradient px-6 pt-14 pb-20 rounded-b-[2.5rem] overflow-hidden">
         {/* Living gradient overlay — slowly shifts colors like a living background */}
@@ -181,10 +181,10 @@ export default function LoginScreen() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-xl p-6 ring-1 ring-black/5 glass-card"
+          className="bg-white dark:bg-[#1a0e2e] rounded-2xl shadow-xl p-6 ring-1 ring-black/5 dark:ring-white/5 glass-card"
         >
           <h2 className="text-lg font-bold text-foreground mb-1">Welcome back</h2>
-          <p className="text-xs text-muted-foreground mb-5">Sign in to your library account</p>
+          <p className="text-xs text-muted-foreground mb-5">Sign in to your account</p>
           <div className="space-y-4">
             {/* Email field with animated label */}
             <div className="space-y-2">
@@ -213,7 +213,7 @@ export default function LoginScreen() {
                   className={`h-12 pl-10 rounded-xl transition-all duration-200 ${
                     emailFocused
                       ? 'border-lib-purple ring-2 ring-lib-purple/20 shadow-sm shadow-lib-purple/5'
-                      : 'border-gray-200'
+                      : 'border-gray-200 dark:border-gray-700'
                   }`}
                 />
               </div>
@@ -247,7 +247,7 @@ export default function LoginScreen() {
                   className={`h-12 rounded-xl transition-all duration-200 pr-10 ${
                     passwordFocused
                       ? 'border-lib-purple ring-2 ring-lib-purple/20 shadow-sm shadow-lib-purple/5'
-                      : 'border-gray-200'
+                      : 'border-gray-200 dark:border-gray-700'
                   }`}
                 />
                 <button
@@ -319,16 +319,16 @@ export default function LoginScreen() {
           {/* Demo login */}
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-100" />
+              <div className="w-full border-t border-gray-100 dark:border-white/10" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-3 text-muted-foreground">or</span>
+              <span className="bg-white dark:bg-[#1a0e2e] px-3 text-muted-foreground">or</span>
             </div>
           </div>
 
           <button
             onClick={handleDemoLogin}
-            className="w-full py-3 rounded-xl border-2 border-dashed border-lib-purple-200 bg-lib-purple-50/50 text-lib-purple text-sm font-medium hover:bg-lib-purple-50 hover:border-lib-purple-300 active:bg-lib-purple-100 transition-all press-effect"
+            className="w-full py-3 rounded-xl border-2 border-dashed border-lib-purple-200 dark:border-lib-purple-700 bg-lib-purple-50/50 dark:bg-lib-purple-900/20 text-lib-purple dark:text-lib-purple-300 text-sm font-medium hover:bg-lib-purple-50 dark:hover:bg-lib-purple-900/30 hover:border-lib-purple-300 dark:hover:border-lib-purple-600 active:bg-lib-purple-100 dark:active:bg-lib-purple-900/40 transition-all press-effect"
           >
             <span className="flex items-center justify-center gap-2">
               <BookOpen className="w-4 h-4" />
@@ -357,7 +357,7 @@ export default function LoginScreen() {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-[10px] text-muted-foreground/60">
-            By signing in, you agree to our Terms of Service and Privacy Policy
+            By signing in, you agree to our Terms of Service & Privacy Policy
           </p>
         </div>
       </div>

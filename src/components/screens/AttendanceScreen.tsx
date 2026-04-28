@@ -239,7 +239,7 @@ export default function AttendanceScreen() {
               <span className="text-[10px] text-muted-foreground">Attended</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-800" />
+              <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-white/10" />
               <span className="text-[10px] text-muted-foreground">No visit</span>
             </div>
             <div className="flex items-center gap-1.5">

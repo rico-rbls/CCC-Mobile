@@ -16,9 +16,9 @@ const categories = [
 ]
 
 const categoryColors: Record<string, string> = {
-  book: 'bg-lib-purple-50 text-lib-purple',
-  research: 'bg-blue-50 text-blue-700',
-  magazine: 'bg-orange-50 text-orange-700',
+  book: 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple',
+  research: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
+  magazine: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
 }
 
 const popularSearches = ['Algorithms', 'Deep Learning', 'Database', 'Nursing', 'Psychology', 'Clean Code']
@@ -153,7 +153,7 @@ export default function SearchScreen() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Search header */}
-      <div className="bg-card px-4 pt-4 pb-3 space-y-3 border-b border-gray-100 dark:border-gray-800">
+      <div className="bg-card px-4 pt-4 pb-3 space-y-3 border-b border-gray-100 dark:border-white/5">
         <h2 className="font-bold text-foreground text-lg">Search Catalog</h2>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -164,12 +164,12 @@ export default function SearchScreen() {
             onChange={(e) => handleSearchChange(e.target.value)}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-            className="h-11 pl-9 pr-9 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus:border-lib-purple focus:ring-lib-purple/20"
+            className="h-11 pl-9 pr-9 rounded-xl border-gray-200 dark:border-white/10 dark:bg-[#1a0e2e] dark:text-gray-100 focus:border-lib-purple focus:ring-lib-purple/20"
           />
           {localQuery && (
             <button
               onClick={clearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 transition-colors"
             >
               <X className="w-3 h-3 text-gray-500" />
             </button>
@@ -320,7 +320,7 @@ export default function SearchScreen() {
                           <div className="w-28 h-36 rounded-xl mb-2 relative overflow-hidden shadow-sm">
                             <img src={coverSrc} alt={resource.title} className="w-full h-full object-cover" />
                             {resource.category && (
-                              <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                              <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
                                 {resource.category}
                               </span>
                             )}
@@ -329,7 +329,7 @@ export default function SearchScreen() {
                           <div className="w-28 h-36 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm cover-pattern-overlay">
                             <BookOpen className="w-6 h-6 text-white/50" />
                             {resource.category && (
-                              <span className="absolute top-1.5 left-1.5 bg-white/90 text-lib-purple text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                              <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
                                 {resource.category}
                               </span>
                             )}
@@ -370,7 +370,7 @@ export default function SearchScreen() {
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">{resource.author}</p>
                   <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${categoryColors[resource.category] || 'bg-gray-100 text-gray-600'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${categoryColors[resource.category] || 'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400'}`}>
                       {resource.category.charAt(0).toUpperCase() + resource.category.slice(1)}
                     </span>
                     {/* Subject/tag pills */}

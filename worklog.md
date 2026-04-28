@@ -613,3 +613,81 @@ Priority Recommendations for Next Phase:
 4. Add real QR code generation for user's attendance
 5. Add search autocomplete/suggestions
 6. Polish micro-animations further
+---
+Task ID: 12
+Agent: Main Agent
+Task: Comprehensive Dark Mode Coverage for ALL Mobile Screens
+
+Work Log:
+- Performed systematic audit of all 15 mobile screen files for dark mode gaps
+- Fixed LoginScreen.tsx — previously had almost zero dark mode coverage:
+  - Root container: added `dark:bg-[#0d0618]`
+  - Form card: added `dark:bg-[#1a0e2e] dark:ring-white/5`
+  - Input fields: added `dark:border-gray-700` borders
+  - "or" divider: added `dark:border-white/10` and `dark:bg-[#1a0e2e]` for label
+  - Demo button: full dark variants (border, bg, text, hover, active)
+- Fixed OnboardingScreen.tsx — inconsistent theme usage:
+  - Root: changed `dark:bg-gray-950` to `dark:bg-[#0d0618]`
+  - All `dark:bg-gray-800` changed to `dark:bg-[#1a0e2e]` (7 instances)
+  - All `dark:border-gray-700` changed to `dark:border-white/10` (7 instances)
+  - Card backgrounds: changed `dark:bg-gray-900` to `dark:bg-[#1a0e2e]`
+  - Icon backgrounds: changed `dark:bg-lib-purple-900/40` to `dark:bg-white/10`
+- Fixed BookDetailScreen.tsx — missing dark variants on several elements:
+  - Availability badge: added `dark:bg-green-900/20 dark:text-green-400` and `dark:bg-red-900/20 dark:text-red-400`
+  - Review textarea: added `dark:border-gray-700 dark:bg-[#1a0e2e]`
+  - Role badges: added dark variants for faculty (amber), student (blue), visitor (gray)
+  - Empty stars: added `dark:text-gray-700` (3 locations)
+  - Borrow button unavailable state: added `dark:bg-white/10 dark:text-lib-purple-300 dark:hover:bg-white/15`
+  - Share button: added `dark:border-lib-purple-700 dark:hover:bg-white/5`
+  - Edit review button: added `dark:border-lib-purple-700 dark:hover:bg-white/5`
+  - Delete review button: added `dark:hover:bg-red-900/20`
+  - ChevronRight: added `dark:text-gray-600`
+- Fixed QRScanScreen.tsx — success modal dark mode:
+  - Modal card: added `dark:bg-[#1a0e2e]`
+  - Success icon circle: added `dark:bg-green-900/30`
+  - CheckCircle2 icon: added `dark:text-green-400`
+  - Scan Again button: added `dark:border-gray-700`
+- Fixed SearchScreen.tsx:
+  - Category colors: added dark variants for all 3 categories (book, research, magazine)
+  - Cover badges: added `dark:bg-black/60` for both image and placeholder variants
+  - Default category: added `dark:bg-white/10 dark:text-gray-400`
+  - Search input: changed `dark:bg-gray-800` to `dark:bg-[#1a0e2e]`, `dark:border-gray-700` to `dark:border-white/10`
+  - Clear button: changed `dark:bg-gray-700` to `dark:bg-white/10`
+  - Border: changed `dark:border-gray-800` to `dark:border-white/5`
+- Fixed FavoritesScreen.tsx:
+  - Book category: changed `dark:bg-gray-800` to `dark:bg-white/10`
+  - Trash icon: added `dark:text-gray-600` for better visibility
+- Fixed BorrowedScreen.tsx:
+  - Tab bar: changed `dark:bg-gray-800` to `dark:bg-white/10`
+  - Active tab: changed `dark:bg-gray-700` to `dark:bg-[#1a0e2e]`
+  - Return button: changed `dark:hover:bg-gray-800` to `dark:hover:bg-white/5`
+  - View button: changed `dark:hover:bg-gray-800` to `dark:hover:bg-white/5`
+  - Header border: changed `dark:border-gray-800` to `dark:border-white/5`
+- Fixed NotificationsScreen.tsx:
+  - Reservation icon bg: changed `dark:bg-gray-800` to `dark:bg-white/10`
+  - Filter tabs: changed `dark:bg-gray-800` to `dark:bg-white/10`, `dark:hover:bg-gray-700` to `dark:hover:bg-white/5`
+  - Divider: changed `dark:bg-gray-700` to `dark:bg-white/10`
+  - Back button: changed `dark:hover:bg-gray-800` to `dark:hover:bg-white/5`
+- Fixed EditProfileScreen.tsx:
+  - All `dark:bg-gray-800` changed to `dark:bg-[#1a0e2e]` (5 instances)
+  - All `dark:border-gray-700` changed to `dark:border-white/10`
+  - Readonly fields: changed `dark:bg-gray-800` to `dark:bg-white/5`
+  - Year level buttons: changed `dark:bg-gray-800` to `dark:bg-white/5`
+- Fixed SettingsScreen.tsx:
+  - Password strength meter: changed `dark:bg-gray-700` to `dark:bg-white/10`
+  - Modal handle bar: changed `dark:bg-gray-600` to `dark:bg-white/20`
+  - All `dark:border-gray-700` changed to `dark:border-white/10`
+- Fixed AttendanceScreen.tsx:
+  - Legend "No visit" box: changed `dark:bg-gray-800` to `dark:bg-white/10`
+
+All lint checks pass with zero errors. Visual testing via VLM confirmed dark mode is working well with consistent dark purple theme across all screens.
+
+Stage Summary:
+- Dark mode now comprehensively covers ALL 15 mobile screens
+- Consistent dark purple theme: bg #0d0618 (outer), cards #1a0e2e, borders white/5-10
+- All `dark:bg-gray-800` replaced with `dark:bg-[#1a0e2e]` for dark purple cards
+- All `dark:border-gray-700/800` replaced with `dark:border-white/10` or `dark:border-white/5`
+- All `dark:hover:bg-gray-800` replaced with `dark:hover:bg-white/5`
+- Login screen and Onboarding screen now fully dark-mode compatible
+- Book detail, QR scan success modal, and search results all properly themed
+- Zero lint errors, dev server compiles successfully

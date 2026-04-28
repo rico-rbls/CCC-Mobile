@@ -129,7 +129,7 @@ export default function EditProfileScreen() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Enter your full name"
-              className="h-11 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus:border-lib-purple"
+              className="h-11 rounded-xl border-gray-200 dark:border-white/10 dark:bg-[#1a0e2e] dark:text-gray-100 focus:border-lib-purple"
             />
           </div>
 
@@ -139,7 +139,7 @@ export default function EditProfileScreen() {
             <Input
               value={user?.email || ''}
               disabled
-              className="h-11 rounded-xl bg-gray-50 dark:bg-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-700"
+              className="h-11 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-gray-400 border-gray-200 dark:border-white/10"
             />
             <p className="text-[10px] text-gray-400 dark:text-gray-500">Email cannot be changed</p>
           </div>
@@ -150,7 +150,7 @@ export default function EditProfileScreen() {
             <Input
               value={user?.universityId || ''}
               disabled
-              className="h-11 rounded-xl bg-gray-50 dark:bg-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-700"
+              className="h-11 rounded-xl bg-gray-50 dark:bg-white/5 dark:text-gray-400 border-gray-200 dark:border-white/10"
             />
             <p className="text-[10px] text-gray-400 dark:text-gray-500">University ID cannot be changed</p>
           </div>
@@ -168,7 +168,7 @@ export default function EditProfileScreen() {
                   if (user?.role === 'faculty') setDepartment(e.target.value)
                   else setProgram(e.target.value)
                 }}
-                className="w-full h-11 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 px-3 text-sm focus:outline-none focus:border-lib-purple focus:ring-1 focus:ring-lib-purple/20"
+                className="w-full h-11 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] dark:text-gray-100 px-3 text-sm focus:outline-none focus:border-lib-purple focus:ring-1 focus:ring-lib-purple/20"
               >
                 <option value="">Select {user?.role === 'faculty' ? 'department' : 'program'}</option>
                 {(user?.role === 'faculty' ? departments : programs).map((item) => (
@@ -190,7 +190,7 @@ export default function EditProfileScreen() {
                     className={`py-2 px-1 rounded-lg text-xs font-medium transition-all ${
                       yearLevel === yl
                         ? 'bg-lib-purple text-white shadow-sm'
-                        : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        : 'bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10'
                     }`}
                   >
                     {yl.replace(' Year', '')}
@@ -225,7 +225,7 @@ export default function EditProfileScreen() {
           <Button
             variant="outline"
             onClick={goBack}
-            className="w-full h-12 rounded-xl border-gray-200 dark:border-gray-700 dark:text-gray-300 font-medium text-base"
+            className="w-full h-12 rounded-xl border-gray-200 dark:border-white/10 dark:text-gray-300 font-medium text-base"
           >
             Cancel
           </Button>

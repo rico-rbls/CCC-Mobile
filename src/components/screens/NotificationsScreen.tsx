@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'react'
 
 const typeConfig: Record<string, { icon: typeof Calendar; color: string; bg: string; borderColor: string }> = {
   due_date: { icon: Calendar, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20', borderColor: 'border-l-orange-500' },
-  reservation: { icon: BookOpen, color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-gray-800', borderColor: 'border-l-lib-purple' },
+  reservation: { icon: BookOpen, color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10', borderColor: 'border-l-lib-purple' },
   announcement: { icon: Megaphone, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20', borderColor: 'border-l-blue-500' },
 }
 
@@ -189,7 +189,7 @@ export default function NotificationsScreen() {
       <div className="bg-card px-4 pt-4 pb-0">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800">
+            <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-white/5">
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             <h2 className="font-bold text-foreground text-lg">Notifications</h2>
@@ -214,7 +214,7 @@ export default function NotificationsScreen() {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all ${
                 activeFilter === tab.id
                   ? 'bg-lib-purple text-white shadow-sm shadow-lib-purple/20'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-lib-purple-50 dark:hover:bg-gray-700'
+                  : 'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 hover:bg-lib-purple-50 dark:hover:bg-white/5'
               }`}
             >
               {tab.id === 'all' && <Filter className="w-3 h-3" />}
@@ -258,7 +258,7 @@ export default function NotificationsScreen() {
                   <span className="text-[10px] font-semibold text-lib-purple uppercase tracking-wider">
                     {group.label}
                   </span>
-                  <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                  <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
                   <span className="text-[10px] text-muted-foreground">{group.items.length}</span>
                 </div>
                 {/* Group items */}
