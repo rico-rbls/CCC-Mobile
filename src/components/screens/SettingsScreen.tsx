@@ -168,9 +168,9 @@ export default function SettingsScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white px-4 pt-4 pb-3 flex items-center gap-3 border-b border-gray-100">
+      <div className="bg-card px-4 pt-4 pb-3 flex items-center gap-3 border-b border-border">
         <button onClick={goBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-50 transition-colors">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
@@ -184,8 +184,8 @@ export default function SettingsScreen() {
             <User className="w-3.5 h-3.5" />
             Account
           </h3>
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-100">
+          <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
               <div className="w-10 h-10 rounded-xl bg-lib-purple flex items-center justify-center">
                 <span className="text-white font-bold text-sm">
                   {user?.avatarInitials || user?.fullName?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'U'}
@@ -198,9 +198,9 @@ export default function SettingsScreen() {
             </div>
             <button 
               onClick={() => setShowPasswordModal(true)}
-              className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-gray-100 hover:bg-lib-purple-50/50 transition-colors"
+              className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-border hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors"
             >
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                 <Lock className="w-4 h-4 text-lib-purple" />
               </div>
               <div className="flex-1 text-left">
@@ -209,15 +209,15 @@ export default function SettingsScreen() {
               </div>
               <span className="text-xs text-muted-foreground">••••</span>
             </button>
-            <div className="flex items-center gap-3 px-4 py-3.5">
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                 <Mail className="w-4 h-4 text-lib-purple" />
               </div>
               <div className="flex-1">
                 <span className="text-sm font-medium text-foreground">Email</span>
                 <p className="text-xs text-muted-foreground">{user?.email ?? 'No email set'}</p>
               </div>
-              <span className="text-xs text-lib-purple font-medium">Verified</span>
+              <span className="text-xs text-lib-purple dark:text-lib-purple-300 font-medium">Verified</span>
             </div>
           </div>
         </motion.div>
@@ -228,10 +228,10 @@ export default function SettingsScreen() {
             <Bell className="w-3.5 h-3.5" />
             Notifications
           </h3>
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100">
+          <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                   <Bell className="w-4 h-4 text-lib-purple" />
                 </div>
                 <div>
@@ -245,9 +245,9 @@ export default function SettingsScreen() {
                 className="data-[state=checked]:bg-lib-purple"
               />
             </div>
-            <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100">
+            <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                   <Bell className="w-4 h-4 text-lib-purple" />
                 </div>
                 <div>
@@ -263,7 +263,7 @@ export default function SettingsScreen() {
             </div>
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                   <Bell className="w-4 h-4 text-lib-purple" />
                 </div>
                 <div>
@@ -286,10 +286,10 @@ export default function SettingsScreen() {
             <Palette className="w-3.5 h-3.5" />
             Appearance
           </h3>
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                   {theme === 'dark' ? <Moon className="w-4 h-4 text-lib-purple" /> : <Sun className="w-4 h-4 text-lib-purple" />}
                 </div>
                 <div>
@@ -312,9 +312,9 @@ export default function SettingsScreen() {
             <BookOpen className="w-3.5 h-3.5" />
             Library
           </h3>
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-100">
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+          <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                 <Clock className="w-4 h-4 text-lib-purple" />
               </div>
               <div className="flex-1">
@@ -331,9 +331,9 @@ export default function SettingsScreen() {
             </div>
             <button
               onClick={() => setCurrentScreen('attendance')}
-              className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/50 transition-colors"
+              className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors"
             >
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                 <FileText className="w-4 h-4 text-lib-purple" />
               </div>
               <div className="flex-1 text-left">
@@ -351,25 +351,25 @@ export default function SettingsScreen() {
             <Info className="w-3.5 h-3.5" />
             About
           </h3>
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100">
+          <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                   <Info className="w-4 h-4 text-lib-purple" />
                 </div>
                 <span className="text-sm font-medium text-foreground">App Version</span>
               </div>
               <span className="text-xs text-muted-foreground">1.0.0</span>
             </div>
-            <button className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-gray-100 hover:bg-lib-purple-50/50 transition-colors">
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+            <button className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-border hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors">
+              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                 <Shield className="w-4 h-4 text-lib-purple" />
               </div>
               <span className="text-sm font-medium text-foreground flex-1 text-left">Privacy Policy</span>
               <span className="text-muted-foreground text-sm">→</span>
             </button>
-            <button className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/50 transition-colors">
-              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 flex items-center justify-center">
+            <button className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors">
+              <div className="w-9 h-9 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
                 <FileText className="w-4 h-4 text-lib-purple" />
               </div>
               <span className="text-sm font-medium text-foreground flex-1 text-left">Terms of Service</span>
@@ -383,7 +383,7 @@ export default function SettingsScreen() {
           <Button
             onClick={handleLogout}
             variant="outline"
-            className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-2xl py-6 text-sm font-semibold"
+            className="w-full border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300 rounded-3xl py-6 text-sm font-semibold"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Log Out
@@ -408,7 +408,7 @@ export default function SettingsScreen() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 300, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-white rounded-t-3xl w-full max-w-[430px] p-6 pb-8"
+              className="bg-white dark:bg-[#1a0e2e] rounded-t-3xl w-full max-w-[430px] p-6 pb-8"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Handle bar */}

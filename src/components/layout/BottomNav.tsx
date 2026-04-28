@@ -60,7 +60,7 @@ export default function BottomNav() {
   const screenChanged = prevScreen !== currentScreen
 
   return (
-    <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-800/50 safe-bottom">
+    <nav className="bg-white/80 dark:bg-[#1a0e2e]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/5 safe-bottom">
       <div className="flex items-end justify-around px-2 pt-2 pb-2">
         {navItems.map((item) => {
           const isActive = currentScreen === item.id
@@ -114,7 +114,7 @@ export default function BottomNav() {
                 >
                   <Icon
                     className={`w-5 h-5 transition-colors ${
-                      isActive ? 'text-lib-purple' : 'text-gray-400 dark:text-gray-500'
+                      isActive ? 'text-lib-purple' : 'text-gray-400 dark:text-white/30'
                     }`}
                   />
                 </motion.div>
@@ -127,7 +127,7 @@ export default function BottomNav() {
               </motion.div>
               <span
                 className={`text-[10px] transition-colors ${
-                  isActive ? 'text-lib-purple font-semibold' : 'text-gray-400 dark:text-gray-500'
+                  isActive ? 'text-lib-purple font-semibold' : 'text-gray-400 dark:text-white/30'
                 }`}
               >
                 {item.label}

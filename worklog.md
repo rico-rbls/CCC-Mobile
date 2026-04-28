@@ -521,3 +521,43 @@ Stage Summary:
 - Section titles are clean text without decorative bars or backgrounds
 - All sections properly wrapped in rounded white cards
 - Consistent systematic spacing throughout
+
+---
+Task ID: 11
+Agent: Main Agent
+Task: Mobile UI Updates - Rounded Corners, Dark Purple Theme, Orange Streak, Icon Cards
+
+Work Log:
+- Changed all card corner radius from `rounded-2xl` (16px) to `rounded-3xl` (24px) across HomeScreen and SettingsScreen
+- Inner card elements changed from `rounded-xl` to `rounded-2xl` for consistency
+- Updated streak card to orange theme: `bg-orange-100 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-700/50`
+- Wrapped bell and settings icons inside small rounded card containers: `rounded-2xl bg-gray-100 dark:bg-white/10`
+- Completely redesigned dark mode with dark purple theme:
+  - Overall background: `#110a1e` (dark purple close to black) via page.tsx
+  - Cards: `bg-card` with dark purple CSS variable `oklch(0.18 0.05 300)`
+  - Text: white/light via `text-foreground` dark variable
+  - Bottom nav: `dark:bg-[#1a0e2e]/90` with `dark:border-white/5`
+  - All gray-900/gray-800 references updated to dark purple equivalents
+  - Settings screen: `bg-card rounded-3xl` with `dark:bg-white/10` icon backgrounds
+  - Password modal: `dark:bg-[#1a0e2e]`
+- Updated CSS variables in globals.css `.dark` to use purple hue (300) instead of achromatic (0)
+- Updated glass-effect, glass-card, skeleton-shimmer dark variants to use dark purple tones
+- All `dark:bg-gray-*` classes in HomeScreen replaced with `dark:bg-white/5`, `dark:bg-white/10`, or `dark:bg-white/15` for transparency over dark purple
+- All `dark:border-gray-*` classes replaced with `dark:border-white/5` or `dark:border-white/10`
+- Settings screen dark mode: added `dark:hover:bg-white/5` hover states, `dark:bg-white/10` icon containers, `dark:text-lib-purple-300` accents
+- Bottom nav inactive icons: `dark:text-white/30` for subtle contrast on dark purple
+- Lint passes with zero errors
+
+Files Modified:
+- `/home/z/my-project/src/app/globals.css` - Dark mode CSS variables to dark purple
+- `/home/z/my-project/src/app/page.tsx` - Dark background colors
+- `/home/z/my-project/src/components/screens/HomeScreen.tsx` - Rounded corners, orange streak, icon cards, dark purple theme
+- `/home/z/my-project/src/components/layout/BottomNav.tsx` - Dark purple nav bar
+- `/home/z/my-project/src/components/screens/SettingsScreen.tsx` - Dark purple theme, rounded corners
+
+All changes verified via agent-browser + VLM in both light and dark modes:
+✅ Light mode: white bg, dark text, orange streak, rounded cards, icon containers
+✅ Dark mode: dark purple bg, dark purple cards, white text, orange streak, icon cards, rounded corners
+✅ Both modes: 24px rounded corners on all section cards
+✅ Streak card is orange-themed in both modes
+✅ Bell & settings icons inside small card containers

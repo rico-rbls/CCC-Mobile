@@ -43,7 +43,7 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 // ── Shimmer / skeleton card ────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4 space-y-3">
+    <div className="bg-card rounded-3xl shadow-sm p-4 space-y-3">
       <Skeleton className="h-4 w-3/4" />
       <Skeleton className="h-3 w-1/2" />
       <Skeleton className="h-1.5 w-full" />
@@ -56,7 +56,7 @@ function SkeletonRecommendations() {
     <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="flex-shrink-0 w-32 space-y-2">
-          <Skeleton className="w-32 h-44 rounded-xl" />
+          <Skeleton className="w-32 h-44 rounded-2xl" />
           <Skeleton className="h-3 w-24" />
           <Skeleton className="h-2 w-16" />
         </div>
@@ -103,7 +103,6 @@ export default function HomeScreen() {
   const fetchData = useCallback(async () => {
     if (!user?.id) return
     try {
-      // Fetch borrowed books
       const borrowRes = await fetch(`/api/borrow?userId=${user.id}&status=active`)
       const borrowData = await borrowRes.json()
       const borrowRecords = Array.isArray(borrowData) ? borrowData : (borrowData.records || [])
@@ -132,7 +131,6 @@ export default function HomeScreen() {
         setBorrowedBooks(books)
       }
 
-      // Fetch program-based recommendations
       const program = user?.program || ''
       let programResources: ResourceItem[] = []
       if (program) {
@@ -143,7 +141,6 @@ export default function HomeScreen() {
         }
       }
 
-      // Fetch general recommendations as fallback
       const genRes = await fetch('/api/resources?limit=6')
       const genData = await genRes.json()
       let generalResources: ResourceItem[] = []
@@ -151,12 +148,10 @@ export default function HomeScreen() {
         generalResources = genData.resources.map(mapResource)
       }
 
-      // Merge: program-based first, then fill with general, deduplicate
       const seen = new Set(programResources.map(r => r.id))
       const merged = [...programResources, ...generalResources.filter(r => !seen.has(r.id))].slice(0, 6)
       setRecommendations(merged.length > 0 ? merged : generalResources)
 
-      // Fetch trending from API - use resources and assign mock borrow counts
       const trendingRes = await fetch('/api/resources?limit=5')
       const trendingData = await trendingRes.json()
       if (trendingRes.ok && trendingData.resources) {
@@ -172,7 +167,6 @@ export default function HomeScreen() {
         setTrending(trendingItems)
       }
 
-      // Fetch highlight book (random pick for Today's Highlights)
       const highlightRes = await fetch('/api/resources?limit=7')
       const highlightData = await highlightRes.json()
       if (highlightRes.ok && highlightData.resources && highlightData.resources.length > 0) {
@@ -180,14 +174,12 @@ export default function HomeScreen() {
         setHighlightBook(mapResource(highlightData.resources[randomIdx]))
       }
 
-      // Fetch announcements
       const annRes = await fetch('/api/announcements')
       const annData = await annRes.json()
       if (annRes.ok && Array.isArray(annData)) {
         setAnnouncements(annData)
       }
 
-      // Fetch library settings
       const settingsRes = await fetch('/api/settings')
       const settingsData = await settingsRes.json()
       if (settingsRes.ok) {
@@ -206,7 +198,6 @@ export default function HomeScreen() {
     }
   }, [user?.id, user?.program])
 
-  // Helper to map resource from API
   function mapResource(r: Record<string, unknown>): ResourceItem {
     return {
       id: r.id as string,
@@ -227,7 +218,6 @@ export default function HomeScreen() {
     fetchData()
   }, [fetchData])
 
-  // ── Announcement auto-rotate carousel ─────────────────────────
   const visibleAnnouncements = announcements.filter(a => !dismissedAnnouncements.has(a.id))
 
   useEffect(() => {
@@ -249,7 +239,6 @@ export default function HomeScreen() {
     }
   }, [announcementIndex, visibleAnnouncements.length])
 
-  // ── Pull-to-refresh ───────────────────────────────────────────
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY
   }
@@ -269,7 +258,6 @@ export default function HomeScreen() {
     setPullDistance(0)
   }
 
-  // ── Helpers ───────────────────────────────────────────────────
   const greeting = () => {
     const h = new Date().getHours()
     if (h < 12) return 'Good morning'
@@ -295,13 +283,13 @@ export default function HomeScreen() {
   // ── Loading state ─────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="flex flex-col min-h-screen bg-background">
         <div className="px-5 pt-6 pb-4">
           <div className="flex items-center justify-between mb-4">
             <Skeleton className="h-8 w-48" />
             <div className="flex gap-2">
-              <Skeleton className="w-9 h-9 rounded-full" />
-              <Skeleton className="w-9 h-9 rounded-full" />
+              <Skeleton className="w-9 h-9 rounded-2xl" />
+              <Skeleton className="w-9 h-9 rounded-2xl" />
             </div>
           </div>
           <Skeleton className="h-4 w-64" />
@@ -317,7 +305,7 @@ export default function HomeScreen() {
   // ── Render ────────────────────────────────────────────────────
   return (
     <div
-      className="flex flex-col bg-gray-50 dark:bg-gray-950"
+      className="flex flex-col bg-background"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -343,30 +331,32 @@ export default function HomeScreen() {
       <div className="px-5 pt-6 pb-5">
         {/* Top bar: streak card + action buttons */}
         <div className="flex items-center justify-between mb-5">
-          {/* Streak in a rounded card */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800">
+          {/* Streak card - orange theme */}
+          <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-700/50">
             <Flame className="w-4 h-4 text-orange-500" />
             <span className="text-sm font-bold text-foreground">x{user?.streakCount ?? 0} day streak!</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
+            {/* Bell icon inside small card */}
             <button
               onClick={() => setCurrentScreen('notifications')}
-              className="relative p-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors"
+              className="relative p-2.5 rounded-2xl bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 transition-colors"
               aria-label="Notifications"
             >
-              <Bell className="w-5 h-5 text-lib-purple" />
+              <Bell className="w-4.5 h-4.5 text-lib-purple" />
               {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white flex items-center justify-center font-bold">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white flex items-center justify-center font-bold">
                   {unreadCount}
                 </span>
               )}
             </button>
+            {/* Settings icon inside small card */}
             <button
               onClick={() => setCurrentScreen('settings')}
-              className="p-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors"
+              className="p-2.5 rounded-2xl bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 transition-colors"
               aria-label="Settings"
             >
-              <Settings className="w-5 h-5 text-lib-purple" />
+              <Settings className="w-4.5 h-4.5 text-lib-purple" />
             </button>
           </div>
         </div>
@@ -422,7 +412,7 @@ export default function HomeScreen() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
+            className="bg-card rounded-3xl shadow-sm p-4"
           >
             <div className="mb-3">
               <SectionHeader>Announcements</SectionHeader>
@@ -434,25 +424,25 @@ export default function HomeScreen() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="bg-lib-purple-50 dark:bg-gray-800/50 border border-lib-purple-200 dark:border-gray-700 rounded-xl p-3 relative"
+                className="bg-lib-purple-50 dark:bg-white/5 border border-lib-purple-200 dark:border-white/10 rounded-2xl p-3 relative"
               >
                 <button
                   onClick={() => {
                     setDismissedAnnouncements(prev => new Set(prev).add(currentAnnouncement.id))
                     setAnnouncementIndex(0)
                   }}
-                  className="absolute top-2.5 right-2.5 p-1 rounded-full hover:bg-lib-purple-100 transition-colors"
+                  className="absolute top-2.5 right-2.5 p-1 rounded-full hover:bg-lib-purple-100 dark:hover:bg-white/10 transition-colors"
                   aria-label="Dismiss announcement"
                 >
                   <X className="w-3 h-3 text-lib-purple" />
                 </button>
                 <div className="flex items-start gap-3 pr-6">
-                  <div className="w-8 h-8 rounded-lg bg-lib-purple flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-xl bg-lib-purple flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Megaphone className="w-4 h-4 text-white" />
                   </div>
                   <div className="min-w-0">
-                    <h4 className="font-semibold text-lib-purple text-sm leading-tight">{currentAnnouncement.title}</h4>
-                    <p className="text-xs text-lib-purple-700 dark:text-lib-purple-300 mt-1 leading-relaxed">{currentAnnouncement.message}</p>
+                    <h4 className="font-semibold text-lib-purple dark:text-lib-purple-300 text-sm leading-tight">{currentAnnouncement.title}</h4>
+                    <p className="text-xs text-lib-purple-700 dark:text-lib-purple-400/70 mt-1 leading-relaxed">{currentAnnouncement.message}</p>
                   </div>
                 </div>
                 {/* Carousel dots */}
@@ -463,7 +453,7 @@ export default function HomeScreen() {
                         key={a.id}
                         onClick={() => setAnnouncementIndex(idx)}
                         className={`w-1.5 h-1.5 rounded-full transition-all ${
-                          idx === announcementIndex ? 'bg-lib-purple w-4' : 'bg-lib-purple-300'
+                          idx === announcementIndex ? 'bg-lib-purple w-4' : 'bg-lib-purple-300 dark:bg-lib-purple-700'
                         }`}
                         aria-label={`Go to announcement ${idx + 1}`}
                       />
@@ -482,7 +472,7 @@ export default function HomeScreen() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
+            className="bg-card rounded-3xl shadow-sm p-4"
           >
             <div className="mb-3">
               <SectionHeader>Today&apos;s Highlight</SectionHeader>
@@ -492,12 +482,11 @@ export default function HomeScreen() {
               onClick={() => { setSelectedBookId(highlightBook.id); setCurrentScreen('book-detail') }}
               className="w-full bg-purple-gradient rounded-2xl p-4 text-left relative overflow-hidden cover-pattern-overlay shadow-sm"
             >
-              {/* Decorative circles */}
               <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/5" />
               <div className="absolute bottom-2 left-10 w-16 h-16 rounded-full bg-white/5" />
 
               <div className="flex items-center gap-3 relative z-10">
-                <div className="w-16 h-20 rounded-lg bg-white/15 backdrop-blur-sm flex items-center justify-center flex-shrink-0 ring-1 ring-white/20">
+                <div className="w-16 h-20 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center flex-shrink-0 ring-1 ring-white/20">
                   <BookOpen className="w-7 h-7 text-white/70" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -531,7 +520,7 @@ export default function HomeScreen() {
           variants={sectionVariants}
           initial="hidden"
           animate="visible"
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
+          className="bg-card rounded-3xl shadow-sm p-4"
         >
           <div className="mb-3">
             <SectionHeader>Current Borrow</SectionHeader>
@@ -540,11 +529,11 @@ export default function HomeScreen() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-3 rounded-xl overflow-hidden relative"
+              className="mt-3 rounded-2xl overflow-hidden relative"
             >
               {/* Left border animation */}
               <motion.div
-                className="absolute left-0 top-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-xl origin-top"
+                className="absolute left-0 top-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-2xl origin-top"
                 initial={{ scaleY: 0 }}
                 animate={{ scaleY: 1 }}
                 transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
@@ -562,7 +551,7 @@ export default function HomeScreen() {
                       ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                       : activeBook.daysLeft <= 3
                       ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
-                      : 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple'
+                      : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple'
                   }`}>
                     {activeBook.status === 'overdue'
                       ? `${Math.abs(activeBook.daysLeft)} days overdue`
@@ -571,9 +560,8 @@ export default function HomeScreen() {
                   </div>
                 </div>
 
-                {/* Category badge */}
                 {activeBook.category && (
-                  <Badge variant="secondary" className="mb-2 text-[10px] h-5 bg-lib-purple-50 dark:bg-gray-800 text-lib-purple border-lib-purple-200 dark:border-gray-700">
+                  <Badge variant="secondary" className="mb-2 text-[10px] h-5 bg-lib-purple-50 dark:bg-white/10 text-lib-purple border-lib-purple-200 dark:border-white/10">
                     {activeBook.category}
                   </Badge>
                 )}
@@ -584,11 +572,10 @@ export default function HomeScreen() {
                   <span className="text-[10px] text-muted-foreground">Due {activeBook.dueDate}</span>
                 </div>
 
-                {/* View Details button */}
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="mt-2 h-7 px-2 text-lib-purple hover:text-lib-purple-light hover:bg-lib-purple-50 dark:hover:bg-gray-800 text-xs font-medium p-0"
+                  className="mt-2 h-7 px-2 text-lib-purple hover:text-lib-purple-light hover:bg-lib-purple-50 dark:hover:bg-white/10 text-xs font-medium p-0"
                   onClick={() => { setSelectedBookId(activeBook.id); setCurrentScreen('book-detail') }}
                 >
                   View Details <ChevronRight className="w-3 h-3 ml-0.5" />
@@ -596,13 +583,12 @@ export default function HomeScreen() {
               </div>
             </motion.div>
           ) : (
-            /* Empty state */
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="mt-3 py-6 flex flex-col items-center text-center"
             >
-              <div className="w-16 h-16 rounded-2xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center mb-3">
+              <div className="w-16 h-16 rounded-3xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-3">
                 <BookOpen className="w-8 h-8 text-lib-purple/40" />
               </div>
               <h4 className="font-semibold text-foreground text-sm">No Active Borrows</h4>
@@ -611,7 +597,7 @@ export default function HomeScreen() {
               </p>
               <Button
                 size="sm"
-                className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-9 px-5 rounded-xl shadow-sm shadow-lib-purple/20"
+                className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-9 px-5 rounded-2xl shadow-sm shadow-lib-purple/20"
                 onClick={() => setCurrentScreen('search')}
               >
                 <BookOpen className="w-3.5 h-3.5 mr-1.5" />
@@ -628,7 +614,7 @@ export default function HomeScreen() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
+            className="bg-card rounded-3xl shadow-sm p-4"
           >
             <div className="flex items-center justify-between mb-3">
               <SectionHeader>Recommended for You</SectionHeader>
@@ -653,30 +639,30 @@ export default function HomeScreen() {
                     {(() => {
                       const coverSrc = getResourceCover(book.coverImage, book.title)
                       return coverSrc ? (
-                        <div className="w-28 h-40 rounded-xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                        <div className="w-28 h-40 rounded-2xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
                           <img src={coverSrc} alt={book.title} className="w-full h-full object-cover" />
                           {book.category && (
-                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-gray-800/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
                               {book.category}
                             </span>
                           )}
                           {isForYou && (
-                            <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none flex items-center gap-0.5">
+                            <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none flex items-center gap-0.5">
                               <Star className="w-2.5 h-2.5 fill-current" />
                               For You
                             </span>
                           )}
                         </div>
                       ) : (
-                        <div className="w-28 h-40 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow cover-pattern-overlay">
+                        <div className="w-28 h-40 rounded-2xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow cover-pattern-overlay">
                           <BookOpen className="w-7 h-7 text-white/50" />
                           {book.category && (
-                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-gray-800/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
                               {book.category}
                             </span>
                           )}
                           {isForYou && (
-                            <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none flex items-center gap-0.5">
+                            <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none flex items-center gap-0.5">
                               <Star className="w-2.5 h-2.5 fill-current" />
                               For You
                             </span>
@@ -706,7 +692,7 @@ export default function HomeScreen() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
+            className="bg-card rounded-3xl shadow-sm p-4"
           >
             <div className="mb-3">
               <SectionHeader>Trending in Your Department</SectionHeader>
@@ -716,12 +702,12 @@ export default function HomeScreen() {
                 <button
                   key={item.id}
                   onClick={() => { setSelectedBookId(item.id); setCurrentScreen('book-detail') }}
-                  className={`flex items-center gap-3 w-full py-3 hover:bg-lib-purple-50/50 dark:hover:bg-gray-800 active:bg-lib-purple-50 dark:active:bg-gray-800/50 transition-colors rounded-lg px-1 ${
-                    index < trending.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''
+                  className={`flex items-center gap-3 w-full py-3 hover:bg-lib-purple-50/50 dark:hover:bg-white/5 active:bg-lib-purple-50 dark:active:bg-white/10 transition-colors rounded-2xl px-1 ${
+                    index < trending.length - 1 ? 'border-b border-gray-50 dark:border-white/5' : ''
                   }`}
                 >
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                    item.rank <= 3 ? 'bg-lib-purple text-white' : 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple'
+                    item.rank <= 3 ? 'bg-lib-purple text-white' : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple'
                   }`}>
                     {item.rank}
                   </span>

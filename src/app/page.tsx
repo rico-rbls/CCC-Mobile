@@ -53,8 +53,8 @@ export default function Home() {
   const showNav = !noNavScreens.has(displayScreen) && isAuthenticated
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex justify-center">
-      <div className="w-full max-w-[430px] h-dvh bg-white dark:bg-gray-950 relative flex flex-col shadow-xl">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0d0618] flex justify-center">
+      <div className="w-full max-w-[430px] h-dvh bg-white dark:bg-[#110a1e] relative flex flex-col shadow-xl">
         {/* Screen content - scrollable area */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
           <AnimatePresence mode="wait">
