@@ -3,9 +3,9 @@
 import { useAppStore, type BorrowedBook, type ResourceItem } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Flame, Bell, Settings, QrCode, BookOpen, Bookmark,
-  ChevronRight, Clock, TrendingUp, Loader2, Megaphone, X,
-  CalendarDays, Star, Calendar, Sparkles,
+  Bell, Settings, BookOpen,
+  ChevronRight, TrendingUp, Loader2, Megaphone, X,
+  CalendarDays, Star, Sparkles, Flame,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -33,14 +33,10 @@ interface TrendingItem {
   category: string
 }
 
-// ── Section header with purple accent bar and pattern ──────────────
-function SectionHeader({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
+// ── Section header - clean, no decorations ──────────────────────────
+function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2 mb-3 section-header-pattern rounded-lg px-1 py-0.5">
-      <div className="w-1 h-5 rounded-full bg-lib-purple" />
-      {icon}
-      <h3 className="font-bold text-foreground">{children}</h3>
-    </div>
+    <h3 className="text-sm font-bold text-foreground tracking-tight">{children}</h3>
   )
 }
 
@@ -298,36 +294,21 @@ export default function HomeScreen() {
 
   const currentAnnouncement = visibleAnnouncements[announcementIndex] || null
 
-  // ── Quick actions config ──────────────────────────────────────
-  const quickActions = [
-    { label: 'Scan QR', subtitle: 'Attendance', icon: QrCode, bg: 'bg-lib-purple', text: 'text-white', screen: 'qr-scan' as const },
-    { label: 'My Loans', subtitle: 'View history', icon: BookOpen, bg: 'bg-lib-purple-50 dark:bg-gray-800', text: 'text-lib-purple', screen: 'borrowed' as const },
-    { label: 'Reservations', subtitle: 'Track items', icon: Bookmark, bg: 'bg-lib-purple-50 dark:bg-gray-800', text: 'text-lib-purple', screen: 'borrowed' as const },
-    { label: 'Attendance', subtitle: 'Check in', icon: Calendar, bg: 'bg-lib-purple-50 dark:bg-gray-800', text: 'text-lib-purple', screen: 'home' as const },
-  ]
-
   // ── Loading state ─────────────────────────────────────────────
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
-        <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3">
-          <div className="flex items-center justify-between mb-3">
-            <Skeleton className="h-5 w-28" />
+        <div className="px-5 pt-6 pb-4">
+          <div className="flex items-center justify-between mb-4">
+            <Skeleton className="h-8 w-48" />
             <div className="flex gap-2">
               <Skeleton className="w-9 h-9 rounded-full" />
               <Skeleton className="w-9 h-9 rounded-full" />
             </div>
           </div>
-          <div className="flex items-center gap-3 mb-3">
-            <Skeleton className="w-11 h-11 rounded-full" />
-            <div className="space-y-1.5">
-              <Skeleton className="h-4 w-40" />
-              <Skeleton className="h-3 w-56" />
-            </div>
-          </div>
-          <Skeleton className="h-7 w-56 rounded-full" />
+          <Skeleton className="h-4 w-64" />
         </div>
-        <div className="flex-1 px-4 py-4 space-y-4">
+        <div className="px-5 py-3 space-y-4">
           <SkeletonCard />
           <SkeletonRecommendations />
         </div>
@@ -338,7 +319,7 @@ export default function HomeScreen() {
   // ── Render ────────────────────────────────────────────────────
   return (
     <div
-      className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950"
+      className="flex flex-col bg-gray-50 dark:bg-gray-950"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -360,19 +341,20 @@ export default function HomeScreen() {
         )}
       </AnimatePresence>
 
-      {/* ── Top section ─────────────────────────────────────── */}
-      <div className="bg-white dark:bg-gray-900 px-4 pt-4 pb-3">
-        {/* Top bar */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-1.5">
-            <Flame className="w-5 h-5 text-orange-500" />
-            <span className="font-bold text-foreground">{user?.streakCount ?? 0}</span>
-            <span className="text-xs text-muted-foreground">day streak</span>
+      {/* ── Top section with greeting ─────────────────────── */}
+      <div className="px-5 pt-6 pb-5">
+        {/* Top bar: streak card + action buttons */}
+        <div className="flex items-center justify-between mb-5">
+          {/* Streak in a rounded card */}
+          <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/50">
+            <Flame className="w-4 h-4 text-orange-500" />
+            <span className="font-bold text-sm text-foreground">{user?.streakCount ?? 0}</span>
+            <span className="text-xs text-orange-600 dark:text-orange-400">day streak</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setCurrentScreen('notifications')}
-              className="relative p-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors"
+              className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               aria-label="Notifications"
             >
               <Bell className="w-5 h-5 text-foreground" />
@@ -384,7 +366,7 @@ export default function HomeScreen() {
             </button>
             <button
               onClick={() => setCurrentScreen('settings')}
-              className="p-2 rounded-full hover:bg-lib-purple-50 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               aria-label="Settings"
             >
               <Settings className="w-5 h-5 text-foreground" />
@@ -392,32 +374,25 @@ export default function HomeScreen() {
           </div>
         </div>
 
-        {/* User greeting */}
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-11 h-11 rounded-full bg-lib-purple flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">{user?.avatarInitials ?? 'U'}</span>
-          </div>
-          <div>
-            <AnimatePresence mode="wait">
-              <motion.h2
-                key={greeting()}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4, ease: 'easeInOut' }}
-                className="font-bold text-foreground"
-              >
-                {greeting()}, {user?.fullName?.split(' ')[0] ?? 'User'}!
-              </motion.h2>
-            </AnimatePresence>
-            <p className="text-xs text-muted-foreground">
-              {[user?.program, user?.yearLevel, user?.role].filter(Boolean).map(s => s?.charAt(0).toUpperCase() + s?.slice(1)).join(' · ')}
-            </p>
-          </div>
-        </div>
+        {/* Greeting - large header */}
+        <AnimatePresence mode="wait">
+          <motion.h1
+            key={greeting()}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
+            className="text-2xl font-bold text-foreground tracking-tight"
+          >
+            {greeting()}, {user?.fullName?.split(' ')[0] ?? 'User'}!
+          </motion.h1>
+        </AnimatePresence>
+        <p className="text-xs text-muted-foreground mt-1">
+          {[user?.program, user?.yearLevel, user?.role].filter(Boolean).map(s => s?.charAt(0).toUpperCase() + s?.slice(1)).join(' · ')}
+        </p>
 
-        {/* Library status badge — pulse when Open */}
-        <div className="flex items-center justify-between mb-1">
+        {/* Library status + date */}
+        <div className="flex items-center justify-between mt-4">
           <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${
             libraryOpen
               ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
@@ -435,20 +410,15 @@ export default function HomeScreen() {
               Library {libraryOpen ? 'Open' : 'Closed'} · {libraryOpen ? `Closes ${closingTime}` : 'Opens tomorrow'}
             </span>
           </div>
-        </div>
-
-        {/* Full date display */}
-        <div className="flex items-center gap-1.5 mt-1.5">
-          <CalendarDays className="w-3.5 h-3.5 text-lib-purple" />
-          <span className="text-xs text-muted-foreground font-medium">{formatFullDate()}</span>
+          <div className="flex items-center gap-1">
+            <CalendarDays className="w-3 h-3 text-lib-purple" />
+            <span className="text-[10px] text-muted-foreground font-medium">{formatFullDate()}</span>
+          </div>
         </div>
       </div>
 
-      {/* ── Subtle divider ──────────────────────────────────── */}
-      <div className="h-px bg-gradient-to-r from-transparent via-lib-purple-200 dark:via-gray-800 to-transparent" />
-
-      {/* ── Main content ─────────────────────────────────────── */}
-      <div className="flex-1 px-4 py-4 space-y-5 overflow-y-auto custom-scrollbar">
+      {/* ── Main content sections ─────────────────────────────── */}
+      <div className="px-5 pb-6 space-y-4">
 
         {/* ── Announcements section ────────────────────────── */}
         {visibleAnnouncements.length > 0 && currentAnnouncement && (
@@ -457,8 +427,12 @@ export default function HomeScreen() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
           >
-            <SectionHeader icon={<Megaphone className="w-4 h-4 text-lib-purple" />}>Announcements</SectionHeader>
+            <div className="flex items-center justify-between mb-3">
+              <SectionHeader>Announcements</SectionHeader>
+              <Megaphone className="w-4 h-4 text-lib-purple" />
+            </div>
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentAnnouncement.id}
@@ -466,17 +440,17 @@ export default function HomeScreen() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="bg-lib-purple-50 dark:bg-gray-800/50 border border-lib-purple-200 dark:border-gray-700 rounded-2xl p-4 relative"
+                className="bg-lib-purple-50 dark:bg-gray-800/50 border border-lib-purple-200 dark:border-gray-700 rounded-xl p-3 relative"
               >
                 <button
                   onClick={() => {
                     setDismissedAnnouncements(prev => new Set(prev).add(currentAnnouncement.id))
                     setAnnouncementIndex(0)
                   }}
-                  className="absolute top-3 right-3 p-1 rounded-full hover:bg-lib-purple-100 transition-colors"
+                  className="absolute top-2.5 right-2.5 p-1 rounded-full hover:bg-lib-purple-100 transition-colors"
                   aria-label="Dismiss announcement"
                 >
-                  <X className="w-3.5 h-3.5 text-lib-purple" />
+                  <X className="w-3 h-3 text-lib-purple" />
                 </button>
                 <div className="flex items-start gap-3 pr-6">
                   <div className="w-8 h-8 rounded-lg bg-lib-purple flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -514,8 +488,12 @@ export default function HomeScreen() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
           >
-            <SectionHeader icon={<Sparkles className="w-4 h-4 text-lib-purple" />}>Today&apos;s Highlight</SectionHeader>
+            <div className="flex items-center justify-between mb-3">
+              <SectionHeader>Today&apos;s Highlight</SectionHeader>
+              <Sparkles className="w-4 h-4 text-lib-purple" />
+            </div>
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={() => { setSelectedBookId(highlightBook.id); setCurrentScreen('book-detail') }}
@@ -560,24 +538,25 @@ export default function HomeScreen() {
           variants={sectionVariants}
           initial="hidden"
           animate="visible"
+          className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
         >
           <SectionHeader>Current Borrow</SectionHeader>
           {activeBook ? (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden relative card-hover-effect"
+              className="mt-3 rounded-xl overflow-hidden relative"
             >
-              {/* Left border animation — fills from top to bottom on mount */}
+              {/* Left border animation */}
               <motion.div
-                className="absolute left-0 top-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-2xl origin-top"
+                className="absolute left-0 top-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-xl origin-top"
                 initial={{ scaleY: 0 }}
                 animate={{ scaleY: 1 }}
                 transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
                 style={{ bottom: 0 }}
               />
 
-              <div className="p-4 pl-5">
+              <div className="pl-4 pr-1">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-foreground text-sm leading-tight">{activeBook.title}</h3>
@@ -622,87 +601,39 @@ export default function HomeScreen() {
               </div>
             </motion.div>
           ) : (
-            /* Empty state - no borrowed books - illustration-like design */
+            /* Empty state */
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6 relative overflow-hidden"
+              className="mt-3 py-6 flex flex-col items-center text-center"
             >
-              {/* Background pattern */}
-              <div className="absolute inset-0 dot-pattern-bg" />
-
-              <div className="flex flex-col items-center text-center relative z-10">
-                {/* Illustration-like design with stacked books */}
-                <div className="relative mb-4">
-                  <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center">
-                    <BookOpen className="w-10 h-10 text-lib-purple/40" />
-                  </div>
-                  {/* Floating book icons around */}
-                  <div className="absolute -top-1 -right-1 w-7 h-7 rounded-lg bg-lib-purple-100 dark:bg-gray-700 flex items-center justify-center floating-animation">
-                    <BookOpen className="w-3.5 h-3.5 text-lib-purple/60" />
-                  </div>
-                  <div className="absolute -bottom-1 -left-2 w-6 h-6 rounded-lg bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center floating-animation" style={{ animationDelay: '1s' }}>
-                    <Bookmark className="w-3 h-3 text-lib-purple/50" />
-                  </div>
-                </div>
-                <h4 className="font-semibold text-foreground text-sm">No Active Borrows</h4>
-                <p className="text-xs text-muted-foreground mt-1 mb-4 leading-relaxed max-w-[220px]">
-                  Your reading list is empty. Explore the catalog to find your next great read!
-                </p>
-                <Button
-                  size="sm"
-                  className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-9 px-5 rounded-xl shadow-sm shadow-lib-purple/20"
-                  onClick={() => setCurrentScreen('search')}
-                >
-                  <BookOpen className="w-3.5 h-3.5 mr-1.5" />
-                  Browse Catalog
-                </Button>
+              <div className="w-16 h-16 rounded-2xl bg-lib-purple-50 dark:bg-gray-800 flex items-center justify-center mb-3">
+                <BookOpen className="w-8 h-8 text-lib-purple/40" />
               </div>
+              <h4 className="font-semibold text-foreground text-sm">No Active Borrows</h4>
+              <p className="text-xs text-muted-foreground mt-1 mb-4 leading-relaxed max-w-[220px]">
+                Your reading list is empty. Explore the catalog to find your next great read!
+              </p>
+              <Button
+                size="sm"
+                className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-9 px-5 rounded-xl shadow-sm shadow-lib-purple/20"
+                onClick={() => setCurrentScreen('search')}
+              >
+                <BookOpen className="w-3.5 h-3.5 mr-1.5" />
+                Browse Catalog
+              </Button>
             </motion.div>
           )}
         </motion.div>
 
-        {/* ── Quick Actions ────────────────────────────────── */}
-        <motion.div
-          custom={2}
-          variants={sectionVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <SectionHeader>Quick Actions</SectionHeader>
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-3">
-            <div className="grid grid-cols-4 gap-2">
-              {quickActions.map((action, actionIndex) => (
-                <motion.button
-                  key={action.label}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * actionIndex + 0.3, duration: 0.3, ease: 'easeOut' }}
-                  whileTap={{ scale: 0.93 }}
-                  onClick={() => setCurrentScreen(action.screen)}
-                  className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl hover:bg-lib-purple-50/50 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <div className={`w-10 h-10 rounded-xl ${action.bg} flex items-center justify-center`}>
-                    <action.icon className={`w-5 h-5 ${action.text}`} />
-                  </div>
-                  <span className="text-[10px] font-semibold text-foreground leading-tight">{action.label}</span>
-                  <span className="text-[9px] text-muted-foreground leading-tight">{action.subtitle}</span>
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* ── Subtle divider ──────────────────────────────── */}
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-800 to-transparent" />
-
         {/* ── Recommended for You ──────────────────────────── */}
         {recommendations.length > 0 && (
           <motion.div
-            custom={3}
+            custom={2}
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
           >
             <div className="flex items-center justify-between mb-3">
               <SectionHeader>Recommended for You</SectionHeader>
@@ -713,7 +644,7 @@ export default function HomeScreen() {
                 See All <ChevronRight className="w-3 h-3" />
               </button>
             </div>
-            <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
+            <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-1 px-1">
               {recommendations.map((book) => {
                 const isForYou = user?.program && book.subject?.toLowerCase().includes(user.program.toLowerCase())
                 return (
@@ -722,20 +653,18 @@ export default function HomeScreen() {
                     whileTap={{ scale: 0.97 }}
                     whileHover={{ scale: 1.02 }}
                     onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
-                    className="flex-shrink-0 w-32 group"
+                    className="flex-shrink-0 w-28 group"
                   >
                     {(() => {
                       const coverSrc = getResourceCover(book.coverImage, book.title)
                       return coverSrc ? (
-                        <div className="w-32 h-44 rounded-xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                        <div className="w-28 h-40 rounded-xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
                           <img src={coverSrc} alt={book.title} className="w-full h-full object-cover" />
-                          {/* Category badge on cover */}
                           {book.category && (
                             <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-gray-800/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
                               {book.category}
                             </span>
                           )}
-                          {/* "For You" star badge */}
                           {isForYou && (
                             <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none flex items-center gap-0.5">
                               <Star className="w-2.5 h-2.5 fill-current" />
@@ -744,15 +673,13 @@ export default function HomeScreen() {
                           )}
                         </div>
                       ) : (
-                        <div className="w-32 h-44 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow cover-pattern-overlay">
-                          <BookOpen className="w-8 h-8 text-white/50" />
-                          {/* Category badge on cover */}
+                        <div className="w-28 h-40 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow cover-pattern-overlay">
+                          <BookOpen className="w-7 h-7 text-white/50" />
                           {book.category && (
                             <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-gray-800/90 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none">
                               {book.category}
                             </span>
                           )}
-                          {/* "For You" star badge */}
                           {isForYou && (
                             <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-md leading-none flex items-center gap-0.5">
                               <Star className="w-2.5 h-2.5 fill-current" />
@@ -777,46 +704,46 @@ export default function HomeScreen() {
           </motion.div>
         )}
 
-        {/* ── Subtle divider ──────────────────────────────── */}
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-800 to-transparent" />
-
         {/* ── Trending in Your Department ──────────────────── */}
-        <motion.div
-          custom={4}
-          variants={sectionVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <SectionHeader icon={<TrendingUp className="w-4 h-4 text-lib-purple" />}>Trending in Your Department</SectionHeader>
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden">
-            {trending.map((item, index) => (
-              <button
-                key={item.id}
-                onClick={() => { setSelectedBookId(item.id); setCurrentScreen('book-detail') }}
-                className={`flex items-center gap-3 w-full px-4 py-3 hover:bg-lib-purple-50/50 dark:hover:bg-gray-800 active:bg-lib-purple-50 dark:active:bg-gray-800/50 transition-colors ${
-                  index < trending.length - 1 ? 'border-b border-gray-100 dark:border-gray-800' : ''
-                }`}
-              >
-                <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                  item.rank <= 3 ? 'bg-lib-purple text-white' : 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple'
-                }`}>
-                  {item.rank}
-                </span>
-                <div className="flex-1 text-left min-w-0">
-                  <h4 className="text-sm font-medium text-foreground truncate">{item.title}</h4>
-                  <p className="text-[10px] text-muted-foreground">{item.author}</p>
-                </div>
-                <div className="flex items-center gap-1 text-muted-foreground flex-shrink-0">
-                  <Clock className="w-3 h-3" />
-                  <span className="text-[10px] font-medium">{item.borrows}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </motion.div>
+        {trending.length > 0 && (
+          <motion.div
+            custom={3}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <SectionHeader>Trending in Your Department</SectionHeader>
+              <TrendingUp className="w-4 h-4 text-lib-purple" />
+            </div>
+            <div className="space-y-0">
+              {trending.map((item, index) => (
+                <button
+                  key={item.id}
+                  onClick={() => { setSelectedBookId(item.id); setCurrentScreen('book-detail') }}
+                  className={`flex items-center gap-3 w-full py-3 hover:bg-lib-purple-50/50 dark:hover:bg-gray-800 active:bg-lib-purple-50 dark:active:bg-gray-800/50 transition-colors rounded-lg px-1 ${
+                    index < trending.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''
+                  }`}
+                >
+                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                    item.rank <= 3 ? 'bg-lib-purple text-white' : 'bg-lib-purple-50 dark:bg-gray-800 text-lib-purple'
+                  }`}>
+                    {item.rank}
+                  </span>
+                  <div className="flex-1 text-left min-w-0">
+                    <h4 className="text-sm font-medium text-foreground truncate">{item.title}</h4>
+                    <p className="text-[10px] text-muted-foreground">{item.author}</p>
+                  </div>
+                  <span className="text-[10px] font-medium text-muted-foreground flex-shrink-0">{item.borrows} borrows</span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
-        {/* ── Bottom safe area padding for nav bar ──────── */}
-        <div className="h-20" />
+        {/* ── Bottom padding for nav bar ──────── */}
+        <div className="h-4" />
       </div>
     </div>
   )

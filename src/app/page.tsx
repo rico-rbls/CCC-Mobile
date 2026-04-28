@@ -54,9 +54,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex justify-center">
-      <div className="w-full max-w-[430px] min-h-screen bg-white dark:bg-gray-950 relative flex flex-col shadow-xl">
-        {/* Screen content */}
-        <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
+      <div className="w-full max-w-[430px] h-dvh bg-white dark:bg-gray-950 relative flex flex-col shadow-xl">
+        {/* Screen content - scrollable area */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
           <AnimatePresence mode="wait">
             <motion.div
               key={displayScreen}
@@ -64,15 +64,18 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2, ease: 'easeInOut' }}
-              className="flex-1 flex flex-col min-h-0"
             >
               <ScreenComponent />
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Bottom navigation */}
-        {showNav && <BottomNav />}
+        {/* Bottom navigation - always stuck to bottom */}
+        {showNav && (
+          <div className="sticky bottom-0 shrink-0">
+            <BottomNav />
+          </div>
+        )}
       </div>
     </div>
   )

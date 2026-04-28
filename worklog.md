@@ -480,3 +480,44 @@ Files Modified:
 - `/home/z/my-project/src/components/screens/SearchScreen.tsx` - Skeleton loading, count highlight glow, spring category pills
 
 All lint checks pass with zero errors.
+
+---
+Task ID: 10
+Agent: Main Agent
+Task: Mobile Home Screen UI Redesign - Sticky Nav, Clean Cards, Remove Quick Actions
+
+Work Log:
+- Changed page.tsx layout from `min-h-screen` with flex content to `h-dvh` with `overflow-y-auto` on content area and `shrink-0` bottom nav, ensuring bottom nav always sticks
+- Completely rewrote HomeScreen.tsx with the following changes:
+  1. **Removed Quick Actions section** - Entire 4-button grid (Scan QR, My Loans, Reservations, Attendance) removed
+  2. **Removed purple bar dividers** - SectionHeader component simplified to just `<h3>` text without `w-1 h-5 rounded-full bg-lib-purple` div
+  3. **Removed bg on titles** - Removed `section-header-pattern rounded-lg px-1 py-0.5` from SectionHeader
+  4. **Removed icons on trending** - Removed Clock icon from trending items, replaced with plain text "X borrows"
+  5. **Every section in rounded cards** - All sections (Announcements, Today's Highlight, Current Borrow, Recommended, Trending) wrapped in `bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4` cards
+  6. **Large bold greeting** - Changed from `<motion.h2 className="font-bold">` to `<motion.h1 className="text-2xl font-bold tracking-tight">` for "Good evening, Juan!"
+  7. **Streak in rounded card** - Moved streak from top-left plain text to a dedicated orange-themed rounded card (`bg-orange-50 border border-orange-200 rounded-full px-3 py-2`) with Flame icon
+  8. **Clean systematic spacing** - Unified padding: `px-5 pt-6 pb-5` for header, `px-5 pb-6 space-y-4` for content sections
+  9. **Removed dividers** - Eliminated all gradient divider lines between sections since cards now provide visual separation
+  10. **Section icons moved to card headers** - Icons (Megaphone, Sparkles, TrendingUp) placed on right side of card header rows alongside section titles
+  11. **Removed unused imports** - Cleaned up Bookmark, Calendar, QrCode, Clock imports
+
+Files Modified:
+- `/home/z/my-project/src/app/page.tsx` - Changed layout to h-dvh with sticky bottom nav
+- `/home/z/my-project/src/components/screens/HomeScreen.tsx` - Complete redesign per user requirements
+
+All lint checks pass with zero errors. Verified via agent-browser + VLM that all changes are working:
+✅ Bottom nav sticks to bottom
+✅ Greeting is large bold header
+✅ Streak in orange rounded card
+✅ Sections in white rounded cards
+✅ No purple bar dividers on titles
+✅ No Quick Actions section
+✅ No Clock icons on trending
+
+Stage Summary:
+- Home screen redesigned with clean card-based layout
+- Bottom navigation is always visible and stuck to the bottom
+- Streak displayed prominently in an orange-themed rounded card
+- Section titles are clean text without decorative bars or backgrounds
+- All sections properly wrapped in rounded white cards
+- Consistent systematic spacing throughout
