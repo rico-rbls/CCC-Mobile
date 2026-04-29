@@ -691,3 +691,51 @@ Stage Summary:
 - Login screen and Onboarding screen now fully dark-mode compatible
 - Book detail, QR scan success modal, and search results all properly themed
 - Zero lint errors, dev server compiles successfully
+
+---
+Task ID: 5
+Agent: Main Agent
+Task: Fix Profile hierarchy, redesign BottomNav, comprehensive dark mode coverage
+
+Work Log:
+- Fixed Profile screen feature hierarchy:
+  - Removed "Library Hours" section
+  - Removed "Favorite Books" section (duplicate of "My Favorites" in menu)
+  - Kept "Attendance History" as standalone card with visit count
+  - Kept "Member Since" info card with Calendar icon
+  - Kept menu items: Edit Profile, My Favorites, My Reservations
+  - Added dark:bg-[#2d1b4e] to all cards for proper dark mode
+  - Added dark:text-lib-purple-300 to all purple text elements
+  - Fixed SVG progress ring to use currentColor with dark mode classes
+- Redesigned BottomNav:
+  - Each icon now sits in its own rounded-[16px] card (w-12 h-12)
+  - Active state: bg-lib-purple-50 dark:bg-lib-purple/20, text-lib-purple dark:text-lib-purple-300
+  - Inactive state: bg-transparent, text-gray-400 dark:text-white/30
+  - Center Scan button: retains purple bg with rounded-[16px] card shape (matching other icons)
+  - Removed all motion/scale animations - clicking only changes color
+  - Removed spring-back overshoot animation
+  - Removed bouncing indicator dot
+  - Badge positioning fixed with relative on card divs
+- Comprehensive dark mode audit across ALL 14 screen components:
+  - Main fix: text-lib-purple → added dark:text-lib-purple-300 across ALL files (70+ instances)
+  - BookDetailScreen: star ratings, avatar initials, edit/share buttons
+  - NotificationsScreen: mark all read, empty state, group headers
+  - AttendanceScreen: icons, badges, section headers
+  - FavoritesScreen: category colors, empty state
+  - ReservationsScreen: header icon, empty state, borrow button
+  - EditProfileScreen: camera button border
+  - BorrowedScreen: empty state, return/view buttons
+  - SearchScreen: category colors, icons, result count, tag pills
+  - HomeScreen: bell/settings icons, dismiss X, status badge, category badges, see all link
+  - SettingsScreen: all 5 section headers, all icons, help guide link, modal elements
+  - LoginScreen: focused labels, forgot password, eye toggle, register link
+  - OnboardingScreen: back arrow, role icons, year level, visitor info, eye toggles
+  - QRScanScreen: scanline icon, scanning text
+- Lint passes cleanly
+- Dev server running without errors
+
+Stage Summary:
+- Profile screen now has clean hierarchy: Stats → Menu → Attendance → Reading Goal → Reading Stats → Member Since → Logout
+- BottomNav redesigned with individual rounded cards, no movement on click, color change only
+- Dark mode comprehensively covered across all 14+ screen components
+- 70+ text-lib-purple instances fixed with dark:text-lib-purple-300 for visibility on dark backgrounds

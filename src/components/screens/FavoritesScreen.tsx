@@ -63,7 +63,7 @@ export default function FavoritesScreen() {
   }
 
   const categoryColors: Record<string, string> = {
-    book: 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple',
+    book: 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300',
     research: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
     magazine: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
   }
@@ -97,7 +97,7 @@ export default function FavoritesScreen() {
             className="flex flex-col items-center justify-center py-16"
           >
             <div className="w-20 h-20 rounded-[22px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-4">
-              <Heart className="w-10 h-10 text-lib-purple" />
+              <Heart className="w-10 h-10 text-lib-purple dark:text-lib-purple-300" />
             </div>
             <h3 className="font-bold text-foreground mb-1">No favorites yet</h3>
             <p className="text-sm text-muted-foreground text-center mb-4 max-w-[240px]">

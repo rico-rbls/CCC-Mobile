@@ -320,7 +320,7 @@ export default function HomeScreen() {
             className="flex items-center justify-center overflow-hidden"
           >
             <Loader2 className={`w-5 h-5 text-lib-purple ${refreshing ? 'animate-spin' : ''}`} />
-            <span className="text-xs text-lib-purple ml-1.5">
+            <span className="text-xs text-lib-purple dark:text-lib-purple-300 ml-1.5">
               {refreshing ? 'Refreshing...' : 'Pull to refresh'}
             </span>
           </motion.div>
@@ -343,7 +343,7 @@ export default function HomeScreen() {
               className="relative p-2.5 rounded-[22px] bg-card shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
               aria-label="Notifications"
             >
-              <Bell className="w-4.5 h-4.5 text-lib-purple" />
+              <Bell className="w-4.5 h-4.5 text-lib-purple dark:text-lib-purple-300" />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white flex items-center justify-center font-bold">
                   {unreadCount}
@@ -356,7 +356,7 @@ export default function HomeScreen() {
               className="p-2.5 rounded-[22px] bg-card shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
               aria-label="Settings"
             >
-              <Settings className="w-4.5 h-4.5 text-lib-purple" />
+              <Settings className="w-4.5 h-4.5 text-lib-purple dark:text-lib-purple-300" />
             </button>
           </div>
         </div>
@@ -434,7 +434,7 @@ export default function HomeScreen() {
                   className="absolute top-2.5 right-2.5 p-1 rounded-full hover:bg-lib-purple-100 dark:hover:bg-white/10 transition-colors"
                   aria-label="Dismiss announcement"
                 >
-                  <X className="w-3 h-3 text-lib-purple" />
+                  <X className="w-3 h-3 text-lib-purple dark:text-lib-purple-300" />
                 </button>
                 <div className="flex items-start gap-3 pr-6">
                   <div className="w-8 h-8 rounded-xl bg-lib-purple flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -551,7 +551,7 @@ export default function HomeScreen() {
                       ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                       : activeBook.daysLeft <= 3
                       ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
-                      : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple'
+                      : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300'
                   }`}>
                     {activeBook.status === 'overdue'
                       ? `${Math.abs(activeBook.daysLeft)} days overdue`
@@ -561,7 +561,7 @@ export default function HomeScreen() {
                 </div>
 
                 {activeBook.category && (
-                  <Badge variant="secondary" className="mb-2 text-[10px] h-5 bg-lib-purple-50 dark:bg-white/10 text-lib-purple border-lib-purple-200 dark:border-white/10">
+                  <Badge variant="secondary" className="mb-2 text-[10px] h-5 bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 border-lib-purple-200 dark:border-white/10">
                     {activeBook.category}
                   </Badge>
                 )}
@@ -575,7 +575,7 @@ export default function HomeScreen() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="mt-2 h-7 px-2 text-lib-purple hover:text-lib-purple-light hover:bg-lib-purple-50 dark:hover:bg-white/10 text-xs font-medium p-0"
+                  className="mt-2 h-7 px-2 text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-light hover:bg-lib-purple-50 dark:hover:bg-white/10 text-xs font-medium p-0"
                   onClick={() => { setSelectedBookId(activeBook.id); setCurrentScreen('book-detail') }}
                 >
                   View Details <ChevronRight className="w-3 h-3 ml-0.5" />
@@ -620,7 +620,7 @@ export default function HomeScreen() {
               <SectionHeader>Recommended for You</SectionHeader>
               <button
                 onClick={() => setCurrentScreen('search')}
-                className="text-xs text-lib-purple font-medium flex items-center gap-0.5"
+                className="text-xs text-lib-purple dark:text-lib-purple-300 font-medium flex items-center gap-0.5"
               >
                 See All <ChevronRight className="w-3 h-3" />
               </button>
@@ -642,7 +642,7 @@ export default function HomeScreen() {
                         <div className="w-28 h-40 rounded-2xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
                           <img src={coverSrc} alt={book.title} className="w-full h-full object-cover" />
                           {book.category && (
-                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
+                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
                               {book.category}
                             </span>
                           )}
@@ -657,7 +657,7 @@ export default function HomeScreen() {
                         <div className="w-28 h-40 rounded-2xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow cover-pattern-overlay">
                           <BookOpen className="w-7 h-7 text-white/50" />
                           {book.category && (
-                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
+                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
                               {book.category}
                             </span>
                           )}
@@ -707,7 +707,7 @@ export default function HomeScreen() {
                   }`}
                 >
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                    item.rank <= 3 ? 'bg-lib-purple text-white' : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple'
+                    item.rank <= 3 ? 'bg-lib-purple text-white' : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300'
                   }`}>
                     {item.rank}
                   </span>

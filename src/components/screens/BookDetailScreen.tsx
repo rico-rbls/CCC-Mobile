@@ -282,7 +282,7 @@ export default function BookDetailScreen() {
     return (
       <div className="flex flex-col min-h-screen bg-background items-center justify-center">
         <p className="text-muted-foreground">Book not found</p>
-        <button onClick={goBack} className="text-lib-purple mt-2 text-sm font-medium">Go back</button>
+        <button onClick={goBack} className="text-lib-purple dark:text-lib-purple-300 mt-2 text-sm font-medium">Go back</button>
       </div>
     )
   }
@@ -395,7 +395,7 @@ export default function BookDetailScreen() {
                 </div>
               )}
               {book.subject && (
-                <div className="px-2.5 py-1 rounded-lg bg-lib-purple-50 dark:bg-white/10 text-xs text-lib-purple font-medium">
+                <div className="px-2.5 py-1 rounded-lg bg-lib-purple-50 dark:bg-white/10 text-xs text-lib-purple dark:text-lib-purple-300 font-medium">
                   {book.subject}
                 </div>
               )}
@@ -410,7 +410,7 @@ export default function BookDetailScreen() {
             {/* Tags */}
             <div className="flex flex-wrap gap-1.5 mt-3">
               {book.tags.map(tag => (
-                <span key={tag} className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple text-[10px] font-medium">
+                <span key={tag} className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 text-[10px] font-medium">
                   {tag}
                 </span>
               ))}
@@ -447,7 +447,7 @@ export default function BookDetailScreen() {
                     key={s}
                     className={`w-3.5 h-3.5 ${
                       s <= Math.round(reviewStats.averageRating)
-                        ? 'text-lib-purple fill-lib-purple'
+                        ? 'text-lib-purple dark:text-lib-purple-300 fill-lib-purple dark:fill-lib-purple-300'
                         : 'text-gray-200 dark:text-gray-700'
                     }`}
                   />
@@ -466,7 +466,7 @@ export default function BookDetailScreen() {
                 return (
                   <div key={star} className="flex items-center gap-2">
                     <span className="text-[10px] text-muted-foreground w-3 text-right">{star}</span>
-                    <Star className="w-2.5 h-2.5 text-lib-purple fill-lib-purple" />
+                    <Star className="w-2.5 h-2.5 text-lib-purple dark:text-lib-purple-300 fill-lib-purple dark:fill-lib-purple-300" />
                     <div className="flex-1 h-2 rounded-full bg-gray-100 dark:bg-white/10 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
@@ -490,7 +490,7 @@ export default function BookDetailScreen() {
                 variant="outline"
                 className={`w-full h-10 rounded-xl text-sm font-semibold transition-colors ${
                   userReview
-                    ? 'border-lib-purple-200 dark:border-lib-purple-700 text-lib-purple hover:bg-lib-purple-50 dark:hover:bg-white/5'
+                    ? 'border-lib-purple-200 dark:border-lib-purple-700 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-50 dark:hover:bg-white/5'
                     : 'bg-lib-purple hover:bg-lib-purple-dark text-white border-0'
                 }`}
               >
@@ -531,7 +531,7 @@ export default function BookDetailScreen() {
                             <Star
                               className={`w-7 h-7 transition-colors ${
                                 s <= reviewRating
-                                  ? 'text-lib-purple fill-lib-purple'
+                                  ? 'text-lib-purple dark:text-lib-purple-300 fill-lib-purple dark:fill-lib-purple-300'
                                   : 'text-gray-200 dark:text-gray-700 hover:text-lib-purple-300'
                               }`}
                             />
@@ -601,7 +601,7 @@ export default function BookDetailScreen() {
                     <div className="flex items-start gap-2.5">
                       {/* Avatar initials circle */}
                       <div className="w-8 h-8 rounded-full bg-lib-purple/10 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
-                        <span className="text-[10px] font-bold text-lib-purple">
+                        <span className="text-[10px] font-bold text-lib-purple dark:text-lib-purple-300">
                           {review.user.avatarInitials || review.user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </span>
                       </div>
@@ -627,7 +627,7 @@ export default function BookDetailScreen() {
                             <Star
                               key={s}
                               className={`w-3 h-3 ${
-                                s <= review.rating ? 'text-lib-purple fill-lib-purple' : 'text-gray-200 dark:text-gray-700'
+                                s <= review.rating ? 'text-lib-purple dark:text-lib-purple-300 fill-lib-purple dark:fill-lib-purple-300' : 'text-gray-200 dark:text-gray-700'
                               }`}
                             />
                           ))}
@@ -698,7 +698,7 @@ export default function BookDetailScreen() {
         <Button
           variant="outline"
           onClick={handleShare}
-          className="h-12 px-4 rounded-xl border-lib-purple-200 dark:border-lib-purple-700 text-lib-purple hover:bg-lib-purple-50 dark:hover:bg-white/5"
+          className="h-12 px-4 rounded-xl border-lib-purple-200 dark:border-lib-purple-700 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-50 dark:hover:bg-white/5"
         >
           <Share2 className="w-4 h-4" />
         </Button>

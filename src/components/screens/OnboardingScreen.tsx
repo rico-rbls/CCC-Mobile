@@ -211,7 +211,7 @@ export default function OnboardingScreen() {
         <div className="flex items-center justify-between">
           {step > 0 ? (
             <button onClick={handleBack} className="p-2 -ml-2 rounded-full hover:bg-lib-purple-100 dark:hover:bg-lib-purple-900/40 active:bg-lib-purple-200 transition-colors">
-              <ArrowLeft className="w-5 h-5 text-lib-purple" />
+              <ArrowLeft className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />
             </button>
           ) : (
             <div className="w-9" />
@@ -294,7 +294,7 @@ export default function OnboardingScreen() {
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
                           selected ? 'bg-lib-purple scale-110' : 'bg-lib-purple-50 dark:bg-white/10'
                         }`}>
-                          <Icon className={`w-6 h-6 transition-colors duration-200 ${selected ? 'text-white' : 'text-lib-purple'}`} />
+                          <Icon className={`w-6 h-6 transition-colors duration-200 ${selected ? 'text-white' : 'text-lib-purple dark:text-lib-purple-300'}`} />
                         </div>
                         <div className="text-left flex-1">
                           <div className="font-semibold text-foreground">{r.label}</div>
@@ -406,7 +406,7 @@ export default function OnboardingScreen() {
                             onClick={() => setOnboardingData({ yearLevel: y })}
                             className={`py-3 rounded-xl text-sm font-medium border-2 transition-all duration-200 ${
                               onboardingData.yearLevel === y
-                                ? 'border-lib-purple bg-lib-purple-50 dark:bg-lib-purple-900/30 text-lib-purple shadow-sm shadow-lib-purple/10'
+                                ? 'border-lib-purple bg-lib-purple-50 dark:bg-lib-purple-900/30 text-lib-purple dark:text-lib-purple-300 shadow-sm shadow-lib-purple/10'
                                 : 'border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-lib-purple-200 dark:hover:border-lib-purple-700'
                             }`}
                           >
@@ -418,7 +418,7 @@ export default function OnboardingScreen() {
                   )}
                   {onboardingData.role === 'visitor' && (
                     <div className="bg-lib-purple-50 dark:bg-lib-purple-900/30 rounded-xl p-4 text-center border border-lib-purple-100 dark:border-lib-purple-800">
-                      <Info className="w-5 h-5 text-lib-purple mx-auto mb-2" />
+                      <Info className="w-5 h-5 text-lib-purple dark:text-lib-purple-300 mx-auto mb-2" />
                       <p className="text-sm text-lib-purple dark:text-lib-purple-300">As a visitor, you can browse the catalog and use the QR check-in feature.</p>
                     </div>
                   )}
@@ -466,7 +466,7 @@ export default function OnboardingScreen() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple dark:hover:text-lib-purple-300 transition-colors"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -501,7 +501,7 @@ export default function OnboardingScreen() {
                       <button
                         type="button"
                         onClick={() => setShowConfirm(!showConfirm)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple dark:hover:text-lib-purple-300 transition-colors"
                       >
                         {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -563,7 +563,7 @@ export default function OnboardingScreen() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                        <BookOpen className="w-5 h-5 text-lib-purple" />
+                        <BookOpen className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />
                       </div>
                       <div>
                         <div className="font-medium text-sm text-foreground">Reservation Alerts</div>
@@ -584,7 +584,7 @@ export default function OnboardingScreen() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                        <Megaphone className="w-5 h-5 text-lib-purple" />
+                        <Megaphone className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />
                       </div>
                       <div>
                         <div className="font-medium text-sm text-foreground">System Announcements</div>

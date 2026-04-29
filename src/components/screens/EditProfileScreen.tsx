@@ -104,7 +104,7 @@ export default function EditProfileScreen() {
             <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-2xl font-bold text-white border-2 border-white/30">
               {user?.avatarInitials || '??'}
             </div>
-            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-lib-purple flex items-center justify-center border-2 border-white shadow-sm">
+            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-lib-purple flex items-center justify-center border-2 border-white dark:border-[#110a1e] shadow-sm">
               <Camera className="w-3.5 h-3.5 text-white" />
             </div>
           </motion.div>

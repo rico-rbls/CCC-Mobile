@@ -272,7 +272,7 @@ export default function BorrowedScreen() {
             className="flex flex-col items-center justify-center py-16"
           >
             <div className="w-20 h-20 rounded-2xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-4">
-              <BookOpen className="w-10 h-10 text-lib-purple" />
+              <BookOpen className="w-10 h-10 text-lib-purple dark:text-lib-purple-300" />
             </div>
             <h3 className="font-bold text-foreground mb-1">No books yet</h3>
             <p className="text-sm text-muted-foreground text-center mb-4">
@@ -388,7 +388,7 @@ export default function BorrowedScreen() {
                                 size="sm"
                                 onClick={() => handleReturn(book.id, book.title)}
                                 disabled={returningId === book.id}
-                                className="h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
+                                className="h-7 px-2 text-xs text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
                               >
                                 {returningId === book.id ? (
                                   <Loader2 className="w-3 h-3 animate-spin" />
@@ -436,7 +436,7 @@ export default function BorrowedScreen() {
                               variant="ghost"
                               size="sm"
                               onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
-                              className="h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
+                              className="h-7 px-2 text-xs text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
                             >
                               View <ChevronRight className="w-3 h-3" />
                             </Button>

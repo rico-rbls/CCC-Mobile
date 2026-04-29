@@ -16,7 +16,7 @@ const categories = [
 ]
 
 const categoryColors: Record<string, string> = {
-  book: 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple',
+  book: 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300',
   research: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
   magazine: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
 }
@@ -187,7 +187,7 @@ export default function SearchScreen() {
               className="overflow-hidden"
             >
               <div className="flex items-center gap-1.5 mb-1.5">
-                <TrendingUp className="w-3 h-3 text-lib-purple" />
+                <TrendingUp className="w-3 h-3 text-lib-purple dark:text-lib-purple-300" />
                 <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Popular</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -264,7 +264,7 @@ export default function SearchScreen() {
         ) : filtered.length === 0 && localQuery.trim() ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="w-16 h-16 rounded-full bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-3">
-              <Search className="w-8 h-8 text-lib-purple" />
+              <Search className="w-8 h-8 text-lib-purple dark:text-lib-purple-300" />
             </div>
             <h3 className="font-semibold text-foreground mb-1">No results found</h3>
             <p className="text-sm text-muted-foreground text-center">
@@ -281,7 +281,7 @@ export default function SearchScreen() {
                   initial={{ opacity: 0, y: -4, scale: 0.9 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   className={`text-xs font-semibold transition-colors duration-300 ${
-                    countHighlight ? 'text-lib-purple' : 'text-lib-purple'
+                    countHighlight ? 'text-lib-purple dark:text-lib-purple-300' : 'text-lib-purple dark:text-lib-purple-300'
                   }`}
                   style={countHighlight ? {
                     textShadow: '0 0 8px rgba(101, 45, 144, 0.4)',
@@ -303,7 +303,7 @@ export default function SearchScreen() {
             {isSearchEmpty && recentlyViewed.length > 0 && (
               <div className="mb-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock className="w-3.5 h-3.5 text-lib-purple" />
+                  <Clock className="w-3.5 h-3.5 text-lib-purple dark:text-lib-purple-300" />
                   <h3 className="text-sm font-semibold text-foreground">Recently Viewed</h3>
                 </div>
                 <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
@@ -320,7 +320,7 @@ export default function SearchScreen() {
                           <div className="w-28 h-36 rounded-xl mb-2 relative overflow-hidden shadow-sm">
                             <img src={coverSrc} alt={resource.title} className="w-full h-full object-cover" />
                             {resource.category && (
-                              <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                              <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
                                 {resource.category}
                               </span>
                             )}
@@ -329,7 +329,7 @@ export default function SearchScreen() {
                           <div className="w-28 h-36 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm cover-pattern-overlay">
                             <BookOpen className="w-6 h-6 text-white/50" />
                             {resource.category && (
-                              <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+                              <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
                                 {resource.category}
                               </span>
                             )}
@@ -375,12 +375,12 @@ export default function SearchScreen() {
                     </span>
                     {/* Subject/tag pills */}
                     {resource.tags.slice(0, 2).map(tag => (
-                      <span key={tag} className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple text-[10px] font-medium">
+                      <span key={tag} className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 text-[10px] font-medium">
                         {tag}
                       </span>
                     ))}
                     {resource.subject && resource.tags.length === 0 && (
-                      <span className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple text-[10px] font-medium">
+                      <span className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 text-[10px] font-medium">
                         {resource.subject}
                       </span>
                     )}

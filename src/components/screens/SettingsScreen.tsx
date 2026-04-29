@@ -147,7 +147,7 @@ export default function SettingsScreen() {
       <div className="flex-1 px-4 py-4 overflow-y-auto space-y-4">
         {/* Account section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-          <h3 className="text-xs font-semibold text-lib-purple uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
+          <h3 className="text-xs font-semibold text-lib-purple dark:text-lib-purple-300 uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
             <User className="w-3.5 h-3.5" />
             Account
           </h3>
@@ -168,7 +168,7 @@ export default function SettingsScreen() {
               className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-border hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors"
             >
               <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                <Lock className="w-4 h-4 text-lib-purple" />
+                <Lock className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
               </div>
               <div className="flex-1 text-left">
                 <span className="text-sm font-medium text-foreground">Change Password</span>
@@ -178,7 +178,7 @@ export default function SettingsScreen() {
             </button>
             <div className="flex items-center gap-3 px-4 py-3.5">
               <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                <Mail className="w-4 h-4 text-lib-purple" />
+                <Mail className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
               </div>
               <div className="flex-1">
                 <span className="text-sm font-medium text-foreground">Email</span>
@@ -191,7 +191,7 @@ export default function SettingsScreen() {
 
         {/* Notifications section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <h3 className="text-xs font-semibold text-lib-purple uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
+          <h3 className="text-xs font-semibold text-lib-purple dark:text-lib-purple-300 uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
             <Bell className="w-3.5 h-3.5" />
             Notifications
           </h3>
@@ -199,7 +199,7 @@ export default function SettingsScreen() {
             <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                  <Bell className="w-4 h-4 text-lib-purple" />
+                  <Bell className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
                 </div>
                 <div>
                   <span className="text-sm font-medium text-foreground">Due Date Reminders</span>
@@ -215,7 +215,7 @@ export default function SettingsScreen() {
             <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                  <Bell className="w-4 h-4 text-lib-purple" />
+                  <Bell className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
                 </div>
                 <div>
                   <span className="text-sm font-medium text-foreground">Reservation Alerts</span>
@@ -231,7 +231,7 @@ export default function SettingsScreen() {
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                  <Bell className="w-4 h-4 text-lib-purple" />
+                  <Bell className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
                 </div>
                 <div>
                   <span className="text-sm font-medium text-foreground">System Announcements</span>
@@ -249,7 +249,7 @@ export default function SettingsScreen() {
 
         {/* Appearance section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-          <h3 className="text-xs font-semibold text-lib-purple uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
+          <h3 className="text-xs font-semibold text-lib-purple dark:text-lib-purple-300 uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
             <Palette className="w-3.5 h-3.5" />
             Appearance
           </h3>
@@ -257,7 +257,7 @@ export default function SettingsScreen() {
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                  {theme === 'dark' ? <Moon className="w-4 h-4 text-lib-purple" /> : <Sun className="w-4 h-4 text-lib-purple" />}
+                  {theme === 'dark' ? <Moon className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" /> : <Sun className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />}
                 </div>
                 <div>
                   <span className="text-sm font-medium text-foreground">Dark Mode</span>
@@ -275,7 +275,7 @@ export default function SettingsScreen() {
 
         {/* Help section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <h3 className="text-xs font-semibold text-lib-purple uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
+          <h3 className="text-xs font-semibold text-lib-purple dark:text-lib-purple-300 uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
             <HelpCircle className="w-3.5 h-3.5" />
             Help
           </h3>
@@ -285,20 +285,20 @@ export default function SettingsScreen() {
               className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-border hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors"
             >
               <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                <HelpCircle className="w-4 h-4 text-lib-purple" />
+                <HelpCircle className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
               </div>
               <div className="flex-1 text-left">
                 <span className="text-sm font-medium text-foreground">How to use CCC&apos;s Library Logbook MS</span>
                 <p className="text-xs text-muted-foreground">Learn how to navigate the system</p>
               </div>
-              <div className="flex items-center gap-1 text-lib-purple text-xs font-medium">
+              <div className="flex items-center gap-1 text-lib-purple dark:text-lib-purple-300 text-xs font-medium">
                 Open Help guide
                 <ChevronRight className="w-3.5 h-3.5" />
               </div>
             </button>
             <button className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-border hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors">
               <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                <Shield className="w-4 h-4 text-lib-purple" />
+                <Shield className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
               </div>
               <div className="flex-1 text-left">
                 <span className="text-sm font-medium text-foreground">Privacy Policy</span>
@@ -308,7 +308,7 @@ export default function SettingsScreen() {
             </button>
             <button className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors">
               <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                <FileText className="w-4 h-4 text-lib-purple" />
+                <FileText className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
               </div>
               <div className="flex-1 text-left">
                 <span className="text-sm font-medium text-foreground">Terms of Service</span>
@@ -321,7 +321,7 @@ export default function SettingsScreen() {
 
         {/* About section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-          <h3 className="text-xs font-semibold text-lib-purple uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
+          <h3 className="text-xs font-semibold text-lib-purple dark:text-lib-purple-300 uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
             <Info className="w-3.5 h-3.5" />
             About
           </h3>
@@ -329,7 +329,7 @@ export default function SettingsScreen() {
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                  <Info className="w-4 h-4 text-lib-purple" />
+                  <Info className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
                 </div>
                 <span className="text-sm font-medium text-foreground">App Version</span>
               </div>
@@ -378,7 +378,7 @@ export default function SettingsScreen() {
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                    <Lock className="w-5 h-5 text-lib-purple" />
+                    <Lock className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />
                   </div>
                   <div>
                     <h3 className="font-bold text-foreground">Change Password</h3>
@@ -410,7 +410,7 @@ export default function SettingsScreen() {
                     <button
                       type="button"
                       onClick={() => setShowCurrentPwd(!showCurrentPwd)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple dark:hover:text-lib-purple-300 transition-colors"
                     >
                       {showCurrentPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -432,7 +432,7 @@ export default function SettingsScreen() {
                     <button
                       type="button"
                       onClick={() => setShowNewPwd(!showNewPwd)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple dark:hover:text-lib-purple-300 transition-colors"
                     >
                       {showNewPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -469,7 +469,7 @@ export default function SettingsScreen() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPwd(!showConfirmPwd)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple dark:hover:text-lib-purple-300 transition-colors"
                     >
                       {showConfirmPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>

@@ -96,7 +96,7 @@ export default function ReservationsScreen() {
             <p className="text-xs text-muted-foreground">{pendingCount} active reservation{pendingCount !== 1 ? 's' : ''}</p>
           </div>
           <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-            <Bookmark className="w-4 h-4 text-lib-purple" />
+            <Bookmark className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
           </div>
         </div>
 
@@ -138,7 +138,7 @@ export default function ReservationsScreen() {
             className="flex flex-col items-center justify-center py-16"
           >
             <div className="w-20 h-20 rounded-[22px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-4">
-              <Bookmark className="w-10 h-10 text-lib-purple" />
+              <Bookmark className="w-10 h-10 text-lib-purple dark:text-lib-purple-300" />
             </div>
             <h3 className="font-bold text-foreground mb-1">
               {activeFilter === 'pending' ? 'No pending reservations' : 'No reservations'}
@@ -217,7 +217,7 @@ export default function ReservationsScreen() {
                           variant="ghost"
                           size="sm"
                           onClick={() => { setSelectedBookId(reservation.resourceId); setCurrentScreen('book-detail') }}
-                          className="mt-2 h-7 px-2 text-xs text-lib-purple hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
+                          className="mt-2 h-7 px-2 text-xs text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
                         >
                           Borrow Now
                         </Button>

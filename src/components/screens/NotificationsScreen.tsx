@@ -197,7 +197,7 @@ export default function NotificationsScreen() {
           {hasUnread && (
             <button
               onClick={markAllRead}
-              className="flex items-center gap-1 text-xs text-lib-purple font-medium"
+              className="flex items-center gap-1 text-xs text-lib-purple dark:text-lib-purple-300 font-medium"
             >
               <CheckCheck className="w-3.5 h-3.5" />
               Mark all read
@@ -240,7 +240,7 @@ export default function NotificationsScreen() {
         ) : filteredNotifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="w-16 h-16 rounded-full bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-3">
-              <BookOpen className="w-8 h-8 text-lib-purple" />
+              <BookOpen className="w-8 h-8 text-lib-purple dark:text-lib-purple-300" />
             </div>
             <h3 className="font-semibold text-foreground mb-1">
               {activeFilter === 'unread' ? 'No unread notifications' : 'No notifications'}
@@ -255,7 +255,7 @@ export default function NotificationsScreen() {
               <div key={group.label}>
                 {/* Group header */}
                 <div className="flex items-center gap-2 mb-2 px-1">
-                  <span className="text-[10px] font-semibold text-lib-purple uppercase tracking-wider">
+                  <span className="text-[10px] font-semibold text-lib-purple dark:text-lib-purple-300 uppercase tracking-wider">
                     {group.label}
                   </span>
                   <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />

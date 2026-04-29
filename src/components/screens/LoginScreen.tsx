@@ -191,14 +191,14 @@ export default function LoginScreen() {
               <Label
                 htmlFor="loginEmail"
                 className={`text-sm font-medium transition-colors duration-200 ${
-                  emailFocused ? 'text-lib-purple' : 'text-foreground'
+                  emailFocused ? 'text-lib-purple dark:text-lib-purple-300' : 'text-foreground'
                 }`}
               >
                 Email
               </Label>
               <div className="relative">
                 <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
-                  emailFocused ? 'text-lib-purple' : 'text-muted-foreground'
+                  emailFocused ? 'text-lib-purple dark:text-lib-purple-300' : 'text-muted-foreground'
                 }`}>
                   <GraduationCap className="w-4 h-4" />
                 </div>
@@ -225,12 +225,12 @@ export default function LoginScreen() {
                 <Label
                   htmlFor="loginPassword"
                   className={`text-sm font-medium transition-colors duration-200 ${
-                    passwordFocused ? 'text-lib-purple' : 'text-foreground'
+                    passwordFocused ? 'text-lib-purple dark:text-lib-purple-300' : 'text-foreground'
                   }`}
                 >
                   Password
                 </Label>
-                <button className="text-xs text-lib-purple font-medium hover:text-lib-purple-dark transition-colors">
+                <button className="text-xs text-lib-purple dark:text-lib-purple-300 font-medium hover:text-lib-purple-dark transition-colors">
                   Forgot password?
                 </button>
               </div>
@@ -253,7 +253,7 @@ export default function LoginScreen() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lib-purple dark:hover:text-lib-purple-300 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -347,7 +347,7 @@ export default function LoginScreen() {
             Don&apos;t have an account?{' '}
             <button
               onClick={handleRegister}
-              className="text-lib-purple font-semibold hover:text-lib-purple-dark transition-colors"
+              className="text-lib-purple dark:text-lib-purple-300 font-semibold hover:text-lib-purple-dark transition-colors"
             >
               Register
             </button>

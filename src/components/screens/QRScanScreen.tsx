@@ -120,7 +120,7 @@ export default function QRScanScreen() {
             transition={{ duration: 0.8, repeat: scanning ? Infinity : 0 }}
             className="w-16 h-16 rounded-full bg-lib-purple/20 flex items-center justify-center backdrop-blur-sm"
           >
-            <ScanLine className="w-8 h-8 text-lib-purple" />
+            <ScanLine className="w-8 h-8 text-lib-purple dark:text-lib-purple-300" />
           </motion.div>
         </div>
 
@@ -142,7 +142,7 @@ export default function QRScanScreen() {
               transition={{ duration: 1.5, repeat: Infinity }}
               className="w-2 h-2 rounded-full bg-lib-purple"
             />
-            <span className="text-sm text-lib-purple font-medium">Scanning...</span>
+            <span className="text-sm text-lib-purple dark:text-lib-purple-300 font-medium">Scanning...</span>
           </motion.div>
         )}
       </AnimatePresence>

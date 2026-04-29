@@ -148,14 +148,14 @@ export default function AttendanceScreen() {
         >
           <div className="bg-card rounded-[22px] shadow-sm p-3 text-center">
             <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mx-auto mb-2">
-              <MapPin className="w-4 h-4 text-lib-purple" />
+              <MapPin className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
             </div>
             <p className="text-xl font-bold text-foreground">{totalVisits}</p>
             <p className="text-[10px] text-muted-foreground font-medium">Total Visits</p>
           </div>
           <div className="bg-card rounded-[22px] shadow-sm p-3 text-center">
             <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mx-auto mb-2">
-              <Clock className="w-4 h-4 text-lib-purple" />
+              <Clock className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
             </div>
             <p className="text-xl font-bold text-foreground">{totalHours}</p>
             <p className="text-[10px] text-muted-foreground font-medium">Total Hours</p>
@@ -178,10 +178,10 @@ export default function AttendanceScreen() {
         >
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-              <Calendar className="w-4 h-4 text-lib-purple" />
+              <Calendar className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
               {monthName}
             </h3>
-            <Badge variant="secondary" className="text-[10px] bg-lib-purple-50 text-lib-purple">
+            <Badge variant="secondary" className="text-[10px] bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300">
               {totalVisits} visits
             </Badge>
           </div>
@@ -255,7 +255,7 @@ export default function AttendanceScreen() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
         >
-          <h3 className="text-xs font-semibold text-lib-purple uppercase tracking-wider mb-2 px-1">
+          <h3 className="text-xs font-semibold text-lib-purple dark:text-lib-purple-300 uppercase tracking-wider mb-2 px-1">
             Recent Visits
           </h3>
           <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
@@ -276,7 +276,7 @@ export default function AttendanceScreen() {
                   }`}
                 >
                   <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-4 h-4 text-lib-purple" />
+                    <Calendar className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">{formatDate(record.date)}</p>
@@ -285,7 +285,7 @@ export default function AttendanceScreen() {
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <Badge variant="secondary" className="text-[10px] bg-lib-purple-50 text-lib-purple font-semibold">
+                    <Badge variant="secondary" className="text-[10px] bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 font-semibold">
                       {formatDuration(record.duration)}
                     </Badge>
                   </div>
