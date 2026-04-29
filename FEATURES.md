@@ -1,6 +1,6 @@
 # LibLog — Digital Library Logbook Management System
 
-> **Feature Documentation** — Last updated: 2025-01-27
+> **Feature Documentation** — Last updated: 2026-03-06
 > This document is the single source of truth for all features. Update it whenever the system is modified.
 
 ---
@@ -30,9 +30,10 @@ LibLog is a **mobile-first** Digital Library Logbook Management System built for
 | Attribute | Value |
 |-----------|-------|
 | Primary Color | `#652D90` (Purple) |
-| Background | `#FFFFFF` (White) |
+| Background (Light) | `#f2f2fa` (Lavender-tinted gray) |
+| Background (Dark) | `oklch(0.13 0.04 300)` (~`#110a1e`, dark purple) |
 | Max Viewport | 430px (mobile container) |
-| Dark Mode | Supported (class-based toggle) |
+| Dark Mode | Supported (class-based toggle via next-themes) |
 | Platform | Next.js 16 App Router, TypeScript |
 | Database | SQLite via Prisma ORM |
 | Test Accounts | `juan@university.edu` / `maria@university.edu` / `alex@university.edu` (password: `password123`) |
@@ -87,18 +88,27 @@ User authentication screen with branded design:
 
 **Screen:** `HomeScreen` | **Route:** Internal (main authenticated screen)
 
-Personalized landing page with multiple content sections:
+Personalized landing page with clean card-based layout:
 
-1. **Top Bar:** Streak counter (flame icon + count), Notifications bell (unread badge), Settings gear
-2. **User Greeting:** Avatar initials circle, time-of-day greeting with crossfade transition (morning/afternoon/evening, [First Name]), program/year/role subtitle
+1. **Top Bar:** Streak counter in orange rounded pill card (`bg-orange-400 dark:bg-orange-500 rounded-full` with Flame icon, white text), Notifications bell icon inside `rounded-[22px] bg-card dark:shadow-sm` squircle card (with unread badge), Settings gear icon inside same-style squircle card
+2. **User Greeting:** Date display (uppercase, muted), time-of-day greeting with crossfade transition — greeting text is NOT bold ("Good afternoon,"), user name IS bold ("**Juan!**") — implemented as `<h1 className="text-2xl">Good afternoon, <span className="font-bold">Juan!</span></h1>`, program/year/role subtitle below
 3. **Library Status Badge:** Open/Closed indicator with pulsing green dot when Open (2s cycle) + closing time
-4. **Full Date Display:** CalendarDays icon + formatted date
-5. **Announcements Carousel:** Auto-rotating (5s interval), dismissible cards with megaphone icon, carousel dot navigation
-6. **Today's Highlight:** Featured book card with purple gradient background, decorative circles, star badge, availability badge
-7. **Current Borrow:** Active book card with animated gradient left border (scaleY 0→1 on mount), progress bar, days-left badge (color-coded: green > 3 days, yellow 1–3 days, red overdue), "View Details" button. Empty state with floating book animation + "Browse Catalog" CTA
-8. **Quick Actions:** 4-button grid — Scan QR, My Loans, Reservations, Attendance (staggered entry, 0.1s delay per button)
-9. **Recommended for You:** Horizontal scrollable book covers with "For You" star badges (program-matched), availability dots, "See All" link
-10. **Trending in Your Department:** Ranked list (1–5) with borrow counts, numbered badges
+4. **Announcements Card:** `bg-card rounded-3xl dark:shadow-sm p-4` card, auto-rotating (5s interval), dismissible with megaphone icon on card header row, carousel dot navigation
+5. **Today's Highlight Card:** `bg-card rounded-3xl dark:shadow-sm p-4` card with featured book, Sparkles icon on card header row
+6. **Current Borrow Card:** `bg-card rounded-3xl dark:shadow-sm p-4` card with active book, animated gradient left border (scaleY 0→1 on mount), progress bar, days-left badge (color-coded), "View Details" button. Empty state with floating book animation + "Browse Catalog" CTA
+7. **2-Column Square Cards:** Attendance Analytics + Reading Goal side by side (both `aspect-square`), each in `bg-card rounded-3xl dark:shadow-sm p-4`:
+   - **Attendance Analytics:** Visit count, total hours, streak count
+   - **Reading Goal:** Circular SVG progress ring, borrowCount/readingGoal ratio
+8. **Recommended for You Card:** `bg-card rounded-3xl dark:shadow-sm p-4` card with horizontal scrollable book covers, "For You" star badges (program-matched), availability dots, "See All" link
+9. **Trending in Your Department Card:** `bg-card rounded-3xl dark:shadow-sm p-4` card with TrendingUp icon on card header row, ranked list (1–5) with borrow counts as plain "X borrows" text (no Clock icons), numbered badges
+
+**Key Design Changes (from Tasks 10–12):**
+- Quick Actions section removed entirely (was 4-button grid: Scan QR, My Loans, Reservations, Attendance)
+- Purple bar dividers removed from section headers
+- No background patterns on section titles (section-header-pattern removed)
+- All sections wrapped in `bg-card rounded-3xl dark:shadow-sm p-4` cards
+- Consistent spacing: `px-5 pt-6 pb-5` header, `px-5 pb-6 space-y-4` content
+- Section icons (Megaphone, Sparkles, TrendingUp) placed on right side of card header rows
 
 **Gesture:** Pull-to-refresh (60px threshold, animated pull indicator).
 
@@ -182,10 +192,9 @@ User profile, statistics, reading goals, and menu:
 - **Stats cards (3 columns):** Borrowed count, Visits count, Streak count
 - **Reading Goal card:** Circular SVG progress ring, goal/borrowed count, "Change" button with goal picker (12/24/36/48)
 - **Reading Stats card:** Mini bar chart (7 months), total books, average per month
-- **Favorite Books card** (navigates to favorites screen)
-- **Quick info:** "Member since" card
-- **Menu items:** Edit Profile (→ Edit Profile screen), My Favorites, My Reservations, Notification Preferences, Privacy Policy, Help & Support, About (v1.0.0)
-- **Logout button** (red themed)
+- **Attendance History card** with visit count and navigation link
+- **Member Since** info card
+- **Menu items:** Edit Profile (→ Edit Profile screen), My Favorites, My Reservations
 
 **Reading Goal Picker:** Toggle overlay to select from 12/24/36/48 annual goal.
 
@@ -280,7 +289,7 @@ App settings and account management:
 1. **Account:** Avatar + name/email, "Change Password" button, Email with "Verified" badge
 2. **Notifications:** Due Date Reminders switch, Reservation Alerts switch, System Announcements switch — each toggle persists to API
 3. **Appearance:** Dark Mode toggle (via next-themes)
-4. **Library:** Hours display (from API), Open/Closed status, Attendance History link
+4. **Help:** "How to use CCC's Library Logbook MS" with "Open Help guide →" link
 5. **About:** App Version (1.0.0), Privacy Policy, Terms of Service
 6. **Log Out** button (red)
 
@@ -561,19 +570,29 @@ Update user profile information:
 
 ### Persisted State
 
-| Variable | Type | Default | Description |
-|----------|------|---------|-------------|
-| currentScreen | AppScreen | `'onboarding'` | Current active screen |
-| previousScreen | AppScreen\|null | `null` | For goBack() navigation |
-| isAuthenticated | boolean | `false` | Login status |
-| user | UserState\|null | `null` | Full user data |
-| onboardingStep | number | `0` | Current onboarding step (0–4) |
-| onboardingData | object | *(defaults)* | Registration form data accumulator |
-| selectedBookId | string\|null | `null` | Book for detail view |
-| searchQuery | string | `''` | Active search text |
-| searchCategory | string | `'all'` | Active category filter (all/book/research/magazine) |
-| unreadCount | number | `3` | Unread notification count |
-| favorites | string[] | `[]` | Favorited resource IDs |
+Only the following fields are persisted to localStorage. The store does **NOT** persist `currentScreen` or `isAuthenticated` — the app always starts at the login screen on open.
+
+| Variable | Type | Default | Persisted | Description |
+|----------|------|---------|-----------|-------------|
+| currentScreen | AppScreen | `'onboarding'` | ❌ No | Current active screen (always resets to `login` on app open) |
+| previousScreen | AppScreen\|null | `null` | ❌ No | For goBack() navigation |
+| isAuthenticated | boolean | `false` | ❌ No | Login status (always resets to `false` on app open) |
+| user | UserState\|null | `null` | ✅ Yes | Full user data |
+| onboardingStep | number | `0` | ✅ Yes | Current onboarding step (0–4) |
+| onboardingData | object | *(defaults)* | ✅ Yes | Registration form data accumulator |
+| selectedBookId | string\|null | `null` | ❌ No | Book for detail view |
+| searchQuery | string | `''` | ❌ No | Active search text |
+| searchCategory | string | `'all'` | ❌ No | Active category filter |
+| unreadCount | number | `3` | ❌ No | Unread notification count |
+| favorites | string[] | `[]` | ✅ Yes | Favorited resource IDs |
+
+### Rehydration Behavior
+
+On app open, the `onRehydrateStorage` callback always resets:
+- `isAuthenticated` → `false`
+- `currentScreen` → `'login'`
+
+This ensures users always start at the login screen, even if they closed the app while authenticated.
 
 ### Actions
 
@@ -608,6 +627,7 @@ Update user profile information:
 - **Password Hashing:** SHA-256 via Web Crypto API (`src/lib/auth.ts`)
 - **Session:** Client-side only (Zustand + localStorage) — no server sessions
 - **Auth Guard:** Unauthenticated users can only see login/onboarding screens
+- **Persistence:** `currentScreen` and `isAuthenticated` are NOT persisted — app always starts at login on open
 - **Role-Based Access Control:**
   - **Student:** Max 3 concurrent borrows, 14-day loan period
   - **Faculty:** Max 10 concurrent borrows, 30-day loan period
@@ -618,6 +638,33 @@ Update user profile information:
 ---
 
 ## 7. Theme & Design System
+
+### Background Colors
+
+| Mode | Color | Description |
+|------|-------|-------------|
+| Light | `#f2f2fa` | Lavender-tinted gray (subtle purple warmth) |
+| Dark | `oklch(0.13 0.04 300)` | Dark purple (~`#110a1e` area) |
+
+### Shadow System
+
+| Element | Light Mode | Dark Mode |
+|---------|-----------|-----------|
+| Cards (all screens) | **No shadow** | `dark:shadow-sm` or `dark:shadow-*` |
+| Buttons | **No shadow** | `dark:shadow-*` (varies) |
+| Images | **No shadow** | `dark:shadow-*` (varies) |
+| Modals | **No shadow** | `dark:shadow-2xl` |
+| BottomNav | `shadow-sm` | `shadow-sm` (both modes) |
+| QR Scan center button | `shadow-*` | `shadow-*` (both modes) |
+| Mobile container | **No shadow** | `dark:shadow-xl` |
+
+**Implementation:** In `globals.css`, the following custom CSS classes only have `box-shadow` in the `.dark` context:
+- `card-hover-effect` — shadow only in `.dark .card-hover-effect:hover`
+- `hover-lift` — shadow only in `.dark .hover-lift:hover`
+- `glass-card` — shadow only in `.dark` variant
+- `press-effect` — shadow only in `.dark .press-effect:active`
+
+**Exceptions:** BottomNav and QR scan center button retain shadows in both light and dark modes.
 
 ### Brand Colors
 
@@ -638,31 +685,54 @@ Update user profile information:
 
 ### Custom CSS Classes
 
-| Class | Purpose |
-|-------|---------|
-| `bg-purple-gradient` | Purple gradient background |
-| `bg-purple-gradient-subtle` | Lighter purple gradient |
-| `glass-effect` / `glass-card` | Frosted glass with backdrop blur |
-| `card-hover-effect` | Hover lift + purple shadow |
-| `purple-shimmer` | Animated gradient shimmer |
-| `cover-pattern-overlay` | Diagonal stripes overlay on book covers |
-| `gradient-border` | Animated gradient border effect |
-| `dot-pattern-bg` | Decorative dot pattern |
-| `grid-pattern-bg` | Decorative grid pattern |
-| `section-header-pattern` | Section header decoration |
-| `shimmer-loading` | Button shimmer sweep animation |
-| `press-effect` | Active scale-down for buttons |
-| `hover-lift` | Subtle hover lift |
-| `gradient-text` | Purple gradient text fill |
-| `safe-bottom` | iOS safe area padding |
-| `custom-scrollbar` | Styled scrollbar |
-| `hide-scrollbar` | Hidden scrollbar |
+| Class | Purpose | Shadow Behavior |
+|-------|---------|-----------------|
+| `bg-purple-gradient` | Purple gradient background | N/A |
+| `bg-purple-gradient-subtle` | Lighter purple gradient | N/A |
+| `glass-effect` / `glass-card` | Frosted glass with backdrop blur | Shadow only in `.dark` context |
+| `card-hover-effect` | Hover lift + purple shadow | Shadow only in `.dark` context |
+| `purple-shimmer` | Animated gradient shimmer | N/A |
+| `cover-pattern-overlay` | Diagonal stripes overlay on book covers | N/A |
+| `gradient-border` | Animated gradient border effect | N/A |
+| `dot-pattern-bg` | Decorative dot pattern | N/A |
+| `grid-pattern-bg` | Decorative grid pattern | N/A |
+| `section-header-pattern` | Section header decoration (legacy, no longer used on Home) | N/A |
+| `shimmer-loading` | Button shimmer sweep animation | N/A |
+| `press-effect` | Active scale-down for buttons | Shadow only in `.dark` context |
+| `hover-lift` | Subtle hover lift | Shadow only in `.dark` context |
+| `gradient-text` | Purple gradient text fill | N/A |
+| `safe-bottom` | iOS safe area padding | N/A |
+| `custom-scrollbar` | Styled scrollbar | N/A |
+| `hide-scrollbar` | Hidden scrollbar | N/A |
 
-### Dark Mode
+### Card Corner Radius
 
-- Class-based toggle via `next-themes`
-- Full dark theme CSS variables (enhanced shadows, dark scrollbar, dark glass effects, dark skeleton shimmer)
-- Toggle available in Settings screen
+| Element | Radius | Tailwind Class |
+|---------|--------|---------------|
+| Section cards (all screens) | 24px | `rounded-3xl` |
+| Inner card elements | 16px | `rounded-2xl` |
+| Small icon containers | 22px | `rounded-[22px]` |
+| Streak pill | Full | `rounded-full` |
+
+### Dark Mode (Dark Purple Theme)
+
+- **Class-based toggle** via `next-themes`
+- **Overall background:** `#110a1e` (dark purple close to black)
+- **Card backgrounds:** `bg-card` with dark purple CSS variable `oklch(0.18 0.05 300)`
+- **Bottom nav:** `dark:bg-[#1a0e2e]/90` with `dark:border-white/5`
+- **Transparency system** (replaces all `dark:bg-gray-*` patterns):
+  - `dark:bg-white/5` — subtle background
+  - `dark:bg-white/10` — medium background / icon containers
+  - `dark:bg-white/15` — emphasized background
+- **Border system** (replaces all `dark:border-gray-*` patterns):
+  - `dark:border-white/5` — subtle borders
+  - `dark:border-white/10` — standard borders
+- **Text accents:** `dark:text-lib-purple-300` for purple-accented text (70+ instances across all screens)
+- **Inactive nav icons:** `dark:text-white/30`
+- **Dark mode card backgrounds for form-heavy screens:** `dark:bg-[#1a0e2e]`
+- **CSS variables in globals.css `.dark`:** Use purple hue (300) in oklch instead of achromatic (0)
+- **Toggle available** in Settings screen
+- **Full dark theme CSS variables:** Enhanced shadows, dark scrollbar, dark glass effects, dark skeleton shimmer
 
 ---
 
@@ -679,7 +749,7 @@ Update user profile information:
 - **Pull-to-refresh:** Touch-based with 60px threshold
 - **Swipe-to-dismiss:** Notifications with spring snap-back (x > 100px threshold)
 - **Floating icons:** Login screen book icons (6s loop)
-- **Confetti:** 20 particles on onboarding final step
+- **Confetti:** 20 particles on onboarding final step, 18 particles on book return success
 
 ### Keyframe Animations (Defined in CSS)
 `shimmer` · `floating` · `pulse-glow` · `slide-in` · `slide-in-up` · `fade-in` · `particle-float` · `gradient-shift` · `subtle-bounce` · `micro-pulse-glow` · `confetti-fall` · `checkmark-draw` · `float-icon` · `count-up` · `badge-shimmer` · `shimmer-sweep` · `star-fill` · `progress-fill` · `skeleton-shimmer` · `badge-pulse` · `countdown-ring` · `slide-indicator` · `page-enter` · `page-exit`
@@ -695,10 +765,12 @@ Update user profile information:
 - **Viewport:** device-width, no user scaling, theme-color #652D90
 
 ### Mobile Container
-- Max-width 430px, centered with `shadow-xl`
+- Max-width 430px, centered with `dark:shadow-xl` (shadow only in dark mode, no shadow in light mode)
+- Full viewport height: `h-dvh` with `overflow-y-auto` on content area
 - Screen routing via Zustand `currentScreen` → component map
 - Auth guard: unauthenticated → login/onboarding only
 - BottomNav visible for authenticated users (hidden on onboarding/login/qr-scan)
+- Bottom nav uses `shrink-0` so it always sticks to the bottom of the viewport
 
 ### Bottom Navigation (5 Tabs)
 
@@ -706,7 +778,7 @@ Update user profile information:
 |-----|------|--------|---------|
 | Home | Home | home | — |
 | Search | Search | search | — |
-| Scan | ScanLine | qr-scan | Center elevated button (-mt-6), purple circle, shadow-lg |
+| Scan | ScanLine | qr-scan | Center elevated button (-mt-6), purple circle, shadow in both modes |
 | Borrowed | BookOpen | borrowed | Active borrows count badge |
 | Profile | User | profile | — |
 
@@ -714,6 +786,7 @@ Update user profile information:
 - **Spring press feedback:** Scale to 0.85 with spring-back (stiffness: 500, damping: 12) on tab press
 - **Scan button ripple:** RippleEffect component scales 0 → 2.5 with opacity fade
 - **Glass effect** background
+- **Shadow:** `shadow-sm` in both light and dark modes (exception to no-shadow rule)
 
 ---
 
@@ -727,7 +800,8 @@ Update user profile information:
 - `getMaxBorrow(role, settings)` — Role→max books mapping
 
 ### `src/lib/covers.ts`
-- `coverMap` — Maps 9 title keywords to `/covers/*.png` image paths
+- `coverMap` — Maps 12 title keywords to `/covers/*.png` image paths:
+  - `introduction-to-algorithms`, `clean-code`, `design-patterns`, `artificial-intelligence`, `ai-modern-approach`, `deep-learning`, `the-pragmatic-programmer`, `pragmatic-programmer` (alias), `database-systems`, `psychology`, `nursing`, `scientific-american`
 - `getBookCover(title)` — Fuzzy-match title to cover image path
 - `getResourceCover(coverImage, title)` — Priority: API coverImage > generated from title > null
 
@@ -762,7 +836,8 @@ Update user profile information:
 - **Reservations (1):** Student → Clean Code (pending)
 - **Attendance (2):** Today (time-in only), Yesterday (7 hours)
 - **Reviews (10):** Across 6 resources with ratings 2-5 and realistic comments
-- **Cover Images (15):** AI-generated covers for 6 popular books + original covers mapped in `public/covers/` directory
+- **AI-Generated Book Covers (10):** `introduction-to-algorithms`, `clean-code`, `design-patterns`, `ai-modern-approach`, `deep-learning`, `the-pragmatic-programmer`, `database-systems`, `psychology-101`, `nursing-fundamentals`, `scientific-american` — saved in `/public/covers/` directory
+- **Cover Images in Seed Data (6):** `coverImage` field populated for 6 most popular books (Introduction to Algorithms, Clean Code, Design Patterns, Deep Learning, The Pragmatic Programmer, AI: A Modern Approach)
 
 ---
 
@@ -820,3 +895,4 @@ A comprehensive branding guide is maintained in **`/home/z/my-project/BRANDING.m
 | 2026-03-05 | Initial FEATURES.md created — comprehensive catalog of all 13 screens, 19 API endpoints, 8 DB models, and all supporting systems |
 | 2026-04-22 | Added Reviews/Ratings feature (3 API + UI + seed data), Edit Profile screen (14th screen), overdue fines display (₱5/day), AI-generated book covers (6 covers), comprehensive dark mode across all screens, micro-interactions (success confetti, living gradient, spring nav feedback, skeleton loading, search glow), Change Password modal fix |
 | 2025-01-27 | Created comprehensive BRANDING.md — 16-section design system guide with SF Pro typography, full purple color palette, corner rounding scale, 4px spacing system, elevation hierarchy, gradient specs, iconography, motion guidelines, dark mode system, component specs, accessibility, and implementation reference |
+| 2026-03-06 | Major update reflecting Tasks 10–13: Home screen redesign (removed Quick Actions, purple bar dividers, section-header-pattern; added card-based layout, 2-column Attendance+Reading Goal cards, orange streak pill, icon squircles); shadow system overhaul (all shadows removed in light mode except BottomNav + QR scan button; shadows only in `.dark` context for card-hover-effect, hover-lift, glass-card, press-effect); background changed to lavender-tinted `#f2f2fa` (light) and `oklch(0.13 0.04 300)` dark purple (dark); card corner radius standardized to `rounded-3xl` (24px); dark purple theme with transparency system (`dark:bg-white/5-15`, `dark:border-white/5-10`) replacing all `dark:bg-gray-*`; greeting changed to non-bold greeting text + bold user name; persistence changed to only persist `user`, `onboardingStep`, `onboardingData`, `favorites` (always starts at login); covers.ts expanded to 12 entries; 10 AI-generated book covers in `/public/covers/`; mobile container uses `dark:shadow-xl` instead of `shadow-xl`; bottom nav sticky with `h-dvh` layout |

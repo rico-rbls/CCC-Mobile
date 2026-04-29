@@ -1,7 +1,7 @@
 # LibLog — Mobile Branding & Design System Guide
 
-> **Version:** 1.0  
-> **Last Updated:** 2025-01-27  
+> **Version:** 1.1  
+> **Last Updated:** 2026-03-04  
 > **Platform:** iOS-first Mobile App (max-width 430px)  
 > **Design Philosophy:** Clean, accessible, purple-forward academic library experience
 
@@ -118,7 +118,7 @@ All text should respect the user's Dynamic Type setting on iOS:
 
 | Token | Hex Approx | Purpose |
 |---|---|---|
-| `--background` | `#FFFFFF` | Page background |
+| `--background` | `#f2f2fa` | Page background (lavender-tinted gray) |
 | `--foreground` | `#1A1A1A` | Primary text |
 | `--card` | `#FFFFFF` | Card background |
 | `--card-foreground` | `#1A1A1A` | Card text |
@@ -135,11 +135,13 @@ All text should respect the user's Dynamic Type setting on iOS:
 | `--input` | `#E8D5F3` | Input field borders |
 | `--ring` | `#652D90` | Focus ring color |
 
+> **Note:** The page background `#f2f2fa` is a lavender-tinted gray rather than pure white. This provides a subtle warm tone that differentiates the page surface from card surfaces (`#FFFFFF`), creating natural visual layering without relying on shadows in light mode.
+
 ### Neutral Grays
 
 | Name | Hex | Usage |
 |---|---|---|
-| Gray-50 | `#F9FAFB` | Page backgrounds (light mode) |
+| Gray-50 | `#f2f2fa` | Page backgrounds (light mode) — our lavender-tinted background |
 | Gray-100 | `#F3F4F6` | Subtle dividers |
 | Gray-200 | `#E5E7EB` | Borders, separators |
 | Gray-300 | `#D1D5DB` | Disabled borders |
@@ -148,17 +150,19 @@ All text should respect the user's Dynamic Type setting on iOS:
 | Gray-600 | `#4B5563` | Body text (muted) |
 | Gray-700 | `#374151` | Secondary headings |
 | Gray-800 | `#1F2937` | Primary text (dark surfaces) |
-| Gray-900 | `#111827` | Card surfaces (dark mode) |
-| Gray-950 | `#030712` | Page background (dark mode) |
+| Gray-900 | `#111827` | Card surfaces (dark mode legacy) |
+| Gray-950 | `#030712` | Page background (dark mode legacy) |
+
+> **Note:** Gray-50 has been replaced by our custom `#f2f2fa` (lavender-tinted) as the page background. In dark mode, the page background uses a deep purple (`#110a1e`) instead of pure gray-950.
 
 ### Contrast Requirements
 
 | Text on Background | Minimum Contrast | Our Standard |
 |---|---|---|
-| Body text on white | 4.5:1 (WCAG AA) | `#1A1A1A` on `#FFFFFF` = **16.7:1** ✅ |
-| Muted text on white | 3:1 (WCAG AA Large) | `#8B6B9F` on `#FFFFFF` = **3.6:1** ✅ |
+| Body text on `#f2f2fa` | 4.5:1 (WCAG AA) | `#1A1A1A` on `#f2f2fa` = **16.2:1** ✅ |
+| Muted text on `#f2f2fa` | 3:1 (WCAG AA Large) | `#8B6B9F` on `#f2f2fa` = **3.5:1** ✅ |
 | White text on purple | 4.5:1 | `#FFFFFF` on `#652D90` = **7.2:1** ✅ |
-| Purple text on white | 4.5:1 | `#652D90` on `#FFFFFF` = **7.2:1** ✅ |
+| Purple text on `#f2f2fa` | 4.5:1 | `#652D90` on `#f2f2fa` = **7.0:1** ✅ |
 
 ---
 
@@ -173,16 +177,17 @@ All text should respect the user's Dynamic Type setting on iOS:
 | **SM** | 8px | `rounded-lg` / `rounded-sm` | Small buttons, compact elements |
 | **MD** | 10px | `rounded-md` | Default shadcn elements |
 | **LG** | 12px | `rounded-xl` | Primary buttons, inputs, icon containers |
-| **XL** | 16px | `rounded-2xl` | Cards, modals, bottom sheets |
+| **XL** | 16px | `rounded-2xl` | Inner card elements, book covers |
 | **2XL** | 20px | `rounded-2xl` + custom | Large cards, feature panels |
-| **3XL** | 24px | `rounded-3xl` | Hero sections, full-width panels |
+| **3XL** | 24px | `rounded-3xl` | **Standard card radius**, hero sections, full-width panels |
 | **Full** | 9999px | `rounded-full` | Avatars, pills, badges, FABs |
 
 ### Element-to-Radius Mapping
 
 | Element | Radius | Rationale |
 |---|---|---|
-| Cards | 16px (`rounded-2xl`) | Soft, approachable feel for content containers |
+| Cards | 24px (`rounded-3xl`) | Soft, approachable feel; generous radius for modern mobile feel |
+| Inner card elements | 16px (`rounded-2xl`) | One step down from parent card for visual hierarchy |
 | Primary Buttons | 12px (`rounded-xl`) | Tappable, finger-friendly curves |
 | Secondary Buttons | 12px (`rounded-xl`) | Consistent with primary |
 | Text Inputs | 12px (`rounded-xl`) | Matches button rounding |
@@ -192,11 +197,13 @@ All text should respect the user's Dynamic Type setting on iOS:
 | Bottom Sheets | 24px (top only) | iOS-standard sheet appearance |
 | Login Header | 40px (bottom only) | Hero curve for brand impact |
 | Profile Header | 32px (bottom only) | Softer curve than login |
-| Book Covers | 12px (`rounded-xl`) | Matches physical book corner softness |
-| Modals / Dialogs | 16px (`rounded-2xl`) | Friendly, not sharp |
+| Book Covers | 16px (`rounded-2xl`) | Soft corners matching physical book feel |
+| Modals / Dialogs | 24px (`rounded-3xl`) | Consistent with card radius |
 | Toast Notifications | 12px (`rounded-xl`) | Discrete but visible |
 | Progress Bars | Full (`rounded-full`) | Smooth ends |
 | Divider Accents | Full (`rounded-full`) | Thin rounded bars |
+
+> **Note:** The standard card radius is `rounded-3xl` (24px), which gives a softer, more modern feel compared to `rounded-2xl`. Inner elements within cards use `rounded-2xl` (16px) for visual hierarchy.
 
 ---
 
@@ -236,7 +243,6 @@ All spacing values are multiples of 4px, following the 4px grid system.
 | **Form field gap** | — | 16px (`space-y-4`) | Between input fields |
 | **List item padding** | 16px (`px-4`) | 14px (`py-3.5`) | Comfortable tappable area |
 | **Bottom nav height** | — | 80px (`h-20`) | Includes safe area |
-| **Quick action grid** | 8px (`gap-2`) | 8px (`gap-2`) | 4-column icon grid |
 | **Horizontal list** | 12px (`gap-3`) | — | Book carousels, tag lists |
 
 ### Internal Spacing Rules
@@ -254,37 +260,64 @@ All spacing values are multiples of 4px, following the 4px grid system.
 
 ## 5. Elevation & Shadows
 
+### Design Philosophy: Flat Light, Depth Dark
+
+> **Major Design Principle:** Light mode is **FLAT** — no shadows on cards, buttons, images, or modals. Visual separation comes from the contrast between the lavender-tinted page background (`#f2f2fa`) and white card surfaces (`#FFFFFF`). Dark mode uses shadows for depth and layer differentiation since the dark purple surfaces need additional visual cues.
+
+- **Light mode:** Cards are flat at rest. No `shadow-sm`, no `shadow-md`, no `shadow-lg` on content surfaces. Only `BottomNav` and the QR scan center button retain shadows in both light and dark mode.
+- **Dark mode:** Shadows are used for depth. Cards get `dark:shadow-sm`, hover states add `dark:shadow-md`, and the mobile container uses `dark:shadow-xl`.
+
 ### Shadow Hierarchy
 
-| Level | Shadow Value | Tailwind | Usage |
-|---|---|---|---|
-| **0 — Flat** | none | `shadow-none` | Inline elements, text |
-| **1 — Subtle** | `0 1px 2px rgba(0,0,0,0.05)` | `shadow-sm` | Cards at rest |
-| **2 — Default** | `0 4px 6px -1px rgba(0,0,0,0.1)` | `shadow` | Elevated cards |
-| **3 — Medium** | `0 8px 25px -5px rgba(101,45,144,0.15), 0 4px 10px -3px rgba(101,45,144,0.08)` | Custom | Card hover state (light) |
-| **4 — High** | `0 10px 15px -3px rgba(0,0,0,0.1)` | `shadow-lg` | Elevated buttons, FABs |
-| **5 — Brand Glow** | `0 0 20px 4px rgba(101,45,144,0.35), 0 4px 14px -2px rgba(101,45,144,0.25)` | Custom | Primary CTA glow effect |
-| **6 — Hero** | `0 20px 25px -5px rgba(0,0,0,0.1)` | `shadow-xl` | Login card, modal surfaces |
+| Level | Shadow Value | Tailwind | Light Mode | Dark Mode | Usage |
+|---|---|---|---|---|---|
+| **0 — Flat** | none | `shadow-none` | ✅ Default | — | Cards at rest, inline elements, text |
+| **1 — Subtle** | `0 1px 2px rgba(0,0,0,0.05)` | `shadow-sm` | ❌ Not used | ✅ `dark:shadow-sm` | Cards at rest (dark mode only) |
+| **2 — Default** | `0 4px 6px -1px rgba(0,0,0,0.1)` | `shadow` | ❌ Not used | ✅ `dark:shadow` | Elevated cards (dark mode only) |
+| **3 — Medium** | `0 8px 25px -5px rgba(101,45,144,0.15), 0 4px 10px -3px rgba(101,45,144,0.08)` | Custom | ❌ Not used | ✅ Dark mode hover | Card hover state (dark mode only) |
+| **4 — High** | `0 10px 15px -3px rgba(0,0,0,0.1)` | `shadow-lg` | ✅ BottomNav + QR scan only | ✅ FABs, elevated buttons | Bottom nav card, scan button |
+| **5 — Brand Glow** | `0 0 20px 4px rgba(101,45,144,0.35), 0 4px 14px -2px rgba(101,45,144,0.25)` | Custom | ❌ Not used | ✅ Dark mode only | Primary CTA glow (dark mode only) |
+| **6 — Hero** | `0 20px 25px -5px rgba(0,0,0,0.1)` | `shadow-xl` | ❌ Not used | ✅ `dark:shadow-xl` | Mobile container (dark mode only) |
 
-### Brand Shadow (Purple-tinted)
+### Elements with Shadows in BOTH Light and Dark Mode
 
-For elements that need to feel "part of the brand" rather than just elevated:
+| Element | Shadow | Rationale |
+|---|---|---|
+| **BottomNav card** | `shadow-sm` | Needs to feel elevated above page content at all times |
+| **QR scan center button** | `shadow-sm` + `shadow-lib-purple/40` | Floating action button must always appear raised |
 
-| State | Shadow |
-|---|---|
-| **Hover (Light)** | `0 8px 25px -5px rgba(101,45,144,0.15), 0 4px 10px -3px rgba(101,45,144,0.08)` |
-| **Hover (Dark)** | `0 8px 25px -5px rgba(101,45,144,0.25), 0 4px 10px -3px rgba(101,45,144,0.15)` |
-| **Lift** | `0 4px 12px -2px rgba(101,45,144,0.12)` |
-| **Focus Ring** | `0 0 0 2px rgba(101,45,144,0.2)` |
-| **Glow** | `0 0 20px 4px rgba(101,45,144,0.35)` |
+### Brand Shadow (Purple-tinted) — Dark Mode Only
+
+For elements that need to feel "part of the brand" rather than just elevated. These only apply in dark mode:
+
+| State | Shadow | Mode |
+|---|---|---|
+| **Hover** | `0 8px 25px -5px rgba(101,45,144,0.25), 0 4px 10px -3px rgba(101,45,144,0.15)` | Dark only |
+| **Lift** | `0 4px 12px -2px rgba(101,45,144,0.12)` | Dark only |
+| **Focus Ring** | `0 0 0 2px rgba(101,45,144,0.2)` | Dark only |
+| **Glow** | `0 0 20px 4px rgba(101,45,144,0.35)` | Dark only |
+
+### CSS Utility Classes
+
+The following global CSS classes apply box-shadow **only in `.dark` context**:
+
+| Class | Effect | Dark Mode Shadow |
+|---|---|---|
+| `.card-hover-effect:hover` | translateY(-2px) | `0 8px 25px -5px rgba(101,45,144,0.25), 0 4px 10px -3px rgba(101,45,144,0.15)` |
+| `.hover-lift:hover` | translateY(-1px) | `0 4px 12px -2px rgba(101,45,144,0.12)` |
+| `.glass-card` | Frosted glass effect | `rgba(35, 20, 60, 0.75)` background |
+| `.press-effect:active` | scale(0.97) | `0 1px 4px rgba(101,45,144,0.1)` |
 
 ### Elevation Rules
 
-1. **Resting state:** Cards use `shadow-sm` — barely visible, implies surface
-2. **Interaction:** Hover/tap adds brand-tinted shadow — purple glow reinforces brand
-3. **Primary CTA:** Uses glow effect when valid/active — draws the eye
-4. **Modal/Sheet:** Uses `shadow-xl` — clearly above all content
-5. **Never use pure black shadows** — always tint with brand purple or use gray
+1. **Light mode resting state:** Cards use NO shadow — flat design. Visual separation comes from background color contrast (`#f2f2fa` page vs `#FFFFFF` card).
+2. **Dark mode resting state:** Cards use `dark:shadow-sm` — subtle depth for surface differentiation.
+3. **Interaction (dark mode only):** Hover/tap adds brand-tinted shadow — purple glow reinforces brand.
+4. **BottomNav + QR scan:** These elements retain shadows in BOTH modes because they float above content and need persistent elevation cues.
+5. **Primary CTA glow:** Only appears in dark mode when valid/active — draws the eye without competing with flat light mode.
+6. **Mobile container:** Uses `dark:shadow-xl` for the 430px container — no shadow in light mode.
+7. **Never use pure black shadows** — always tint with brand purple or use gray.
+8. **Light mode rule of thumb:** If it's not BottomNav or QR scan, it doesn't get a shadow.
 
 ---
 
@@ -336,10 +369,12 @@ For elements that need to feel "part of the brand" rather than just elevated:
 
 | Container | Size | Icon | Background | Radius |
 |---|---|---|---|---|
-| **Small** | 36×36px (`w-9 h-9`) | 18px | `bg-lib-purple-50` | 12px (`rounded-xl`) |
-| **Medium** | 40×40px (`w-10 h-10`) | 20px | `bg-lib-purple-50` | 12px (`rounded-xl`) |
-| **Large** | 44×44px (`w-11 h-11`) | 22px | `bg-lib-purple-50` | 12px (`rounded-xl`) |
-| **XL** | 48×48px (`w-12 h-12`) | 24px | `bg-lib-purple-50` | 12px (`rounded-xl`) |
+| **Small** | 36×36px (`w-9 h-9`) | 18px | `bg-card dark:shadow-sm` | 12px (`rounded-xl`) |
+| **Medium** | 40×40px (`w-10 h-10`) | 20px | `bg-card dark:shadow-sm` | 12px (`rounded-xl`) |
+| **Large** | 44×44px (`w-11 h-11`) | 22px | `bg-card dark:shadow-sm` | 12px (`rounded-xl`) |
+| **XL** | 48×48px (`w-12 h-12`) | 24px | `bg-card dark:shadow-sm` | 12px (`rounded-xl`) |
+
+> **Note:** Icon containers (bell, settings, etc.) use `bg-card dark:shadow-sm` squircle containers. They have no shadow in light mode and a subtle shadow in dark mode.
 
 ### Icon Color Rules
 
@@ -370,7 +405,7 @@ For elements that need to feel "part of the brand" rather than just elevated:
 | Animation | Properties | Duration | Easing |
 |---|---|---|---|
 | **Screen Enter** | opacity: 0→1, y: +8→0 | 200ms | easeInOut |
-| **Card Hover** | translateY: 0→-2px, shadow | 200ms | easeOut |
+| **Card Hover** | translateY: 0→-2px, dark:shadow | 200ms | easeOut |
 | **Button Press** | scale: 1→0.97 | 100ms | easeOut |
 | **Modal Enter** | opacity: 0→1, scale: 0.95→1 | 300ms | easeOut |
 | **Sheet Enter** | translateY: 100%→0 | 300ms | easeOut |
@@ -407,15 +442,17 @@ For elements that need to feel "part of the brand" rather than just elevated:
 |---|---|
 | **Max Width** | 430px |
 | **Centering** | `mx-auto` |
-| **Shadow** | `shadow-xl` (on container) |
+| **Shadow** | `dark:shadow-xl` (dark mode only; no shadow in light mode) |
 | **Min Height** | `100vh` / `100dvh` |
+
+> **Note:** The mobile container uses `dark:shadow-xl` instead of `shadow-xl`. In light mode, the container has no shadow — visual separation comes from the lavender-tinted background. In dark mode, the shadow provides depth against the dark purple page.
 
 ### Grid System
 
 | Context | Columns | Gap | Notes |
 |---|---|---|---|
-| **Quick Actions** | 4 | 8px (`gap-2`) | Icon + label grid |
 | **Stats Row** | 3 | 12px (`gap-3`) | Number + label cards |
+| **2-column cards** | 2 | 12px (`gap-3`) | Square cards (e.g. Attendance Analytics + Reading Goal) |
 | **Book Carousel** | Auto | 12px (`gap-3`) | Horizontal scroll |
 | **Tag List** | Auto | 8px (`gap-2`) | Flex wrap |
 
@@ -458,38 +495,54 @@ For elements that need to feel "part of the brand" rather than just elevated:
 
 ### Dark Mode Philosophy
 
-Dark mode is not "invert colors" — it's a carefully crafted dark surface system that maintains the brand identity while reducing eye strain.
+Dark mode is not "invert colors" — it's a carefully crafted **dark purple** surface system that maintains the brand identity while reducing eye strain. The system uses a deep purple base instead of pure dark gray, creating a distinctive and cohesive dark experience.
 
 ### Surface Hierarchy (Dark Mode)
 
-| Level | Background | Usage |
-|---|---|---|
-| **L0 — Page** | `bg-gray-950` (`#030712`) | Deepest background |
-| **L1 — Card** | `bg-gray-900` (`#111827`) | Content surfaces |
-| **L2 — Elevated** | `bg-gray-800` (`#1F2937`) | Interactive elements, hover |
-| **L3 — Overlay** | `bg-gray-700/50` | Modals over content |
+| Level | Background | CSS Variable / Class | Usage |
+|---|---|---|---|
+| **L0 — Page** | `#110a1e` (deep purple-black) | `--background: oklch(0.13 0.04 300)` | Deepest background |
+| **L1 — Card** | Dark purple surface | `--card: oklch(0.18 0.05 300)` | Content surfaces |
+| **L2 — Elevated** | `dark:bg-white/10` | Transparency-based | Interactive elements, hover |
+| **L3 — Overlay** | `dark:bg-white/15` | Transparency-based | Modals over content |
+| **L4 — Subtle** | `dark:bg-white/5` | Transparency-based | Subtle backgrounds, icon containers |
+
+> **Key Change:** The dark mode surface system uses **transparency over dark purple** (`dark:bg-white/5`, `dark:bg-white/10`, `dark:bg-white/15`) instead of opaque gray surfaces (`dark:bg-gray-900`, `dark:bg-gray-800`). This allows the purple base to show through all surfaces, creating a cohesive dark purple aesthetic.
 
 ### Color Adaptation Rules
 
 | Light Mode | Dark Mode | Reason |
 |---|---|---|
-| `#FFFFFF` backgrounds | `bg-gray-900` | True white is too bright |
-| `#F9FAFB` page bg | `bg-gray-950` | Deeper than cards |
-| `bg-lib-purple-50` surfaces | `bg-gray-800` | Subtle purple → neutral dark |
-| `border-gray-200` borders | `border-gray-700` / `border-white/10%` | Visible but not harsh |
+| `#f2f2fa` page bg | `#110a1e` (deep purple-black) | Lavender-tinted → deep purple base |
+| `#FFFFFF` card bg | `bg-card` (`oklch(0.18 0.05 300)`) | White → dark purple surface |
+| `bg-lib-purple-50` surfaces | `dark:bg-white/5` | Subtle purple → transparent over dark purple |
+| `bg-gray-100` surfaces | `dark:bg-white/10` | Light gray → translucent overlay |
+| `border-gray-200` borders | `dark:border-white/5` or `dark:border-white/10` | Visible but not harsh |
 | `text-gray-500` muted | `text-gray-400` | Slightly brighter for readability |
-| `shadow-sm` | Reduced or removed | Shadows invisible on dark |
+| `shadow-sm` (light mode: none) | `dark:shadow-sm` | Shadows are dark-mode-only for depth |
 | Purple gradients | Darker stops (-20% lightness) | Prevents glowing effect |
+| `bg-white` icons/containers | `dark:bg-white/10` with `dark:shadow-sm` | Translucent with subtle depth |
 
 ### Dark Mode Specific Elements
 
 | Element | Treatment |
 |---|---|
 | **Brand gradient** | Use darker stops: `#522575 → #5A2880 → #7B3FA8` |
-| **Cards** | Add `border-gray-800` for definition |
-| **Inputs** | `bg-gray-800 border-gray-700` with white text |
-| **Shadows** | Reduce intensity by 50%, or replace with subtle borders |
+| **Cards** | `bg-card` with `dark:shadow-sm`; no border needed (shadow provides definition) |
+| **Bottom Navigation** | `dark:bg-[#1a0e2e]/90` with `dark:border-white/5` |
+| **Inputs** | `dark:bg-white/10 border-white/5` with white text |
+| **Shadows** | Applied in dark mode only via `dark:shadow-*` classes |
 | **Images** | Consider slight dimming (`opacity-90`) |
+| **Password modal** | `dark:bg-[#1a0e2e]` |
+| **Glass effects** | `dark:bg-[rgba(35,20,60,0.75)]` with dark purple tint |
+
+### oklch Hue Shift
+
+The dark mode CSS variables use oklch with hue **300** (purple) instead of **0** (achromatic). This gives all dark surfaces a subtle purple undertone:
+
+- `--background: oklch(0.13 0.04 300)` — deep purple-black
+- `--card: oklch(0.18 0.05 300)` — dark purple surface
+- `--primary: oklch(0.55 0.2 300)` — vivid purple accent
 
 ---
 
@@ -504,17 +557,19 @@ Dark mode is not "invert colors" — it's a carefully crafted dark surface syste
 | **Outline** | 44px (`h-11`) | `px-4` | 12px (`rounded-xl`) | 14px medium | `border-lib-purple text-lib-purple` |
 | **Ghost** | 44px (`h-11`) | `px-4` | 12px (`rounded-xl`) | 14px medium | transparent |
 | **Destructive** | 44px (`h-11`) | `px-4` | 12px (`rounded-xl`) | 14px medium | `bg-red-50 border-red-200 text-red-600` |
-| **Icon** | 44×44px | — | 12px (`rounded-xl`) | — | `bg-lib-purple-50` |
-| **FAB** | 56×56px | — | Full | — | `bg-lib-purple` + `shadow-lg` |
+| **Icon** | 44×44px | — | 12px (`rounded-xl`) | — | `bg-card dark:shadow-sm` |
+| **FAB** | 56×56px | — | Full | — | `bg-lib-purple` + `dark:shadow-lg` |
 
 ### Cards
 
 | Type | Padding | Radius | Shadow | Border |
 |---|---|---|---|---|
-| **Standard** | 16px (`p-4`) | 16px (`rounded-2xl`) | `shadow-sm` | `border-gray-100 dark:border-gray-800` |
-| **Spacious** | 24px (`p-6`) | 16px (`rounded-2xl`) | `shadow-sm` | `border-gray-100 dark:border-gray-800` |
-| **Interactive** | 16px | 16px | `shadow-sm` → brand shadow on hover | Same |
-| **Stat** | 16px | 16px | `shadow-sm` | Same |
+| **Standard** | 16px (`p-4`) | 24px (`rounded-3xl`) | `dark:shadow-sm` (flat in light) | `border-gray-100 dark:border-white/5` |
+| **Spacious** | 24px (`p-6`) | 24px (`rounded-3xl`) | `dark:shadow-sm` (flat in light) | `border-gray-100 dark:border-white/5` |
+| **Interactive** | 16px | 24px (`rounded-3xl`) | `dark:shadow-sm` → `dark:shadow-md` on hover | Same |
+| **Stat** | 16px | 24px (`rounded-3xl`) | `dark:shadow-sm` (flat in light) | Same |
+
+> **Note:** Cards are flat (no shadow) in light mode. The lavender-tinted page background (`#f2f2fa`) provides natural separation from white card surfaces. In dark mode, `dark:shadow-sm` provides depth on the dark purple surfaces.
 
 ### Input Fields
 
@@ -535,13 +590,34 @@ Dark mode is not "invert colors" — it's a carefully crafted dark surface syste
 |---|---|
 | **Height** | 80px total (`h-20`) |
 | **Padding** | `pt-2 pb-2 px-2` |
-| **Background** | `bg-white dark:bg-gray-900` |
-| **Border** | `border-t border-gray-100 dark:border-gray-800` |
-| **Active icon** | `text-lib-purple` |
-| **Inactive icon** | `text-gray-400` |
-| **Active label** | 9px medium `text-lib-purple` |
-| **Inactive label** | 9px medium `text-gray-400` |
-| **Center scan button** | 56px circle, `bg-purple-gradient`, `shadow-lg` |
+| **Background** | `bg-card shadow-sm` (retains shadow in both light and dark mode) |
+| **Border** | `border-t border-gray-100 dark:border-white/5` |
+| **Active icon** | `text-white` (on `bg-lib-purple` pill) |
+| **Inactive icon** | `text-muted-foreground` |
+| **Active label** | 8px semibold `text-white` (on purple pill) |
+| **Inactive label** | 8px medium `text-muted-foreground` |
+| **Center scan button** | 52px `rounded-2xl`, `bg-purple-gradient`, `shadow-sm shadow-lib-purple/40` (retains shadow in both modes) |
+| **Dark mode** | `dark:bg-[#1a0e2e]/90` with `dark:border-white/5` |
+
+> **Note:** The BottomNav is one of only two components that retain shadows in light mode (the other being the QR scan center button). This ensures it always feels elevated above content.
+
+### Home Screen — Streak Card
+
+| Property | Value |
+|---|---|
+| **Background** | `bg-orange-400 dark:bg-orange-500` |
+| **Radius** | Full (`rounded-full`) — pill shape |
+| **Padding** | `px-3.5 py-2` |
+| **Icon** | Flame (white) |
+| **Text** | White, bold streak count |
+
+### Home Screen — Greeting
+
+| Property | Value |
+|---|---|
+| **Style** | Split weight: "Good afternoon," is regular weight, "Juan!" is bold |
+| **Size** | `text-2xl` |
+| **Tracking** | `tracking-tight` |
 
 ---
 
@@ -579,10 +655,14 @@ Dark mode is not "invert colors" — it's a carefully crafted dark surface syste
 | Property | Value |
 |---|---|
 | **Aspect Ratio** | 2:3 (standard book) |
-| **Radius** | 12px (`rounded-xl`) |
-| **Shadow** | `shadow-sm` |
+| **Radius** | 16px (`rounded-2xl`) |
+| **Shadow** | `dark:shadow-sm` (flat in light mode) |
+| **Hover Shadow** | `group-hover:dark:shadow-md` (dark mode only) |
 | **Placeholder** | Gradient background + book icon |
 | **Loading** | Skeleton shimmer |
+| **AI-generated covers** | 10 covers in `/public/covers/` |
+
+> **Note:** Book covers use `rounded-2xl` (16px) for their corner radius, and `dark:shadow-sm` for their shadow treatment. In light mode, covers are completely flat (no shadow). On hover in dark mode, they get `group-hover:dark:shadow-md`.
 
 ### Avatars
 
@@ -668,7 +748,7 @@ The following custom values are defined in `globals.css` under `@theme inline`:
 
 ### CSS Custom Properties (shadcn/ui)
 
-All shadcn semantic tokens are defined with oklch values and automatically adapt to dark mode via `.dark` class.
+All shadcn semantic tokens are defined with oklch values and automatically adapt to dark mode via `.dark` class. In dark mode, the hue is shifted to 300 (purple) for a cohesive dark purple aesthetic.
 
 ### Quick Reference: Class Mapping
 
@@ -678,11 +758,16 @@ All shadcn semantic tokens are defined with oklch values and automatically adapt
 | Primary text | `text-lib-purple` |
 | Light surface | `bg-lib-purple-50` |
 | Gradient button | `bg-purple-gradient` |
-| Card | `rounded-2xl shadow-sm p-4` |
+| Card | `rounded-3xl dark:shadow-sm p-4` |
 | Primary button | `h-12 rounded-xl bg-purple-gradient text-white font-semibold` |
 | Input | `h-11 rounded-xl border-gray-200 px-3` |
 | Section gap | `space-y-5` |
 | Page padding | `px-4 py-4` |
+| Card inner element | `rounded-2xl` |
+| Icon container | `rounded-xl bg-card dark:shadow-sm` |
+| Dark surface | `dark:bg-white/5` / `dark:bg-white/10` / `dark:bg-white/15` |
+| Dark border | `dark:border-white/5` / `dark:border-white/10` |
+| Container shadow | `dark:shadow-xl` (no shadow in light) |
 
 ---
 
@@ -690,6 +775,7 @@ All shadcn semantic tokens are defined with oklch values and automatically adapt
 
 | Date | Version | Changes |
 |---|---|---|
+| 2026-03-04 | 1.1 | **Major update:** Light mode page background changed to `#f2f2fa` (lavender-tinted gray). Shadow system overhauled — light mode is now completely flat (no shadows on cards, buttons, images, modals), shadows only appear in dark mode via `dark:shadow-*`. BottomNav and QR scan button are exceptions that retain shadows in both modes. Card corner radius updated from `rounded-2xl` (16px) to `rounded-3xl` (24px); inner card elements use `rounded-2xl` (16px). Dark mode redesigned with dark purple base (`#110a1e`) instead of pure dark gray, using transparency system (`dark:bg-white/5`, `dark:bg-white/10`, `dark:bg-white/15`) and oklch hue 300. Book covers updated to `rounded-2xl` with `dark:shadow-sm`. Home screen: streak card is orange pill (`bg-orange-400 dark:bg-orange-500`), greeting uses split weight (regular + bold), bell/settings icons in `bg-card dark:shadow-sm` squircle containers, Quick Actions section removed, 2-column square cards added. CSS utility classes (`.card-hover-effect`, `.hover-lift`, `.glass-card`, `.press-effect`) updated to apply box-shadow only in `.dark` context. Container shadow changed from `shadow-xl` to `dark:shadow-xl`. |
 | 2025-01-27 | 1.0 | Initial branding guide created — typography, colors, spacing, corners, shadows, gradients, icons, motion, layout, accessibility, dark mode, components, status colors, imagery, writing tone |
 
 ---

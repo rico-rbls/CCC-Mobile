@@ -1000,3 +1000,61 @@ Stage Summary:
 - BottomNav and QR scan center button shadows preserved in both light and dark mode
 - globals.css box-shadow styles moved to .dark context only (card-hover-effect, hover-lift, glass-card, press-effect)
 - HomeScreen greeting now shows "Good afternoon," in normal weight and "Juan!" in bold
+
+---
+Task ID: 13-doc-features
+Agent: Documentation Agent
+Task: Update FEATURES.md with current system state
+
+Work Log:
+- Updated FEATURES.md to reflect all recent changes
+
+Stage Summary:
+- FEATURES.md updated with current system state
+
+---
+Task ID: 13-doc-branding
+Agent: Documentation Agent
+Task: Update BRANDING.md with current system state
+
+Work Log:
+- Read existing BRANDING.md (v1.0) and project worklog for context
+- Verified current codebase state: globals.css variables, HomeScreen classes, BottomNav, page.tsx container
+- Rewrote BRANDING.md to v1.1 with the following updates:
+  1. Section 2 (Color System): Updated --background from #FFFFFF to #f2f2fa, added lavender-tinted note, updated Gray-50 to #f2f2fa, updated contrast requirements
+  2. Section 3 (Corner Rounding): Updated card radius from rounded-2xl (16px) to rounded-3xl (24px), added inner card elements mapping, updated book covers to rounded-2xl
+  3. Section 5 (Elevation & Shadows): Major rewrite - new "Flat Light, Depth Dark" philosophy, light mode is completely flat (no shadows), dark mode uses shadows for depth, only BottomNav and QR scan button retain shadows in both modes, updated shadow hierarchy table with light/dark mode columns, updated brand shadow to dark-mode-only, added CSS utility classes table, rewrote elevation rules
+  4. Section 9 (Layout & Grid): Updated container shadow from shadow-xl to dark:shadow-xl, removed Quick Actions grid, added 2-column cards
+  5. Section 11 (Dark Mode Guidelines): Updated Surface Hierarchy to dark purple (#110a1e), added transparency system (dark:bg-white/5, /10, /15), updated Color Adaptation Rules, updated Dark Mode Specific Elements with purple theme details, added oklch hue shift section
+  6. Section 12 (Component Specifications): Updated cards table with rounded-3xl and dark:shadow-sm, updated BottomNav with dark purple details and shadow retention note, updated FAB shadow, added Home Screen Streak Card and Greeting specs, updated Quick Reference class mapping
+  7. Section 14 (Imagery): Updated book cover radius to rounded-2xl, shadow to dark:shadow-sm, added hover shadow and AI covers note
+  8. Changelog: Added v1.1 entry with comprehensive change description
+
+Stage Summary:
+- BRANDING.md updated with current system state
+---
+Task ID: 13
+Agent: Main Agent
+Task: Update all MD files based on current system state
+
+Work Log:
+- Reviewed all project MD files (FEATURES.md, BRANDING.md, worklog.md)
+- Audited current codebase state: globals.css, store.ts, covers.ts, schema.prisma, page.tsx, BottomNav, HomeScreen
+- Delegated FEATURES.md update to sub-agent (Task 13-doc-features)
+- Delegated BRANDING.md update to sub-agent (Task 13-doc-branding)
+- Verified all key changes are reflected in both documents:
+  - Background color: #f9f9f9 → #f2f2fa (lavender-tinted gray)
+  - Shadow system: all shadows removed in light mode (dark:shadow-* only), except BottomNav + QR button
+  - Greeting: non-bold greeting text + bold user name
+  - Card radius: rounded-3xl (24px) standard
+  - Dark mode: dark purple theme (#110a1e), transparency system (dark:bg-white/5-15)
+  - Home screen redesign: no Quick Actions, card-based layout, 2-column square cards, orange streak pill
+  - Store persistence: only user, onboardingStep, onboardingData, favorites
+  - 10 AI-generated book covers, 12 coverMap entries
+  - Mobile container: dark:shadow-xl, h-dvh layout with sticky bottom nav
+
+Stage Summary:
+- FEATURES.md updated from 823 → 898 lines with comprehensive changelog entry
+- BRANDING.md updated from 698 → 783 lines as v1.1 with full design system updates
+- Both documents now accurately reflect the current system state
+- All major design decisions documented: flat light mode, dark purple dark mode, lavender background
