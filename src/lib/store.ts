@@ -189,13 +189,20 @@ export const useAppStore = create<AppState>()(
     {
       name: 'liblog-store',
       partialize: (state) => ({
-        currentScreen: state.currentScreen,
-        isAuthenticated: state.isAuthenticated,
+        // Do NOT persist currentScreen or isAuthenticated —
+        // always start at login on app open
         user: state.user,
         onboardingStep: state.onboardingStep,
         onboardingData: state.onboardingData,
         favorites: state.favorites,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Always reset to login on app open
+        if (state) {
+          state.isAuthenticated = false
+          state.currentScreen = 'login'
+        }
+      },
     }
   )
 )
