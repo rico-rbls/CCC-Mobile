@@ -840,3 +840,24 @@ Stage Summary:
 - Reading Goal and Reading Stats restored to Profile screen
 - Book detail supports full-screen image viewing on cover tap
 - Bottom nav: single card containing all 4 icons with Scan as separate FAB
+
+---
+Task ID: 12
+Agent: Main Agent
+Task: Home Screen UI refinements + Bottom Nav redesign
+
+Work Log:
+- HomeScreen - Attendance card: Removed BarChart3 icon, kept "X visits" and "X hours" displayed inline with larger text
+- HomeScreen - Reading Goal card: Removed Target icon, kept just the text label "Reading Goal"
+- HomeScreen - Announcement card: Removed Megaphone icon inside the card content
+- HomeScreen - Today's Highlight Feature Pick card: Replaced purple-gradient bg with announcement card style (bg-lib-purple-50 dark:bg-white/5 border border-lib-purple-200 dark:border-white/10), updated all text colors from white to purple theme, removed decorative circles
+- HomeScreen - Trending section: Added "See All" button with ChevronRight icon next to header (same style as Recommended section)
+- HomeScreen - Current Borrow empty state: Changed from centered flex column to horizontal rectangle layout with text on left and "Browse" button on right side, matching announcement/highlight card style
+- BottomNav - Complete redesign: Removed the single rectangle container (bg-white/[0.06]) that wrapped all 4 icons; each icon now has its own individual floating rounded card (w-11 h-11 rounded-2xl bg-white/[0.07]); Scan button same size as other icons (no longer elevated FAB); no movement on click, just color change
+- Cleaned up unused imports: BarChart3, Target, Megaphone removed from HomeScreen
+
+Files Modified:
+- `/home/z/my-project/src/components/screens/HomeScreen.tsx` - Attendance icon removed, Reading Goal icon removed, Announcement icon removed, Feature Pick card bg changed, Trending See All added, Current Borrow empty state redesigned
+- `/home/z/my-project/src/components/layout/BottomNav.tsx` - Complete redesign with individual floating cards per icon, Scan same size, no rectangle container
+
+All lint checks pass with zero errors.

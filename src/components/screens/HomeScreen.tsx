@@ -4,8 +4,8 @@ import { useAppStore, type BorrowedBook, type ResourceItem } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Bell, Settings, BookOpen,
-  ChevronRight, Loader2, Megaphone, X,
-  Star, Flame, Target, BarChart3,
+  ChevronRight, Loader2, X,
+  Star, Flame,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -462,16 +462,11 @@ export default function HomeScreen() {
                 >
                   <X className="w-3 h-3 text-lib-purple dark:text-lib-purple-300" />
                 </button>
-                <div className="flex items-start gap-3 pr-6">
-                  <div className="w-8 h-8 rounded-xl bg-lib-purple flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Megaphone className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="min-w-0">
-                    <h4 className="font-semibold text-lib-purple dark:text-lib-purple-300 text-sm leading-tight">{currentAnnouncement.title}</h4>
-                    {expandedAnnouncement === currentAnnouncement.id && (
-                      <p className="text-xs text-lib-purple-700 dark:text-lib-purple-400/70 mt-1 leading-relaxed">{currentAnnouncement.message}</p>
-                    )}
-                  </div>
+                <div className="min-w-0 pr-6">
+                  <h4 className="font-semibold text-lib-purple dark:text-lib-purple-300 text-sm leading-tight">{currentAnnouncement.title}</h4>
+                  {expandedAnnouncement === currentAnnouncement.id && (
+                    <p className="text-xs text-lib-purple-700 dark:text-lib-purple-400/70 mt-1 leading-relaxed">{currentAnnouncement.message}</p>
+                  )}
                 </div>
                 <button
                   onClick={() => setExpandedAnnouncement(prev => prev === currentAnnouncement.id ? null : currentAnnouncement.id)}
@@ -509,24 +504,21 @@ export default function HomeScreen() {
         >
           {/* Left: Attendance Analytics */}
           <div className="bg-card rounded-3xl shadow-sm p-4 aspect-square flex flex-col">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
-                <BarChart3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span className="text-xs font-bold text-foreground leading-tight mb-3">Attendance</span>
+            <div className="flex-1 flex flex-col justify-center items-center gap-2">
+              <div className="text-center">
+                <span className="text-3xl font-bold text-foreground">{attendanceCount}</span>
+                <span className="text-xs text-muted-foreground font-medium ml-1">visits</span>
               </div>
-              <span className="text-xs font-bold text-foreground leading-tight">Attendance</span>
-            </div>
-            <div className="flex-1 flex flex-col justify-center items-center gap-1">
-              <span className="text-3xl font-bold text-foreground">{attendanceCount}</span>
-              <span className="text-[10px] text-muted-foreground font-medium">visits</span>
-              <div className="w-full flex items-center justify-center gap-3 mt-2">
+              <div className="w-full flex items-center justify-center gap-3">
                 <div className="text-center">
                   <span className="text-sm font-bold text-foreground">{totalHours}</span>
-                  <span className="text-[9px] text-muted-foreground block">hours</span>
+                  <span className="text-[9px] text-muted-foreground ml-0.5">hours</span>
                 </div>
                 <div className="w-px h-6 bg-gray-200 dark:bg-white/10" />
                 <div className="text-center">
                   <span className="text-sm font-bold text-orange-500">x{user?.streakCount ?? 0}</span>
-                  <span className="text-[9px] text-muted-foreground block">streak</span>
+                  <span className="text-[9px] text-muted-foreground ml-0.5">streak</span>
                 </div>
               </div>
             </div>
@@ -534,12 +526,7 @@ export default function HomeScreen() {
 
           {/* Right: Reading Goal */}
           <div className="bg-card rounded-3xl shadow-sm p-4 aspect-square flex flex-col">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                <Target className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
-              </div>
-              <span className="text-xs font-bold text-foreground leading-tight">Reading Goal</span>
-            </div>
+            <span className="text-xs font-bold text-foreground leading-tight mb-3">Reading Goal</span>
             <div className="flex-1 flex flex-col items-center justify-center gap-2">
               <div className="relative w-16 h-16">
                 <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
@@ -609,33 +596,30 @@ export default function HomeScreen() {
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={() => { setSelectedBookId(highlightBook.id); setCurrentScreen('book-detail') }}
-              className="w-full bg-purple-gradient rounded-2xl p-4 text-left relative overflow-hidden cover-pattern-overlay shadow-sm"
+              className="w-full bg-lib-purple-50 dark:bg-white/5 border border-lib-purple-200 dark:border-white/10 rounded-2xl p-4 text-left"
             >
-              <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/5" />
-              <div className="absolute bottom-2 left-10 w-16 h-16 rounded-full bg-white/5" />
-
-              <div className="flex items-center gap-3 relative z-10">
-                <div className="w-16 h-20 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center flex-shrink-0 ring-1 ring-white/20">
-                  <BookOpen className="w-7 h-7 text-white/70" />
+              <div className="flex items-center gap-3">
+                <div className="w-16 h-20 rounded-2xl bg-lib-purple-100 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-7 h-7 text-lib-purple/50 dark:text-lib-purple-300/50" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1">
-                    <Star className="w-3 h-3 text-amber-300 fill-amber-300" />
-                    <span className="text-[10px] font-medium text-white/70">Featured Pick</span>
+                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                    <span className="text-[10px] font-medium text-lib-purple dark:text-lib-purple-300">Featured Pick</span>
                   </div>
-                  <h4 className="text-sm font-bold text-white leading-tight line-clamp-2">{highlightBook.title}</h4>
-                  <p className="text-xs text-white/60 mt-0.5">{highlightBook.author}</p>
+                  <h4 className="text-sm font-bold text-lib-purple dark:text-lib-purple-200 leading-tight line-clamp-2">{highlightBook.title}</h4>
+                  <p className="text-xs text-lib-purple/60 dark:text-lib-purple-400/70 mt-0.5">{highlightBook.author}</p>
                   <div className="flex items-center gap-2 mt-2">
                     {highlightBook.availableCopies > 0 ? (
-                      <span className="px-2 py-0.5 rounded-full bg-white/15 text-white text-[10px] font-medium">
+                      <span className="px-2 py-0.5 rounded-full bg-lib-purple-100 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 text-[10px] font-medium">
                         {highlightBook.availableCopies} available
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-red-400/20 text-white text-[10px] font-medium">
+                      <span className="px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[10px] font-medium">
                         Currently unavailable
                       </span>
                     )}
-                    <span className="text-white/50 text-[10px]">→</span>
+                    <ChevronRight className="w-3 h-3 text-lib-purple/40 dark:text-lib-purple-300/40" />
                   </div>
                 </div>
               </div>
@@ -715,22 +699,21 @@ export default function HomeScreen() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-3 py-6 flex flex-col items-center text-center"
+              className="mt-3 rounded-2xl bg-lib-purple-50 dark:bg-white/5 border border-lib-purple-200 dark:border-white/10 p-4 flex items-center gap-3"
             >
-              <div className="w-16 h-16 rounded-3xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mb-3">
-                <BookOpen className="w-8 h-8 text-lib-purple/40" />
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-foreground text-sm">No Active Borrows</h4>
+                <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                  Your reading list is empty. Explore the catalog!
+                </p>
               </div>
-              <h4 className="font-semibold text-foreground text-sm">No Active Borrows</h4>
-              <p className="text-xs text-muted-foreground mt-1 mb-4 leading-relaxed max-w-[220px]">
-                Your reading list is empty. Explore the catalog to find your next great read!
-              </p>
               <Button
                 size="sm"
-                className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-9 px-5 rounded-2xl shadow-sm shadow-lib-purple/20"
+                className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-9 px-4 rounded-2xl shadow-sm shadow-lib-purple/20 flex-shrink-0"
                 onClick={() => setCurrentScreen('search')}
               >
                 <BookOpen className="w-3.5 h-3.5 mr-1.5" />
-                Browse Catalog
+                Browse
               </Button>
             </motion.div>
           )}
@@ -823,8 +806,14 @@ export default function HomeScreen() {
             animate="visible"
             className="bg-card rounded-3xl shadow-sm p-4"
           >
-            <div className="mb-3">
+            <div className="flex items-center justify-between mb-3">
               <SectionHeader>Trending in Your Department</SectionHeader>
+              <button
+                onClick={() => setCurrentScreen('search')}
+                className="text-xs text-lib-purple dark:text-lib-purple-300 font-medium flex items-center gap-0.5"
+              >
+                See All <ChevronRight className="w-3 h-3" />
+              </button>
             </div>
             <div className="space-y-0">
               {trending.map((item, index) => (

@@ -36,11 +36,13 @@ export default function BottomNav() {
     setCurrentScreen(screenId)
   }, [setCurrentScreen])
 
+  const isScanActive = currentScreen === 'qr-scan'
+
   return (
     <nav className="safe-bottom">
-      <div className="flex items-end justify-between px-4 pt-2 pb-3 bg-[#0f0a1e]">
-        {/* Single card containing all 4 nav icons */}
-        <div className="flex-1 flex items-center justify-around py-2.5 px-2 rounded-2xl bg-white/[0.06]">
+      <div className="flex items-center justify-between px-4 pt-2 pb-3 bg-[#0f0a1e]">
+        {/* 4 nav icons — each in its own floating rounded card */}
+        <div className="flex-1 flex items-center justify-around gap-2">
           {navItems.map((item) => {
             const isActive = currentScreen === item.id
             const Icon = item.icon
@@ -52,13 +54,13 @@ export default function BottomNav() {
                 className="flex flex-col items-center gap-1"
                 aria-label={item.label}
               >
-                <div className="relative w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200">
+                <div className="relative w-11 h-11 rounded-2xl bg-white/[0.07] flex items-center justify-center transition-colors duration-200">
                   <Icon className={`w-5 h-5 transition-colors duration-200 ${
                     isActive ? 'text-white' : 'text-white/35'
                   }`} />
                   {/* Badge for active borrows */}
                   {item.id === 'borrowed' && activeBorrows > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 rounded-full bg-red-500 text-[7px] text-white font-bold flex items-center justify-center px-0.5">
+                    <span className="absolute -top-1 -right-1 min-w-[14px] h-3.5 rounded-full bg-red-500 text-[7px] text-white font-bold flex items-center justify-center px-0.5">
                       {activeBorrows}
                     </span>
                   )}
@@ -73,17 +75,19 @@ export default function BottomNav() {
           })}
         </div>
 
-        {/* Scan FAB — floating action button on the right */}
+        {/* Scan — same size floating card on the right */}
         <button
           onClick={() => handleNavClick('qr-scan')}
-          className="flex flex-col items-center gap-1 ml-3"
+          className="flex flex-col items-center gap-1 ml-2"
           aria-label="Scan"
         >
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-lib-purple/40 -mt-6 relative transition-colors duration-200 bg-lib-purple`}>
-            <ScanLine className="w-6 h-6 text-white" />
+          <div className="w-11 h-11 rounded-2xl bg-white/[0.07] flex items-center justify-center transition-colors duration-200 relative">
+            <ScanLine className={`w-5 h-5 transition-colors duration-200 ${
+              isScanActive ? 'text-white' : 'text-white/35'
+            }`} />
           </div>
-          <span className={`text-[9px] transition-colors duration-200 leading-tight -mt-0.5 ${
-            currentScreen === 'qr-scan' ? 'text-white font-semibold' : 'text-white/30'
+          <span className={`text-[9px] transition-colors duration-200 leading-tight ${
+            isScanActive ? 'text-white font-semibold' : 'text-white/30'
           }`}>
             Scan
           </span>
