@@ -39,10 +39,10 @@ export default function BottomNav() {
   const isScanActive = currentScreen === 'qr-scan'
 
   return (
-    <nav className="safe-bottom">
-      <div className="flex items-end justify-between px-4 pt-2 pb-3 bg-[#0f0a1e]">
-        {/* Rounded rectangle containing 4 nav icons */}
-        <div className="flex-1 flex items-center justify-around py-2.5 px-3 rounded-2xl bg-white/[0.06]">
+    <nav className="pb-3">
+      <div className="flex items-end justify-between px-4 pt-2">
+        {/* Rounded rectangle card — the visible nav element */}
+        <div className="flex-1 flex items-center justify-around py-3 px-3 rounded-2xl bg-white/[0.06]">
           {navItems.map((item) => {
             const isActive = currentScreen === item.id
             const Icon = item.icon
@@ -78,15 +78,15 @@ export default function BottomNav() {
         {/* Scan — separate big purple rounded card, icon only, no text */}
         <button
           onClick={() => handleNavClick('qr-scan')}
-          className="ml-3 -mt-4"
+          className="ml-3 -mt-5"
           aria-label="Scan"
         >
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-200 ${
+          <div className={`w-[68px] h-[68px] rounded-[20px] flex items-center justify-center shadow-lg transition-all duration-200 ${
             isScanActive
               ? 'bg-lib-purple-light shadow-lib-purple/50'
               : 'bg-lib-purple shadow-lib-purple/40'
           }`}>
-            <ScanLine className="w-6 h-6 text-white" />
+            <ScanLine className="w-7 h-7 text-white" />
           </div>
         </button>
       </div>
