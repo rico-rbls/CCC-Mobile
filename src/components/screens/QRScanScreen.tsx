@@ -1,12 +1,17 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { ScanLine, Zap, X, CheckCircle2, Clock, BookOpen, UserCheck } from 'lucide-react'
-import { useAppStore } from '@/lib/store'
+import {
+  ScanLine, Zap, X, CheckCircle2, Clock, BookOpen,
+  UserCheck, LogOut, ChevronRight, Loader2, BookMarked,
+} from 'lucide-react'
+import { useAppStore, type ResourceItem } from '@/lib/store'
 import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { getResourceCover } from '@/lib/covers'
 
-type ScanMode = 'attendance' | 'checkout'
+type ScanMode = 'attendance' | 'checkout' | 'exit'
 
 interface ScanResult {
   success: boolean
@@ -14,12 +19,24 @@ interface ScanResult {
   timestamp: string
 }
 
+interface ExitSummary {
+  timedOut: boolean
+  duration?: number
+  returnedBooks: { id: string; title: string; author: string }[]
+  totalReturned: number
+}
+
 export default function QRScanScreen() {
-  const { setCurrentScreen } = useAppStore()
+  const { user, setCurrentScreen, setSelectedBookId } = useAppStore()
   const [mode, setMode] = useState<ScanMode>('attendance')
   const [torchOn, setTorchOn] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [result, setResult] = useState<ScanResult | null>(null)
+  const [scannedBook, setScannedBook] = useState<ResourceItem | null>(null)
+  const [startingReading, setStartingReading] = useState(false)
+  const [readingStarted, setReadingStarted] = useState(false)
+  const [exitSummary, setExitSummary] = useState<ExitSummary | null>(null)
+  const [processingExit, setProcessingExit] = useState(false)
 
   const handleClose = useCallback(() => {
     setCurrentScreen('home')
@@ -39,19 +56,120 @@ export default function QRScanScreen() {
           mode,
           timestamp: new Date().toLocaleString(),
         })
+
+        // Mode-specific post-scan actions
+        if (mode === 'checkout') {
+          fetchRandomBook()
+        } else if (mode === 'exit') {
+          processLibraryExit()
+        }
       }, 3000)
     }, 2000)
 
     return () => clearTimeout(timer)
-  }, [scanning, result, mode])
+  }, [scanning, result, mode, fetchRandomBook, processLibraryExit])
+
+  const fetchRandomBook = useCallback(async () => {
+    try {
+      const res = await fetch('/api/resources?limit=7')
+      const data = await res.json()
+      if (res.ok && data.resources?.length > 0) {
+        const randomIdx = Math.floor(Math.random() * data.resources.length)
+        const r = data.resources[randomIdx]
+        setScannedBook({
+          id: r.id,
+          title: r.title,
+          author: r.author,
+          category: r.category,
+          coverImage: r.coverImage,
+          availableCopies: r.availableCopies,
+          totalCopies: r.copies,
+          shelfLocation: r.shelfLocation,
+          status: r.status,
+          subject: r.subject,
+          tags: (r.tags || '').split(',').filter(Boolean),
+        })
+      }
+    } catch (e) {
+      console.error('Failed to fetch book:', e)
+    }
+  }, [])
+
+  const processLibraryExit = useCallback(async () => {
+    if (!user?.id) return
+    setProcessingExit(true)
+    try {
+      const res = await fetch('/api/library/exit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setExitSummary(data)
+      }
+    } catch (e) {
+      console.error('Failed to process exit:', e)
+    } finally {
+      setProcessingExit(false)
+    }
+  }, [user?.id])
+
+  const handleStartReading = async () => {
+    if (!user?.id || !scannedBook) return
+    setStartingReading(true)
+    try {
+      const res = await fetch('/api/borrow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, resourceId: scannedBook.id }),
+      })
+      if (res.ok) {
+        setReadingStarted(true)
+      }
+    } catch (e) {
+      console.error('Failed to start reading:', e)
+    } finally {
+      setStartingReading(false)
+    }
+  }
+
+  const handleViewBook = () => {
+    if (scannedBook) {
+      setSelectedBookId(scannedBook.id)
+      setCurrentScreen('book-detail')
+    }
+  }
 
   const handleRetry = () => {
     setResult(null)
     setScanning(false)
+    setScannedBook(null)
+    setReadingStarted(false)
+    setExitSummary(null)
+    setProcessingExit(false)
   }
 
   const handleDone = () => {
     setCurrentScreen('home')
+  }
+
+  const modeConfig: Record<ScanMode, { icon: React.ReactNode; label: string; activeIcon: React.ReactNode }> = {
+    attendance: {
+      icon: <UserCheck className="w-4 h-4" />,
+      label: 'Check-in',
+      activeIcon: <UserCheck className="w-3.5 h-3.5 text-white" />,
+    },
+    checkout: {
+      icon: <BookOpen className="w-4 h-4" />,
+      label: 'Book Scan',
+      activeIcon: <BookOpen className="w-3.5 h-3.5 text-white" />,
+    },
+    exit: {
+      icon: <LogOut className="w-4 h-4" />,
+      label: 'Exit',
+      activeIcon: <LogOut className="w-3.5 h-3.5 text-white" />,
+    },
   }
 
   return (
@@ -67,13 +185,9 @@ export default function QRScanScreen() {
       {/* Mode indicator */}
       <div className="absolute top-4 left-4 z-10">
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-lib-purple/80 backdrop-blur-sm">
-          {mode === 'attendance' ? (
-            <UserCheck className="w-3.5 h-3.5 text-white" />
-          ) : (
-            <BookOpen className="w-3.5 h-3.5 text-white" />
-          )}
+          {modeConfig[mode].activeIcon}
           <span className="text-xs font-medium text-white">
-            {mode === 'attendance' ? 'Attendance' : 'Checkout'}
+            {mode === 'attendance' ? 'Attendance' : mode === 'checkout' ? 'Book Scan' : 'Library Exit'}
           </span>
         </div>
       </div>
@@ -82,7 +196,11 @@ export default function QRScanScreen() {
       <div className="text-center pt-16 pb-6 px-6">
         <h2 className="text-2xl font-bold text-white mb-2">Scan QR Code</h2>
         <p className="text-sm text-white/50 leading-relaxed">
-          Point your camera at the QR code for attendance or book checkout
+          {mode === 'attendance'
+            ? 'Point your camera at the entrance QR for attendance check-in'
+            : mode === 'checkout'
+            ? 'Scan the QR code on a book to start reading'
+            : 'Scan the exit QR to check out of the library'}
         </p>
       </div>
 
@@ -152,29 +270,21 @@ export default function QRScanScreen() {
 
       {/* Mode buttons */}
       <div className="w-full px-6 pb-2">
-        <div className="flex gap-3">
-          <button
-            onClick={() => { setMode('attendance'); setResult(null); setScanning(false) }}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
-              mode === 'attendance'
-                ? 'bg-lib-purple text-white dark:shadow-lg dark:shadow-lib-purple/30'
-                : 'bg-white/10 text-white/60 hover:bg-white/15'
-            }`}
-          >
-            <UserCheck className="w-4 h-4" />
-            Attendance Check-in
-          </button>
-          <button
-            onClick={() => { setMode('checkout'); setResult(null); setScanning(false) }}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
-              mode === 'checkout'
-                ? 'bg-lib-purple text-white dark:shadow-lg dark:shadow-lib-purple/30'
-                : 'bg-white/10 text-white/60 hover:bg-white/15'
-            }`}
-          >
-            <BookOpen className="w-4 h-4" />
-            Book Checkout
-          </button>
+        <div className="flex gap-2">
+          {(Object.keys(modeConfig) as ScanMode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => { setMode(m); handleRetry() }}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl font-medium text-xs transition-all duration-200 ${
+                mode === m
+                  ? 'bg-lib-purple text-white dark:shadow-lg dark:shadow-lib-purple/30'
+                  : 'bg-white/10 text-white/60 hover:bg-white/15'
+              }`}
+            >
+              {modeConfig[m].icon}
+              {modeConfig[m].label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -193,91 +303,303 @@ export default function QRScanScreen() {
         </button>
       </div>
 
-      {/* Success Modal Overlay */}
+      {/* ─── Result Modal ─────────────────────────────────────────── */}
       <AnimatePresence>
         {result && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm z-20 flex items-center justify-center px-6"
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm z-20 flex items-center justify-center px-4"
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-              className="bg-white dark:bg-[#1a0e2e] rounded-3xl p-8 w-full max-w-sm text-center dark:shadow-2xl"
+              className="bg-white dark:bg-[#1a0e2e] rounded-3xl w-full max-w-sm dark:shadow-2xl overflow-hidden"
             >
-              {/* Success icon */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.2 }}
-                className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-5"
-              >
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.4 }}
-                >
-                  <CheckCircle2 className="w-10 h-10 text-green-600 dark:text-green-400" />
-                </motion.div>
-              </motion.div>
+              {/* ── Attendance Mode Result ── */}
+              {mode === 'attendance' && (
+                <div className="p-8 text-center">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.2 }}
+                    className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-5"
+                  >
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.4 }}
+                    >
+                      <CheckCircle2 className="w-10 h-10 text-green-600 dark:text-green-400" />
+                    </motion.div>
+                  </motion.div>
+                  <motion.h3
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-xl font-bold text-foreground mb-2"
+                  >
+                    Attendance Logged!
+                  </motion.h3>
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="text-sm text-muted-foreground mb-4"
+                  >
+                    Your library visit has been recorded successfully.
+                  </motion.p>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground mb-6"
+                  >
+                    <Clock className="w-3.5 h-3.5" />
+                    {result.timestamp}
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                    className="flex gap-3"
+                  >
+                    <Button onClick={handleRetry} variant="outline" className="flex-1 rounded-xl py-5 border-gray-200 dark:border-gray-700">
+                      Scan Again
+                    </Button>
+                    <Button onClick={handleDone} className="flex-1 rounded-xl py-5 bg-lib-purple hover:bg-lib-purple/90 text-white">
+                      Done
+                    </Button>
+                  </motion.div>
+                </div>
+              )}
 
-              {/* Success message */}
-              <motion.h3
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-xl font-bold text-foreground mb-2"
-              >
-                {result.mode === 'attendance' ? 'Attendance Logged!' : 'Book Scanned!'}
-              </motion.h3>
+              {/* ── Book Checkout Mode Result ── */}
+              {mode === 'checkout' && !scannedBook && (
+                <div className="p-8 text-center">
+                  <Loader2 className="w-8 h-8 text-lib-purple animate-spin mx-auto mb-4" />
+                  <p className="text-sm text-muted-foreground">Looking up book...</p>
+                </div>
+              )}
 
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="text-sm text-muted-foreground mb-4"
-              >
-                {result.mode === 'attendance'
-                  ? 'Your library visit has been recorded successfully.'
-                  : 'The book has been scanned for checkout.'}
-              </motion.p>
+              {mode === 'checkout' && scannedBook && (
+                <div>
+                  {/* Book cover header */}
+                  <div className="relative h-36 bg-purple-gradient overflow-hidden">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {(() => {
+                        const coverSrc = getResourceCover(scannedBook.coverImage, scannedBook.title)
+                        return coverSrc ? (
+                          <img src={coverSrc} alt={scannedBook.title} className="w-20 h-28 rounded-xl object-cover dark:shadow-lg" />
+                        ) : (
+                          <div className="w-20 h-28 rounded-xl bg-white/20 flex items-center justify-center">
+                            <BookOpen className="w-8 h-8 text-white/60" />
+                          </div>
+                        )
+                      })()}
+                    </div>
+                    {/* Decorative circles */}
+                    <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-white/10" />
+                    <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-white/5" />
+                  </div>
 
-              {/* Timestamp */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground mb-6"
-              >
-                <Clock className="w-3.5 h-3.5" />
-                {result.timestamp}
-              </motion.div>
+                  {/* Book details */}
+                  <div className="p-5 pt-4">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="text-lg font-bold text-foreground leading-tight">{scannedBook.title}</h3>
+                      <Badge className={`flex-shrink-0 text-[10px] h-5 ${
+                        scannedBook.availableCopies > 0
+                          ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                          : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                      }`}>
+                        {scannedBook.availableCopies > 0 ? `${scannedBook.availableCopies} available` : 'Unavailable'}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">{scannedBook.author}</p>
 
-              {/* Action buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-                className="flex gap-3"
-              >
-                <Button
-                  onClick={handleRetry}
-                  variant="outline"
-                  className="flex-1 rounded-xl py-5 border-gray-200 dark:border-gray-700"
-                >
-                  Scan Again
-                </Button>
-                <Button
-                  onClick={handleDone}
-                  className="flex-1 rounded-xl py-5 bg-lib-purple hover:bg-lib-purple/90 text-white"
-                >
-                  Done
-                </Button>
-              </motion.div>
+                    {scannedBook.subject && (
+                      <Badge variant="secondary" className="mb-3 text-[10px] h-5 bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300">
+                        {scannedBook.subject}
+                      </Badge>
+                    )}
+
+                    {readingStarted ? (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-4 text-center mb-4"
+                      >
+                        <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                        <p className="text-sm font-semibold text-green-700 dark:text-green-400">You&apos;re now reading!</p>
+                        <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-1">This book has been added to your borrows.</p>
+                      </motion.div>
+                    ) : scannedBook.availableCopies > 0 ? (
+                      <Button
+                        onClick={handleStartReading}
+                        disabled={startingReading}
+                        className="w-full rounded-xl py-5 bg-lib-purple hover:bg-lib-purple/90 text-white font-semibold text-sm mb-3"
+                      >
+                        {startingReading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Starting...
+                          </>
+                        ) : (
+                          <>
+                            <BookMarked className="w-4 h-4 mr-2" />
+                            Start Reading
+                          </>
+                        )}
+                      </Button>
+                    ) : (
+                      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-4 text-center mb-4">
+                        <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-400">No copies available</p>
+                        <p className="text-xs text-yellow-600/70 dark:text-yellow-400/70 mt-1">You can reserve this book instead.</p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={handleViewBook}
+                      className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl text-lib-purple dark:text-lib-purple-300 text-sm font-medium hover:bg-lib-purple-50 dark:hover:bg-white/5 transition-colors"
+                    >
+                      View Full Details <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+
+                    <div className="flex gap-3 mt-3">
+                      <Button onClick={handleRetry} variant="outline" className="flex-1 rounded-xl py-4 border-gray-200 dark:border-gray-700 text-xs">
+                        Scan Another
+                      </Button>
+                      <Button onClick={handleDone} className="flex-1 rounded-xl py-4 bg-lib-purple hover:bg-lib-purple/90 text-white text-xs">
+                        Done
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Library Exit Mode Result ── */}
+              {mode === 'exit' && processingExit && (
+                <div className="p-8 text-center">
+                  <Loader2 className="w-8 h-8 text-lib-purple animate-spin mx-auto mb-4" />
+                  <p className="text-sm text-muted-foreground">Processing exit...</p>
+                </div>
+              )}
+
+              {mode === 'exit' && !processingExit && exitSummary && (
+                <div className="p-6">
+                  {/* Success icon */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.2 }}
+                    className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4"
+                  >
+                    <LogOut className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                  </motion.div>
+
+                  <motion.h3
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-lg font-bold text-foreground text-center mb-1"
+                  >
+                    Library Exit Complete
+                  </motion.h3>
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-sm text-muted-foreground text-center mb-5"
+                  >
+                    You&apos;ve been checked out of the library.
+                  </motion.p>
+
+                  {/* Attendance info */}
+                  {exitSummary.attendance.timedOut && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-3 mb-3"
+                    >
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-green-700 dark:text-green-400">Attendance Checked Out</p>
+                          <p className="text-[10px] text-green-600/70 dark:text-green-400/70">
+                            {exitSummary.attendance.duration ? `${exitSummary.attendance.duration} min session` : 'Session recorded'}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Returned books */}
+                  {exitSummary.totalReturned > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                      className="bg-lib-purple-50 dark:bg-white/5 border border-lib-purple-200 dark:border-white/10 rounded-2xl p-3 mb-4"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <BookMarked className="w-4 h-4 text-lib-purple dark:text-lib-purple-300 flex-shrink-0" />
+                        <p className="text-xs font-semibold text-lib-purple dark:text-lib-purple-300">
+                          {exitSummary.totalReturned} book{exitSummary.totalReturned > 1 ? 's' : ''} auto-returned
+                        </p>
+                      </div>
+                      <div className="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar">
+                        {exitSummary.returnedBooks.map((book) => (
+                          <div key={book.id} className="flex items-center gap-2 py-1 px-2 bg-white dark:bg-white/5 rounded-lg">
+                            <BookOpen className="w-3 h-3 text-lib-purple/60 dark:text-lib-purple-300/60 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-foreground truncate">{book.title}</p>
+                              <p className="text-[10px] text-muted-foreground truncate">{book.author}</p>
+                            </div>
+                            <span className="text-[9px] text-green-600 dark:text-green-400 font-medium flex-shrink-0">Returned</span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {exitSummary.totalReturned === 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                      className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-3 mb-4"
+                    >
+                      <p className="text-xs text-muted-foreground text-center">No active books to return.</p>
+                    </motion.div>
+                  )}
+
+                  {/* Timestamp */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground mb-5"
+                  >
+                    <Clock className="w-3.5 h-3.5" />
+                    {result.timestamp}
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                  >
+                    <Button onClick={handleDone} className="w-full rounded-xl py-5 bg-lib-purple hover:bg-lib-purple/90 text-white">
+                      Done
+                    </Button>
+                  </motion.div>
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}
