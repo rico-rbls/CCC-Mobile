@@ -363,10 +363,10 @@ export default function HomeScreen() {
             <span className="text-sm font-bold text-white">x{user?.streakCount ?? 0} day streak!</span>
           </div>
           <div className="flex items-center gap-2">
-            {/* Bell icon inside small card */}
+            {/* Bell icon inside squircle card */}
             <button
               onClick={() => setCurrentScreen('notifications')}
-              className="relative p-2.5 rounded-[22px] bg-card shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
+              className="relative p-2.5 rounded-xl bg-card shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
               aria-label="Notifications"
             >
               <Bell className="w-4.5 h-4.5 text-lib-purple dark:text-lib-purple-300" />
@@ -376,10 +376,10 @@ export default function HomeScreen() {
                 </span>
               )}
             </button>
-            {/* Settings icon inside small card */}
+            {/* Settings icon inside squircle card */}
             <button
               onClick={() => setCurrentScreen('settings')}
-              className="p-2.5 rounded-[22px] bg-card shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
+              className="p-2.5 rounded-xl bg-card shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
               aria-label="Settings"
             >
               <Settings className="w-4.5 h-4.5 text-lib-purple dark:text-lib-purple-300" />

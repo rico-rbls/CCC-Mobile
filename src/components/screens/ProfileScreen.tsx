@@ -75,7 +75,7 @@ export default function ProfileScreen() {
   ]
 
   return (
-    <div className="flex flex-col min-h-screen bg-background dark:bg-[#110a1e]">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Profile header with gradient */}
       <div className="relative bg-purple-gradient px-6 pt-10 pb-14 rounded-b-[22px] overflow-hidden">
         {/* Decorative circles */}

@@ -106,8 +106,8 @@ export default function Home() {
   }, [showNavEl])
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-[#0d0618] flex justify-center">
-      <div className="w-full max-w-[430px] h-dvh bg-white dark:bg-[#110a1e] relative shadow-xl">
+    <div className="min-h-screen bg-background flex justify-center">
+      <div className="w-full max-w-[430px] h-dvh bg-background relative shadow-xl">
         {/* Screen content - full scrollable area */}
         <div
           ref={scrollRef}

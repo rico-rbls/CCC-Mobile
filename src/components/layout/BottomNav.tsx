@@ -40,9 +40,9 @@ export default function BottomNav() {
 
   return (
     <nav>
-      <div className="flex items-center justify-between px-4 pt-2 pb-4">
+      <div className="flex items-center gap-2.5 px-4 pt-2 pb-4">
         {/* Rounded rectangle card — same bg as home screen section cards */}
-        <div className="flex-1 flex items-center justify-around py-2.5 px-2 rounded-2xl bg-card shadow-sm">
+        <div className="flex-1 flex items-center justify-around py-2 px-1.5 rounded-2xl bg-card shadow-sm">
           {navItems.map((item) => {
             const isActive = currentScreen === item.id
             const Icon = item.icon
@@ -51,39 +51,41 @@ export default function BottomNav() {
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className="flex flex-col items-center gap-1"
+                className="flex flex-col items-center"
                 aria-label={item.label}
               >
-                <div className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200 ${
+                <div className={`relative flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-colors duration-200 ${
                   isActive ? 'bg-lib-purple' : ''
                 }`}>
-                  <Icon className={`w-5 h-5 transition-colors duration-200 ${
-                    isActive ? 'text-white' : 'text-muted-foreground'
-                  }`} />
-                  {/* Badge for active borrows */}
-                  {item.id === 'borrowed' && activeBorrows > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 rounded-full bg-red-500 text-[7px] text-white font-bold flex items-center justify-center px-0.5">
-                      {activeBorrows}
-                    </span>
-                  )}
+                  <div className="relative flex items-center justify-center">
+                    <Icon className={`w-5 h-5 transition-colors duration-200 ${
+                      isActive ? 'text-white' : 'text-muted-foreground'
+                    }`} />
+                    {/* Badge for active borrows */}
+                    {item.id === 'borrowed' && activeBorrows > 0 && (
+                      <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 rounded-full bg-red-500 text-[7px] text-white font-bold flex items-center justify-center px-0.5">
+                        {activeBorrows}
+                      </span>
+                    )}
+                  </div>
+                  <span className={`text-[8px] transition-colors duration-200 leading-tight ${
+                    isActive ? 'text-white font-semibold' : 'text-muted-foreground'
+                  }`}>
+                    {item.label}
+                  </span>
                 </div>
-                <span className={`text-[9px] transition-colors duration-200 leading-tight ${
-                  isActive ? 'text-lib-purple font-semibold' : 'text-muted-foreground'
-                }`}>
-                  {item.label}
-                </span>
               </button>
             )
           })}
         </div>
 
-        {/* Scan — purple rounded card, aligned horizontally, icon only */}
+        {/* Scan — same height as the 4-icon card */}
         <button
           onClick={() => handleNavClick('qr-scan')}
-          className="ml-3"
+          className="self-stretch"
           aria-label="Scan"
         >
-          <div className={`w-[56px] h-[56px] rounded-2xl flex items-center justify-center shadow-lg transition-all duration-200 ${
+          <div className={`h-full min-h-[52px] w-[52px] rounded-2xl flex items-center justify-center shadow-sm transition-all duration-200 ${
             isScanActive
               ? 'bg-lib-purple-light shadow-lib-purple/50'
               : 'bg-lib-purple shadow-lib-purple/40'
