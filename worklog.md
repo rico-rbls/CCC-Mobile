@@ -739,3 +739,52 @@ Stage Summary:
 - BottomNav redesigned with individual rounded cards, no movement on click, color change only
 - Dark mode comprehensively covered across all 14+ screen components
 - 70+ text-lib-purple instances fixed with dark:text-lib-purple-300 for visibility on dark backgrounds
+
+---
+Task ID: 12
+Agent: Main Agent
+Task: BottomNav Redesign - Floating Rounded Cards with Scan FAB + Profile Hierarchy Fix
+
+Work Log:
+- Analyzed uploaded reference screenshot using VLM to understand the target bottom nav design
+  - Reference shows: 4 items (Home, Wallet, Plan, History) in floating rounded cards on a dark bar
+  - A separate FAB (floating action button) with plus icon on the right side, elevated above the bar
+  - Active state: darker green (purple for us) background with white icon and text
+  - Inactive: muted/gray icons and text with subtle card backgrounds
+  - Dark near-black background for the nav bar
+- Redesigned BottomNav.tsx completely:
+  1. **Dark bar background**: `bg-[#0f0a1e]` always-dark bar (not theme-dependent)
+  2. **4 nav items in floating rounded cards**: Home, Search, Borrowed, Profile — each in its own `rounded-2xl` card
+  3. **Active state**: `bg-lib-purple shadow-lg shadow-lib-purple/30` with white icon/text
+  4. **Inactive state**: `bg-white/[0.06]` with `text-white/35` muted icons
+  5. **Scan FAB on the right**: `w-14 h-14 rounded-2xl bg-lib-purple` elevated with `-mt-6` above the bar
+  6. **No movement on click**: Only `transition-colors duration-200` — no scale, no spring, no bounce
+  7. **Badge support**: Red notification badge on Borrowed tab for active borrows
+- Fixed ProfileScreen.tsx hierarchy:
+  1. **Removed Reading Goal card** — user didn't mention it in desired hierarchy
+  2. **Removed Reading Stats bar chart** — user didn't mention it in desired hierarchy
+  3. **Reorganized sections in user-requested order**:
+     - Edit Profile (pencil icon, purple)
+     - My Favorites (heart icon, red)
+     - My Reservations (bookmark icon, purple)
+     - Member Since (calendar icon, separate card)
+     - Attendance History (file-text icon, navigable card)
+     - Log Out (red outlined button at bottom)
+  4. **Changed My Reservations icon** from BookOpen to Bookmark to differentiate from Borrowed
+  5. **Applied dark mode** classes throughout: `dark:bg-[#2d1b4e]`, `dark:text-white`, `dark:text-white/40`, etc.
+- Tested via agent-browser + VLM:
+  - Logged in with demo account (juan@university.edu)
+  - Verified bottom nav: ✅ Each icon in rounded card, ✅ Active state purple/white, ✅ Inactive muted, ✅ Scan FAB elevated on right, ✅ No movement on click
+  - Verified profile: ✅ Edit Profile, ✅ My Favorites, ✅ My Reservations, ✅ Member Since, ✅ Attendance History, ✅ Log Out
+- Lint passes with zero errors
+
+Files Modified:
+- `/home/z/my-project/src/components/layout/BottomNav.tsx` - Complete redesign: floating cards + Scan FAB
+- `/home/z/my-project/src/components/screens/ProfileScreen.tsx` - Hierarchy fix: removed Reading Goal/Stats, reordered sections
+
+Stage Summary:
+- Bottom nav now matches the reference design: floating rounded cards per icon with Scan as elevated FAB on the right
+- Profile screen cleaned up with user-requested hierarchy: Edit Profile → My Favorites → My Reservations → Member Since → Attendance History → Log Out
+- Removed duplicate sections (Reading Goal, Reading Stats) that weren't in the desired hierarchy
+- No movement/animation on bottom nav clicks — only color transitions
+- Dark mode applied to both components

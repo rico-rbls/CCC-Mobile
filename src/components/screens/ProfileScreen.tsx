@@ -4,36 +4,14 @@ import { useAppStore, type AppScreen } from '@/lib/store'
 import { motion } from 'framer-motion'
 import {
   BookOpen, Flame, Clock,
-  ChevronRight, Edit, LogOut, MapPin, Heart, Mail, GraduationCap, FileText, Calendar
+  ChevronRight, Edit, LogOut, MapPin, Heart, Mail, GraduationCap, FileText, Calendar, Bookmark
 } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
-
-// Menu items - Edit Profile, Favorites, Reservations
-function getMenuItems(favCount: number) {
-  return [
-    { id: 'edit-profile' as AppScreen, icon: Edit, label: 'Edit Profile', desc: 'Update your information', color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10' },
-    { id: 'favorites' as AppScreen, icon: Heart, label: 'My Favorites', desc: `${favCount} saved book${favCount !== 1 ? 's' : ''}`, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
-    { id: 'reservations' as AppScreen, icon: BookOpen, label: 'My Reservations', desc: 'Track reserved items', color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10' },
-  ]
-}
-
-// Monthly reading data for bar chart
-const monthlyData = [
-  { month: 'Sep', books: 2 },
-  { month: 'Oct', books: 4 },
-  { month: 'Nov', books: 3 },
-  { month: 'Dec', books: 1 },
-  { month: 'Jan', books: 5 },
-  { month: 'Feb', books: 3 },
-  { month: 'Mar', books: 4 },
-]
 
 export default function ProfileScreen() {
   const { user, setCurrentScreen, logout, favorites } = useAppStore()
   const [borrowCount, setBorrowCount] = useState(0)
   const [attendanceCount, setAttendanceCount] = useState(0)
-  const [readingGoal, setReadingGoal] = useState(24)
-  const [showGoalPicker, setShowGoalPicker] = useState(false)
   const userIdRef = useRef(user?.id)
 
   useEffect(() => {
@@ -73,17 +51,23 @@ export default function ProfileScreen() {
   ]
 
   const roleLabel = user?.role === 'faculty' ? 'Faculty' : user?.role === 'visitor' ? 'Visitor' : 'Student'
-  const maxBooks = Math.max(...monthlyData.map(d => d.books), 1)
+
+  // Profile menu items in the user's requested hierarchy
+  const menuItems = [
+    { id: 'edit-profile' as AppScreen, icon: Edit, label: 'Edit Profile', desc: 'Update your information', color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10' },
+    { id: 'favorites' as AppScreen, icon: Heart, label: 'My Favorites', desc: `${favorites.length} saved book${favorites.length !== 1 ? 's' : ''}`, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
+    { id: 'reservations' as AppScreen, icon: Bookmark, label: 'My Reservations', desc: 'Track reserved items', color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10' },
+  ]
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background dark:bg-[#110a1e]">
       {/* Profile header with gradient */}
       <div className="relative bg-purple-gradient px-6 pt-10 pb-14 rounded-b-[22px] overflow-hidden">
         {/* Decorative circles */}
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
         <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/5" />
         <div className="absolute top-12 right-20 w-16 h-16 rounded-full bg-white/5" />
-        
+
         <div className="flex flex-col items-center relative z-10">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
@@ -135,8 +119,8 @@ export default function ProfileScreen() {
                 <div className={`w-10 h-10 rounded-[14px] ${stat.bg} flex items-center justify-center`}>
                   <Icon className={`w-5 h-5 ${stat.color}`} />
                 </div>
-                <span className="text-lg font-bold text-foreground">{stat.value}</span>
-                <span className="text-[10px] text-muted-foreground text-center font-medium">{stat.label}</span>
+                <span className="text-lg font-bold text-foreground dark:text-white">{stat.value}</span>
+                <span className="text-[10px] text-muted-foreground dark:text-white/50 text-center font-medium">{stat.label}</span>
               </motion.div>
             )
           })}
@@ -146,7 +130,7 @@ export default function ProfileScreen() {
       {/* Menu items: Edit Profile, My Favorites, My Reservations */}
       <div className="px-4 mt-4">
         <div className="bg-card dark:bg-[#2d1b4e] rounded-[22px] shadow-sm overflow-hidden divide-y divide-gray-50 dark:divide-white/5">
-          {getMenuItems(favorites.length).map((item, index) => {
+          {menuItems.map((item, index) => {
             const Icon = item.icon
             return (
               <motion.button
@@ -161,152 +145,14 @@ export default function ProfileScreen() {
                   <Icon className={`w-4 h-4 ${item.color}`} />
                 </div>
                 <div className="flex-1 text-left">
-                  <span className="text-sm font-medium text-foreground block">{item.label}</span>
-                  {item.desc && <span className="text-[10px] text-muted-foreground">{item.desc}</span>}
+                  <span className="text-sm font-medium text-foreground dark:text-white block">{item.label}</span>
+                  {item.desc && <span className="text-[10px] text-muted-foreground dark:text-white/40">{item.desc}</span>}
                 </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground dark:text-white/20" />
               </motion.button>
             )
           })}
         </div>
-      </div>
-
-      {/* Attendance History */}
-      <div className="px-4 mt-3">
-        <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          onClick={() => setCurrentScreen('attendance')}
-          className="w-full bg-card dark:bg-[#2d1b4e] rounded-[22px] shadow-sm p-4 flex items-center gap-3"
-        >
-          <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
-            <FileText className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />
-          </div>
-          <div className="flex-1 text-left">
-            <span className="text-sm font-semibold text-foreground">Attendance History</span>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              {attendanceCount} visit{attendanceCount !== 1 ? 's' : ''} recorded
-            </p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-        </motion.button>
-      </div>
-
-      {/* Reading Goal card */}
-      <div className="px-4 mt-3">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.18 }}
-          className="bg-card dark:bg-[#2d1b4e] rounded-[22px] shadow-sm p-4"
-        >
-          <div className="flex items-center gap-4">
-            {/* Circular progress */}
-            <div className="relative w-16 h-16 flex-shrink-0">
-              <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  className="text-lib-purple-200 dark:text-white/10"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeDasharray={`${Math.min(100, (borrowCount / readingGoal) * 100)}, 100`}
-                  strokeLinecap="round"
-                  className="text-lib-purple dark:text-lib-purple-300"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs font-bold text-lib-purple dark:text-lib-purple-300">{borrowCount}/{readingGoal}</span>
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-foreground">Reading Goal</h4>
-                <button
-                  onClick={() => setShowGoalPicker(!showGoalPicker)}
-                  className="text-xs text-lib-purple dark:text-lib-purple-300 font-medium"
-                >
-                  {showGoalPicker ? 'Done' : 'Change'}
-                </button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {borrowCount >= readingGoal
-                  ? '\uD83C\uDF89 Goal achieved! Great job!'
-                  : `${readingGoal - borrowCount} more book${readingGoal - borrowCount !== 1 ? 's' : ''} to reach your goal`
-                }
-              </p>
-              {showGoalPicker && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="flex gap-2 mt-2"
-                >
-                  {[12, 24, 36, 48].map(goal => (
-                    <button
-                      key={goal}
-                      onClick={() => { setReadingGoal(goal); setShowGoalPicker(false) }}
-                      className={`flex-1 py-1.5 rounded-[14px] text-xs font-medium transition-all ${
-                        readingGoal === goal
-                          ? 'bg-lib-purple text-white'
-                          : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-white/15'
-                      }`}
-                    >
-                      {goal}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Reading Stats card with mini bar chart */}
-      <div className="px-4 mt-3">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-card dark:bg-[#2d1b4e] rounded-[22px] shadow-sm p-4"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold text-foreground">Reading Stats</span>
-            <span className="text-[10px] text-muted-foreground">Books per month</span>
-          </div>
-          {/* Mini bar chart */}
-          <div className="flex items-end gap-2 h-20">
-            {monthlyData.map((d, i) => (
-              <div key={d.month} className="flex-1 flex flex-col items-center gap-1">
-                <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: `${(d.books / maxBooks) * 100}%` }}
-                  transition={{ delay: 0.2 + i * 0.05, duration: 0.4, ease: 'easeOut' }}
-                  className={`w-full rounded-t-md min-h-[4px] ${
-                    i === monthlyData.length - 1 ? 'bg-lib-purple' : 'bg-lib-purple-200 dark:bg-white/20'
-                  }`}
-                />
-                <span className={`text-[9px] ${i === monthlyData.length - 1 ? 'text-lib-purple dark:text-lib-purple-300 font-bold' : 'text-muted-foreground'}`}>
-                  {d.month}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50 dark:border-white/5">
-            <span className="text-[10px] text-muted-foreground">
-              Total: {monthlyData.reduce((sum, d) => sum + d.books, 0)} books this year
-            </span>
-            <span className="text-[10px] font-medium text-lib-purple dark:text-lib-purple-300">
-              Avg: {(monthlyData.reduce((sum, d) => sum + d.books, 0) / monthlyData.length).toFixed(1)}/mo
-            </span>
-          </div>
-        </motion.div>
       </div>
 
       {/* Member Since card */}
@@ -314,14 +160,41 @@ export default function ProfileScreen() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22 }}
-          className="bg-lib-purple-50 dark:bg-white/5 rounded-[22px] p-3 flex items-center gap-3"
+          transition={{ delay: 0.15 }}
+          className="bg-card dark:bg-[#2d1b4e] rounded-[22px] shadow-sm p-4 flex items-center gap-3"
         >
-          <Calendar className="w-4 h-4 text-lib-purple dark:text-lib-purple-300 flex-shrink-0" />
-          <p className="text-xs text-lib-purple-700 dark:text-lib-purple-300">
-            Member since {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-          </p>
+          <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
+            <Calendar className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />
+          </div>
+          <div className="flex-1 text-left">
+            <span className="text-sm font-semibold text-foreground dark:text-white">Member Since</span>
+            <p className="text-[10px] text-muted-foreground dark:text-white/40 mt-0.5">
+              {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </p>
+          </div>
         </motion.div>
+      </div>
+
+      {/* Attendance History */}
+      <div className="px-4 mt-3">
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          onClick={() => setCurrentScreen('attendance')}
+          className="w-full bg-card dark:bg-[#2d1b4e] rounded-[22px] shadow-sm p-4 flex items-center gap-3"
+        >
+          <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
+            <FileText className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />
+          </div>
+          <div className="flex-1 text-left">
+            <span className="text-sm font-semibold text-foreground dark:text-white">Attendance History</span>
+            <p className="text-[10px] text-muted-foreground dark:text-white/40 mt-0.5">
+              {attendanceCount} visit{attendanceCount !== 1 ? 's' : ''} recorded
+            </p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground dark:text-white/20" />
+        </motion.button>
       </div>
 
       {/* Logout */}
