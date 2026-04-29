@@ -57,8 +57,7 @@ function SkeletonRecommendations() {
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="flex-shrink-0 w-[120px] space-y-2">
           <Skeleton className="w-[120px] h-[160px] rounded-2xl" />
-          <div className="h-[52px] space-y-1.5">
-            <Skeleton className="h-2.5 w-16" />
+          <div className="space-y-1.5">
             <Skeleton className="h-3 w-24" />
             <Skeleton className="h-2 w-14" />
           </div>
@@ -791,13 +790,7 @@ export default function HomeScreen() {
                       })()}
                     </div>
                     {/* Text content - fixed min-height for alignment */}
-                    <div className="h-[52px] flex flex-col">
-                      <div className="flex items-center gap-1 mb-0.5">
-                        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${book.availableCopies > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
-                        <span className="text-[10px] text-muted-foreground truncate">
-                          {book.availableCopies > 0 ? `${book.availableCopies} available` : 'Unavailable'}
-                        </span>
-                      </div>
+                    <div className="flex flex-col">
                       <h4 className="text-xs font-semibold text-foreground leading-tight line-clamp-2 min-h-[28px]">{book.title}</h4>
                       <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{book.author}</p>
                     </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useAppStore, type BorrowedBook } from '@/lib/store'
-import { BookOpen, Clock, Loader2, RotateCcw, CheckCircle2, ChevronRight, AlertTriangle, Info } from 'lucide-react'
+import { BookOpen, Clock, Loader2, CheckCircle2, ChevronRight, AlertTriangle, Info } from 'lucide-react'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getResourceCover } from '@/lib/covers'
@@ -340,16 +340,7 @@ export default function BorrowedScreen() {
                     transition={{ delay: index * 0.07 }}
                     className="bg-card rounded-[22px] shadow-sm overflow-hidden relative"
                   >
-                    {activeTab === 'active' && (
-                      <div className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl ${
-                        isOverdue
-                          ? 'bg-gradient-to-b from-red-500 via-red-400 to-red-300'
-                          : isDueSoon
-                          ? 'bg-gradient-to-b from-amber-500 via-amber-400 to-amber-300'
-                          : 'bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300'
-                      }`} />
-                    )}
-                    <div className={`flex items-start gap-3 ${activeTab === 'active' ? 'p-4 pl-5' : 'p-4'}`}>
+                    <div className="flex items-start gap-3 p-4">
                       {(() => {
                         const coverSrc = getResourceCover(book.coverImage, book.title)
                         return coverSrc ? (
@@ -384,18 +375,16 @@ export default function BorrowedScreen() {
                                 }
                               </span>
                               <Button
-                                variant="ghost"
                                 size="sm"
                                 onClick={() => handleReturn(book.id, book.title)}
                                 disabled={returningId === book.id}
-                                className="h-7 px-2 text-xs text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
+                                className="h-8 px-4 text-xs bg-lib-purple hover:bg-lib-purple-dark text-white rounded-xl shadow-sm shadow-lib-purple/20 font-semibold"
                               >
                                 {returningId === book.id ? (
                                   <Loader2 className="w-3 h-3 animate-spin" />
                                 ) : (
-                                  <RotateCcw className="w-3 h-3 mr-1" />
+                                  'Return'
                                 )}
-                                Return
                               </Button>
                             </div>
                             {/* Overdue Fine Badge */}

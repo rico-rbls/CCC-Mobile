@@ -912,3 +912,26 @@ Stage Summary:
 - Better scroll padding with -mx-2 px-2 and pb-2
 - Skeleton loading matches real card dimensions
 - Lint passes with zero errors
+
+---
+Task ID: 13
+Agent: Main Agent
+Task: Home Screen carousel cleanup + Borrowed screen card style changes
+
+Work Log:
+- Removed availability description (green/red dot + "2 available" / "Unavailable") from Recommended for You carousel cards on HomeScreen
+- Updated SkeletonRecommendations to match (removed availability skeleton line)
+- Removed colored left accent lines (purple/amber/red gradient borders) from BorrowedScreen active book cards
+- Removed conditional pl-5 padding that was needed for the accent border, now uniform p-4
+- Styled Return button as a highlighted card: changed from ghost variant to solid bg-lib-purple with white text, rounded-xl, shadow-sm, font-semibold, removed RotateCcw icon
+- Removed unused RotateCcw import from BorrowedScreen
+- Lint passes with zero errors
+
+Files Modified:
+- `/home/z/my-project/src/components/screens/HomeScreen.tsx` - Removed availability description from carousel
+- `/home/z/my-project/src/components/screens/BorrowedScreen.tsx` - Removed accent lines, styled Return button
+
+Stage Summary:
+- Carousel cards now show only cover image, title, and author — clean and minimal
+- Borrowed cards have no left accent lines — clean card style
+- Return button is now a prominent purple pill button with no icon
