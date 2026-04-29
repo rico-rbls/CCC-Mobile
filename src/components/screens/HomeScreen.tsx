@@ -644,18 +644,9 @@ export default function HomeScreen() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-3 rounded-2xl overflow-hidden relative"
+              className="mt-3 rounded-2xl overflow-hidden"
             >
-              {/* Left border animation */}
-              <motion.div
-                className="absolute left-0 top-0 w-1.5 bg-gradient-to-b from-lib-purple via-lib-purple-light to-lib-purple-300 rounded-l-2xl origin-top"
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-                style={{ bottom: 0 }}
-              />
-
-              <div className="pl-4 pr-1">
+              <div className="p-1">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-foreground text-sm leading-tight">{activeBook.title}</h3>
@@ -687,14 +678,16 @@ export default function HomeScreen() {
                   <span className="text-[10px] text-muted-foreground">Due {activeBook.dueDate}</span>
                 </div>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2 h-7 px-2 text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-light hover:bg-lib-purple-50 dark:hover:bg-white/10 text-xs font-medium p-0"
-                  onClick={() => { setSelectedBookId(activeBook.id); setCurrentScreen('book-detail') }}
-                >
-                  View Details <ChevronRight className="w-3 h-3 ml-0.5" />
-                </Button>
+                <div className="flex justify-end mt-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-light hover:bg-lib-purple-50 dark:hover:bg-white/10 text-xs font-medium p-0"
+                    onClick={() => { setSelectedBookId(activeBook.id); setCurrentScreen('book-detail') }}
+                  >
+                    View Details <ChevronRight className="w-3 h-3 ml-0.5" />
+                  </Button>
+                </div>
               </div>
             </motion.div>
           ) : (
