@@ -306,38 +306,44 @@ export default function SearchScreen() {
                   <Clock className="w-3.5 h-3.5 text-lib-purple dark:text-lib-purple-300" />
                   <h3 className="text-sm font-semibold text-foreground">Recently Viewed</h3>
                 </div>
-                <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
+                <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-2 px-2">
                   {recentlyViewed.map((resource) => (
                     <motion.button
                       key={resource.id}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
-                      className="flex-shrink-0 w-28 group"
+                      className="flex-shrink-0 w-[120px] group"
                     >
-                      {(() => {
-                        const coverSrc = getResourceCover(resource.coverImage, resource.title)
-                        return coverSrc ? (
-                          <div className="w-28 h-36 rounded-xl mb-2 relative overflow-hidden shadow-sm">
-                            <img src={coverSrc} alt={resource.title} className="w-full h-full object-cover" />
-                            {resource.category && (
-                              <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
-                                {resource.category}
-                              </span>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="w-28 h-36 rounded-xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm cover-pattern-overlay">
-                            <BookOpen className="w-6 h-6 text-white/50" />
-                            {resource.category && (
-                              <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[7px] font-bold px-1.5 py-0.5 rounded-md leading-none">
-                                {resource.category}
-                              </span>
-                            )}
-                          </div>
-                        )
-                      })()}
-                      <h4 className="text-[11px] font-semibold text-foreground leading-tight line-clamp-2">{resource.title}</h4>
-                      <p className="text-[9px] text-muted-foreground mt-0.5">{resource.author}</p>
+                      <div className="w-[120px] h-[160px] rounded-2xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                        {(() => {
+                          const coverSrc = getResourceCover(resource.coverImage, resource.title)
+                          return coverSrc ? (
+                            <>
+                              <img src={coverSrc} alt={resource.title} className="w-full h-full object-cover" />
+                              {resource.category && (
+                                <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
+                                  {resource.category}
+                                </span>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-full h-full bg-purple-gradient flex items-center justify-center cover-pattern-overlay">
+                                <BookOpen className="w-7 h-7 text-white/50" />
+                              </div>
+                              {resource.category && (
+                                <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
+                                  {resource.category}
+                                </span>
+                              )}
+                            </>
+                          )
+                        })()}
+                      </div>
+                      <div className="flex flex-col">
+                        <h4 className="text-xs font-semibold text-foreground leading-tight line-clamp-2 min-h-[28px]">{resource.title}</h4>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{resource.author}</p>
+                      </div>
                     </motion.button>
                   ))}
                 </div>

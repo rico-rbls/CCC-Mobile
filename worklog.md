@@ -935,3 +935,33 @@ Stage Summary:
 - Carousel cards now show only cover image, title, and author — clean and minimal
 - Borrowed cards have no left accent lines — clean card style
 - Return button is now a prominent purple pill button with no icon
+
+---
+Task ID: 14
+Agent: Main Agent
+Task: Remove notification colored edges, align Catalog carousel, fix light mode colors
+
+Work Log:
+- Removed colored left border edges (`border-l-4` with orange/purple/blue) from notification cards in NotificationsScreen
+- Cleaned up unused `borderColor` property from typeConfig object
+- Removed unused CSS notification border classes (`.notif-border-due`, `.notif-border-reservation`, `.notif-border-announcement`)
+- Aligned Catalog (SearchScreen) "Recently Viewed" carousel horizontally:
+  - Unified card width from `w-28` to `w-[120px]` with fixed `h-[160px]` cover container
+  - Single shared cover container for both image and placeholder variants
+  - Added `min-h-[28px]` on title, `truncate` on author, consistent text sizes
+  - Added `-mx-2 px-2` scroll padding matching HomeScreen
+- Fixed light mode colors in globals.css:
+  - `--background: #f9f9f9` (was `oklch(0.97 0.005 300)`)
+  - `--card: #ffffff` (was `oklch(1 0 0)`)
+  - `--popover: #ffffff` (was `oklch(1 0 0)`)
+- Lint passes with zero errors
+
+Files Modified:
+- `/home/z/my-project/src/components/screens/NotificationsScreen.tsx` - Removed colored left borders
+- `/home/z/my-project/src/components/screens/SearchScreen.tsx` - Aligned carousel cards
+- `/home/z/my-project/src/app/globals.css` - Light mode bg #f9f9f9, card #ffffff, removed notif border CSS
+
+Stage Summary:
+- Notification cards are clean without colored left edges
+- Catalog carousel cards are horizontally aligned with fixed dimensions
+- Light mode: background #f9f9f9, cards pure white #ffffff

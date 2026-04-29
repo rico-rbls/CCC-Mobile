@@ -5,10 +5,10 @@ import { motion, AnimatePresence, useMotionValue, useAnimation, PanInfo } from '
 import { ArrowLeft, Calendar, BookOpen, Megaphone, CheckCheck, Loader2, Filter } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 
-const typeConfig: Record<string, { icon: typeof Calendar; color: string; bg: string; borderColor: string }> = {
-  due_date: { icon: Calendar, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20', borderColor: 'border-l-orange-500' },
-  reservation: { icon: BookOpen, color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10', borderColor: 'border-l-lib-purple' },
-  announcement: { icon: Megaphone, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20', borderColor: 'border-l-blue-500' },
+const typeConfig: Record<string, { icon: typeof Calendar; color: string; bg: string }> = {
+  due_date: { icon: Calendar, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
+  reservation: { icon: BookOpen, color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10' },
+  announcement: { icon: Megaphone, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
 }
 
 type FilterTab = 'all' | 'unread' | 'mentions'
@@ -61,9 +61,7 @@ function NotificationCard({
         dragElastic={0.7}
         onDragEnd={handleDragEnd}
         animate={controls}
-        className={`bg-card rounded-[22px] shadow-sm p-4 flex items-start gap-3 border-l-4 ${
-          notif.isRead ? 'border-l-gray-200 dark:border-l-gray-700' : config.borderColor
-        } touch-pan-y`}
+        className="bg-card rounded-[22px] shadow-sm p-4 flex items-start gap-3 touch-pan-y"
       >
         <div className={`w-9 h-9 rounded-xl ${config.bg} flex items-center justify-center flex-shrink-0`}>
           <Icon className={`w-4 h-4 ${config.color}`} />

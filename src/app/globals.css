@@ -58,11 +58,11 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.97 0.005 300);
+  --background: #f9f9f9;
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+  --card: #ffffff;
   --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
+  --popover: #ffffff;
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.403 0.175 300);
   --primary-foreground: oklch(0.985 0 0);
@@ -262,11 +262,6 @@
   );
   pointer-events: none;
 }
-
-/* Notification type colored borders */
-.notif-border-due { border-left-color: #f97316; }
-.notif-border-reservation { border-left-color: #652D90; }
-.notif-border-announcement { border-left-color: #3b82f6; }
 
 /* Keyframes */
 @keyframes shimmer {
