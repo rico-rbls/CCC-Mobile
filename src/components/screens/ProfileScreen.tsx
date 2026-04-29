@@ -1,9 +1,10 @@
 'use client'
 
 import { useAppStore, type AppScreen } from '@/lib/store'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen, Flame, Clock,
+  X,
   ChevronRight, Edit, LogOut, MapPin, Heart, Mail, GraduationCap, FileText, Calendar, Bookmark, Target
 } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
@@ -26,6 +27,7 @@ export default function ProfileScreen() {
   const [attendanceCount, setAttendanceCount] = useState(0)
   const [readingGoal, setReadingGoal] = useState(24)
   const [showGoalPicker, setShowGoalPicker] = useState(false)
+  const [showFullQR, setShowFullQR] = useState(false)
   const userIdRef = useRef(user?.id)
 
   useEffect(() => {
@@ -150,7 +152,11 @@ export default function ProfileScreen() {
         >
           <div className="flex flex-col items-center">
             <span className="text-sm font-semibold text-foreground dark:text-white mb-3">My Library QR Code</span>
-            <div className="bg-white p-3 rounded-2xl shadow-sm">
+            <button
+              onClick={() => setShowFullQR(true)}
+              className="bg-white p-3 rounded-2xl shadow-sm active:scale-95 transition-transform"
+              aria-label="View QR code full screen"
+            >
               <QRCodeSVG
                 value={JSON.stringify({
                   userId: user?.id,
@@ -165,9 +171,9 @@ export default function ProfileScreen() {
                 fgColor="#652D90"
                 includeMargin={false}
               />
-            </div>
+            </button>
             <p className="text-[10px] text-muted-foreground dark:text-white/40 mt-3 text-center leading-relaxed">
-              Present this QR code at the library entrance<br />for attendance check-in
+              Tap to expand · Present at library entrance<br />for attendance check-in
             </p>
             <div className="flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-full bg-lib-purple-50 dark:bg-white/10">
               <Clock className="w-3 h-3 text-lib-purple dark:text-lib-purple-300" />
@@ -176,6 +182,67 @@ export default function ProfileScreen() {
           </div>
         </motion.div>
       </div>
+
+      {/* Full-screen QR overlay */}
+      <AnimatePresence>
+        {showFullQR && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-6"
+            onClick={() => setShowFullQR(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.7, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="bg-white rounded-3xl p-8 shadow-2xl flex flex-col items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between w-full mb-6">
+                <div>
+                  <h3 className="text-lg font-bold text-lib-purple">My Library QR Code</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">Present at the library entrance</p>
+                </div>
+                <button
+                  onClick={() => setShowFullQR(false)}
+                  className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="w-4 h-4 text-gray-500" />
+                </button>
+              </div>
+              <div className="p-4 rounded-2xl bg-lib-purple-50">
+                <QRCodeSVG
+                  value={JSON.stringify({
+                    userId: user?.id,
+                    name: user?.fullName,
+                    universityId: user?.universityId,
+                    role: user?.role,
+                    type: 'library-access',
+                  })}
+                  size={260}
+                  level="H"
+                  bgColor="#ffffff"
+                  fgColor="#652D90"
+                  includeMargin={false}
+                />
+              </div>
+              <div className="mt-5 text-center">
+                <p className="text-sm font-semibold text-gray-800">{user?.fullName}</p>
+                <p className="text-xs text-gray-500 mt-0.5">ID: {user?.universityId}</p>
+              </div>
+              <div className="flex items-center gap-1.5 mt-3 px-4 py-2 rounded-full bg-lib-purple-50">
+                <Clock className="w-3.5 h-3.5 text-lib-purple" />
+                <span className="text-[10px] font-medium text-lib-purple">Valid for attendance check-in</span>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Menu items: Edit Profile, My Favorites, My Reservations — same bg-card color as home */}
       <div className="px-4 mt-3">
