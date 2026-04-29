@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Bell, Settings, BookOpen,
   ChevronRight, Loader2, X,
-  Star, Flame,
+  Star, Flame, Library, Clock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -93,6 +93,15 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false)
   const [highlightBook, setHighlightBook] = useState<ResourceItem | null>(null)
   const [expandedAnnouncement, setExpandedAnnouncement] = useState<string | null>(null)
+
+  // Reading sessions (in-library)
+  const [activeReadings, setActiveReadings] = useState<{
+    id: string
+    title: string
+    author: string
+    startTime: string
+    resourceId: string
+  }[]>([])
 
   // Reading goal & attendance stats
   const [readingGoal, setReadingGoal] = useState(24)
@@ -206,6 +215,20 @@ export default function HomeScreen() {
       const annData = await annRes.json()
       if (annRes.ok && Array.isArray(annData)) {
         setAnnouncements(annData)
+      }
+
+      // Fetch active reading sessions
+      const readingRes = await fetch(`/api/reading-sessions?userId=${user.id}&status=active`)
+      if (readingRes.ok) {
+        const readingData = await readingRes.json()
+        const sessions = Array.isArray(readingData) ? readingData : []
+        setActiveReadings(sessions.map((s: Record<string, unknown>) => ({
+          id: s.id as string,
+          title: (s.resource as Record<string, unknown>)?.title as string || 'Unknown',
+          author: (s.resource as Record<string, unknown>)?.author as string || 'Unknown',
+          startTime: s.startTime as string,
+          resourceId: s.resourceId as string,
+        })))
       }
 
       const settingsRes = await fetch('/api/settings')
@@ -629,6 +652,89 @@ export default function HomeScreen() {
           </motion.div>
         )}
 
+        {/* ── Currently Reading (in-library) ────────────────── */}
+        {activeReadings.length > 0 && (
+          <motion.div
+            custom={0.8}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
+            className="bg-card rounded-3xl dark:shadow-sm p-4"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <SectionHeader>Currently Reading</SectionHeader>
+              <Badge className="text-[9px] h-4 px-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-0">
+                In Library
+              </Badge>
+            </div>
+            <div className="space-y-2.5">
+              {activeReadings.map((reading, idx) => {
+                const startTime = new Date(reading.startTime)
+                const now = new Date()
+                const diffMs = now.getTime() - startTime.getTime()
+                const diffMins = Math.floor(diffMs / (1000 * 60))
+                const diffHours = Math.floor(diffMins / 60)
+                const remainingMins = diffMins % 60
+                const durationText = diffHours > 0
+                  ? `${diffHours}h ${remainingMins}m`
+                  : `${diffMins}m`
+
+                return (
+                  <motion.div
+                    key={reading.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30 rounded-2xl p-3"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+                        <Library className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-foreground text-sm leading-tight truncate">{reading.title}</h4>
+                        <p className="text-xs text-muted-foreground mt-0.5 truncate">{reading.author}</p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                          <span className="text-[10px] font-medium text-amber-700 dark:text-amber-400">
+                            Reading for {durationText}
+                          </span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-amber-600 dark:text-amber-400 hover:text-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-xs font-medium p-0 flex-shrink-0"
+                        onClick={() => { setSelectedBookId(reading.resourceId); setCurrentScreen('book-detail') }}
+                      >
+                        View <ChevronRight className="w-3 h-3 ml-0.5" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 px-2.5 text-[10px] border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg flex-shrink-0"
+                        onClick={async () => {
+                          try {
+                            const res = await fetch(`/api/reading-sessions/${reading.id}/end`, { method: 'PUT' })
+                            if (res.ok) {
+                              setActiveReadings(prev => prev.filter(r => r.id !== reading.id))
+                            }
+                          } catch (e) {
+                            console.error('Failed to stop reading:', e)
+                          }
+                        }}
+                      >
+                        Stop Reading
+                      </Button>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </motion.div>
+        )}
+
         {/* ── Active borrowed book card ───────────────────── */}
         <motion.div
           custom={1}
@@ -637,8 +743,13 @@ export default function HomeScreen() {
           animate="visible"
           className="bg-card rounded-3xl dark:shadow-sm p-4"
         >
-          <div className="mb-3">
+          <div className="flex items-center gap-2 mb-3">
             <SectionHeader>Current Borrow</SectionHeader>
+            {borrowedBooks.length > 0 && (
+              <Badge className="text-[9px] h-4 px-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-0">
+                Take Home
+              </Badge>
+            )}
           </div>
           {activeBook ? (
             <motion.div

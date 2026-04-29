@@ -27,11 +27,12 @@ model User {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  borrowedBooks   BorrowRecord[]
-  attendance      Attendance[]
-  reservations    Reservation[]
-  notifications   Notification[]
-  reviews         Review[]
+  borrowedBooks     BorrowRecord[]
+  attendance        Attendance[]
+  reservations      Reservation[]
+  notifications     Notification[]
+  reviews           Review[]
+  readingSessions   ReadingSession[]
 }
 
 model Resource {
@@ -53,9 +54,10 @@ model Resource {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  borrowRecords   BorrowRecord[]
-  reservations    Reservation[]
-  reviews         Review[]
+  borrowRecords     BorrowRecord[]
+  reservations      Reservation[]
+  reviews           Review[]
+  readingSessions   ReadingSession[]
 }
 
 model BorrowRecord {
@@ -149,4 +151,19 @@ model Review {
   resource   Resource @relation(fields: [resourceId], references: [id])
 
   @@unique([userId, resourceId]) // one review per user per book
+}
+
+model ReadingSession {
+  id          String   @id @default(cuid())
+  userId      String
+  resourceId  String
+  startTime   DateTime @default(now())
+  endTime     DateTime?
+  status      String   @default("active") // active, ended
+  date        String   // YYYY-MM-DD
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id])
+  resource    Resource @relation(fields: [resourceId], references: [id])
 }

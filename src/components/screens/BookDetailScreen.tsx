@@ -2,7 +2,7 @@
 
 import { useAppStore, type ResourceItem } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, BookOpen, MapPin, Bookmark, ChevronRight, Loader2, Heart, Share2, Calendar, Hash, Star, MessageSquare, Trash2, Pencil, X } from 'lucide-react'
+import { ArrowLeft, BookOpen, MapPin, Bookmark, ChevronRight, Loader2, Heart, Share2, Calendar, Hash, Star, MessageSquare, Trash2, Pencil, X, Library } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useState, useEffect, useCallback } from 'react'
@@ -39,6 +39,7 @@ export default function BookDetailScreen() {
   const [relatedBooks, setRelatedBooks] = useState<ResourceItem[]>([])
   const [loading, setLoading] = useState(true)
   const [borrowing, setBorrowing] = useState(false)
+  const [startingReading, setStartingReading] = useState(false)
   const [reserving, setReserving] = useState(false)
   const [hearted, setHearted] = useState(false)
   const [showShareToast, setShowShareToast] = useState(false)
@@ -135,6 +136,33 @@ export default function BookDetailScreen() {
     fetchRelated()
     fetchReviews()
   }, [fetchBook, fetchRelated, fetchReviews])
+
+  const handleStartReading = async () => {
+    if (!user?.id || !book) return
+    setStartingReading(true)
+    try {
+      const res = await fetch('/api/reading-sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, resourceId: book.id }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        if (data.error?.includes('already have an active')) {
+          toast({ title: 'Already Reading', description: 'You already have an active reading session for this book.' })
+        } else {
+          toast({ title: 'Cannot Start Reading', description: data.error || 'Something went wrong', variant: 'destructive' })
+        }
+        return
+      }
+      toast({ title: 'Reading Started!', description: `You're now reading "${book.title}" in the library.` })
+      fetchBook()
+    } catch {
+      toast({ title: 'Error', description: 'Something went wrong.', variant: 'destructive' })
+    } finally {
+      setStartingReading(false)
+    }
+  }
 
   const handleBorrow = async () => {
     if (!user?.id || !book) return
@@ -672,30 +700,60 @@ export default function BookDetailScreen() {
 
       {/* Action buttons */}
       <div className="px-4 mt-4 flex gap-3">
-        <Button
-          onClick={isAvailable ? handleBorrow : handleReserve}
-          disabled={borrowing || reserving}
-          className={`flex-1 h-12 rounded-xl font-semibold text-base ${
-            isAvailable
-              ? 'bg-lib-purple hover:bg-lib-purple-dark text-white'
-              : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-white/15'
-          }`}
-        >
-          {borrowing || reserving ? (
-            <span className="flex items-center gap-2">
-              <motion.div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-              Processing...
-            </span>
-          ) : isAvailable ? (
-            <span className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4" /> Borrow
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              <Bookmark className="w-4 h-4" /> Reserve
-            </span>
-          )}
-        </Button>
+        {isAvailable ? (
+          <>
+            <Button
+              onClick={handleStartReading}
+              disabled={startingReading}
+              className="flex-1 h-12 rounded-xl font-semibold text-base bg-lib-purple hover:bg-lib-purple-dark text-white"
+            >
+              {startingReading ? (
+                <span className="flex items-center gap-2">
+                  <motion.div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                  Starting...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Library className="w-4 h-4" /> Read Here
+                </span>
+              )}
+            </Button>
+            <Button
+              onClick={handleBorrow}
+              disabled={borrowing}
+              variant="outline"
+              className="flex-1 h-12 rounded-xl font-semibold text-base border-lib-purple-200 dark:border-lib-purple-700 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-50 dark:hover:bg-white/5"
+            >
+              {borrowing ? (
+                <span className="flex items-center gap-2">
+                  <motion.div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                  Borrowing...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" /> Take Home
+                </span>
+              )}
+            </Button>
+          </>
+        ) : (
+          <Button
+            onClick={handleReserve}
+            disabled={reserving}
+            className="flex-1 h-12 rounded-xl font-semibold text-base bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-white/15"
+          >
+            {reserving ? (
+              <span className="flex items-center gap-2">
+                <motion.div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                Processing...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <Bookmark className="w-4 h-4" /> Reserve
+              </span>
+            )}
+          </Button>
+        )}
         <Button
           variant="outline"
           onClick={handleShare}

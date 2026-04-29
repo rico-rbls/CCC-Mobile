@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   ScanLine, Zap, X, CheckCircle2, Clock, BookOpen,
   UserCheck, LogOut, ChevronRight, Loader2, BookMarked,
+  ArrowRightLeft, Library,
 } from 'lucide-react'
 import { useAppStore, type ResourceItem } from '@/lib/store'
 import { useState, useEffect, useCallback } from 'react'
@@ -20,8 +21,9 @@ interface ScanResult {
 }
 
 interface ExitSummary {
-  timedOut: boolean
-  duration?: number
+  attendance: { timedOut: boolean; duration?: number; message?: string }
+  endedReadingSessions: { id: string; title: string; author: string; durationMinutes: number }[]
+  totalReadingSessionsEnded: number
   returnedBooks: { id: string; title: string; author: string }[]
   totalReturned: number
 }
@@ -35,6 +37,8 @@ export default function QRScanScreen() {
   const [scannedBook, setScannedBook] = useState<ResourceItem | null>(null)
   const [startingReading, setStartingReading] = useState(false)
   const [readingStarted, setReadingStarted] = useState(false)
+  const [borrowing, setBorrowing] = useState(false)
+  const [borrowed, setBorrowed] = useState(false)
   const [exitSummary, setExitSummary] = useState<ExitSummary | null>(null)
   const [processingExit, setProcessingExit] = useState(false)
 
@@ -67,7 +71,7 @@ export default function QRScanScreen() {
     }, 2000)
 
     return () => clearTimeout(timer)
-  }, [scanning, result, mode, fetchRandomBook, processLibraryExit])
+  }, [scanning, result, mode])
 
   const fetchRandomBook = useCallback(async () => {
     try {
@@ -119,18 +123,42 @@ export default function QRScanScreen() {
     if (!user?.id || !scannedBook) return
     setStartingReading(true)
     try {
-      const res = await fetch('/api/borrow', {
+      const res = await fetch('/api/reading-sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, resourceId: scannedBook.id }),
       })
       if (res.ok) {
         setReadingStarted(true)
+      } else {
+        const data = await res.json()
+        if (data.error?.includes('already have an active')) {
+          setReadingStarted(true) // Already reading
+        }
       }
     } catch (e) {
       console.error('Failed to start reading:', e)
     } finally {
       setStartingReading(false)
+    }
+  }
+
+  const handleBorrow = async () => {
+    if (!user?.id || !scannedBook) return
+    setBorrowing(true)
+    try {
+      const res = await fetch('/api/borrow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, resourceId: scannedBook.id }),
+      })
+      if (res.ok) {
+        setBorrowed(true)
+      }
+    } catch (e) {
+      console.error('Failed to borrow book:', e)
+    } finally {
+      setBorrowing(false)
     }
   }
 
@@ -146,6 +174,7 @@ export default function QRScanScreen() {
     setScanning(false)
     setScannedBook(null)
     setReadingStarted(false)
+    setBorrowed(false)
     setExitSummary(null)
     setProcessingExit(false)
   }
@@ -199,7 +228,7 @@ export default function QRScanScreen() {
           {mode === 'attendance'
             ? 'Point your camera at the entrance QR for attendance check-in'
             : mode === 'checkout'
-            ? 'Scan the QR code on a book to start reading'
+            ? 'Scan the QR code on a book to read or borrow'
             : 'Scan the exit QR to check out of the library'}
         </p>
       </div>
@@ -317,7 +346,7 @@ export default function QRScanScreen() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-              className="bg-white dark:bg-[#1a0e2e] rounded-3xl w-full max-w-sm dark:shadow-2xl overflow-hidden"
+              className="bg-white dark:bg-[#1a0e2e] rounded-3xl w-full max-w-sm dark:shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
             >
               {/* ── Attendance Mode Result ── */}
               {mode === 'attendance' && (
@@ -426,6 +455,7 @@ export default function QRScanScreen() {
                       </Badge>
                     )}
 
+                    {/* Reading started success message */}
                     {readingStarted ? (
                       <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -434,26 +464,59 @@ export default function QRScanScreen() {
                       >
                         <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
                         <p className="text-sm font-semibold text-green-700 dark:text-green-400">You&apos;re now reading!</p>
-                        <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-1">This book has been added to your borrows.</p>
+                        <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-1">Read inside the library. Your session will end when you exit.</p>
+                      </motion.div>
+                    ) : borrowed ? (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 text-center mb-4"
+                      >
+                        <CheckCircle2 className="w-8 h-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                        <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">Book Borrowed!</p>
+                        <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">You can take this book outside the library.</p>
                       </motion.div>
                     ) : scannedBook.availableCopies > 0 ? (
-                      <Button
-                        onClick={handleStartReading}
-                        disabled={startingReading}
-                        className="w-full rounded-xl py-5 bg-lib-purple hover:bg-lib-purple/90 text-white font-semibold text-sm mb-3"
-                      >
-                        {startingReading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Starting...
-                          </>
-                        ) : (
-                          <>
-                            <BookMarked className="w-4 h-4 mr-2" />
-                            Start Reading
-                          </>
-                        )}
-                      </Button>
+                      <div className="space-y-2.5 mb-3">
+                        {/* Read in library option */}
+                        <Button
+                          onClick={handleStartReading}
+                          disabled={startingReading}
+                          className="w-full rounded-xl py-5 bg-lib-purple hover:bg-lib-purple/90 text-white font-semibold text-sm"
+                        >
+                          {startingReading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Starting...
+                            </>
+                          ) : (
+                            <>
+                              <Library className="w-4 h-4 mr-2" />
+                              Read in Library
+                            </>
+                          )}
+                        </Button>
+
+                        {/* Borrow to take outside option */}
+                        <Button
+                          onClick={handleBorrow}
+                          disabled={borrowing}
+                          variant="outline"
+                          className="w-full rounded-xl py-5 border-lib-purple-200 dark:border-lib-purple-700 text-lib-purple dark:text-lib-purple-300 font-semibold text-sm hover:bg-lib-purple-50 dark:hover:bg-white/5"
+                        >
+                          {borrowing ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Borrowing...
+                            </>
+                          ) : (
+                            <>
+                              <ArrowRightLeft className="w-4 h-4 mr-2" />
+                              Borrow to Take Home
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     ) : (
                       <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-4 text-center mb-4">
                         <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-400">No copies available</p>
@@ -538,7 +601,38 @@ export default function QRScanScreen() {
                     </motion.div>
                   )}
 
-                  {/* Returned books */}
+                  {/* Ended reading sessions (in-library) */}
+                  {exitSummary.totalReadingSessionsEnded > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.55 }}
+                      className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-3 mb-3"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <Library className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                        <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">
+                          {exitSummary.totalReadingSessionsEnded} reading session{exitSummary.totalReadingSessionsEnded > 1 ? 's' : ''} ended
+                        </p>
+                      </div>
+                      <div className="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar">
+                        {exitSummary.endedReadingSessions.map((book) => (
+                          <div key={book.id} className="flex items-center gap-2 py-1 px-2 bg-white dark:bg-white/5 rounded-lg">
+                            <BookOpen className="w-3 h-3 text-amber-600/60 dark:text-amber-400/60 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-foreground truncate">{book.title}</p>
+                              <p className="text-[10px] text-muted-foreground truncate">{book.author}</p>
+                            </div>
+                            <span className="text-[9px] text-amber-600 dark:text-amber-400 font-medium flex-shrink-0">
+                              {book.durationMinutes} min
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Returned borrowed books (outside) */}
                   {exitSummary.totalReturned > 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
@@ -549,7 +643,7 @@ export default function QRScanScreen() {
                       <div className="flex items-center gap-2 mb-2">
                         <BookMarked className="w-4 h-4 text-lib-purple dark:text-lib-purple-300 flex-shrink-0" />
                         <p className="text-xs font-semibold text-lib-purple dark:text-lib-purple-300">
-                          {exitSummary.totalReturned} book{exitSummary.totalReturned > 1 ? 's' : ''} auto-returned
+                          {exitSummary.totalReturned} book{exitSummary.totalReturned > 1 ? 's' : ''} returned
                         </p>
                       </div>
                       <div className="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar">
@@ -567,7 +661,7 @@ export default function QRScanScreen() {
                     </motion.div>
                   )}
 
-                  {exitSummary.totalReturned === 0 && (
+                  {exitSummary.totalReadingSessionsEnded === 0 && exitSummary.totalReturned === 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}

@@ -36,7 +36,42 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // 2. Find all active/overdue borrowed books
+    // 2. End all active reading sessions (in-library reading)
+    const activeReadingSessions = await db.readingSession.findMany({
+      where: { userId, status: 'active' },
+      include: { resource: true },
+    })
+
+    const endedReadingSessions: { id: string; title: string; author: string; durationMinutes: number }[] = []
+    const now = new Date()
+
+    for (const session of activeReadingSessions) {
+      const durationMs = now.getTime() - session.startTime.getTime()
+      const durationMinutes = Math.round(durationMs / (1000 * 60))
+
+      await db.$transaction([
+        db.readingSession.update({
+          where: { id: session.id },
+          data: {
+            endTime: now,
+            status: 'ended',
+          },
+        }),
+        db.resource.update({
+          where: { id: session.resourceId },
+          data: { availableCopies: { increment: 1 } },
+        }),
+      ])
+
+      endedReadingSessions.push({
+        id: session.resource.id,
+        title: session.resource.title,
+        author: session.resource.author,
+        durationMinutes,
+      })
+    }
+
+    // 3. Find all active/overdue borrowed books (outside borrowing)
     const activeBorrows = await db.borrowRecord.findMany({
       where: {
         userId,
@@ -45,13 +80,11 @@ export async function POST(request: NextRequest) {
       include: { resource: true },
     })
 
-    // 3. Return all active books (stop reading)
+    // 4. Return all active borrowed books
     const returnedBooks: { id: string; title: string; author: string }[] = []
 
     for (const borrow of activeBorrows) {
-      const now = new Date()
-      const dueDate = new Date(borrow.dueDate)
-      const isLate = now > dueDate
+      const isLate = now > new Date(borrow.dueDate)
 
       await db.$transaction([
         db.borrowRecord.update({
@@ -79,6 +112,8 @@ export async function POST(request: NextRequest) {
       attendance: attendanceResult
         ? { timedOut: true, duration: attendanceResult.duration }
         : { timedOut: false, message: 'No active attendance record found for today' },
+      endedReadingSessions,
+      totalReadingSessionsEnded: endedReadingSessions.length,
       returnedBooks,
       totalReturned: returnedBooks.length,
     })

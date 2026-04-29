@@ -1058,3 +1058,89 @@ Stage Summary:
 - BRANDING.md updated from 698 → 783 lines as v1.1 with full design system updates
 - Both documents now accurately reflect the current system state
 - All major design decisions documented: flat light mode, dark purple dark mode, lavender background
+---
+Task ID: 12
+Agent: Main Agent
+Task: Add two types of borrowing - In-library reading (ReadingSession) and outside borrowing (BorrowRecord)
+
+Work Log:
+- Analyzed user requirement: two types of borrowing exist:
+  1. In-library reading: User scans book QR, reads inside library, auto-stops when exiting
+  2. Outside borrowing: User takes book home with a due date (existing BorrowRecord flow)
+- Added `ReadingSession` model to Prisma schema with fields: id, userId, resourceId, startTime, endTime, status, date
+- Added `readingSessions` relation to both User and Resource models
+- Pushed schema changes to database with `bun run db:push`
+- Fixed db.ts cache invalidation to check for `readingSession` model in cached Prisma client
+- Created API endpoints:
+  - `GET /api/reading-sessions?userId=X&status=active` - List reading sessions with resource details
+  - `POST /api/reading-sessions` - Start a reading session (decrements availableCopies)
+  - `PUT /api/reading-sessions/[id]/end` - End a reading session manually (increments availableCopies)
+- Updated `POST /api/library/exit` to also end active reading sessions:
+  - Now returns `endedReadingSessions` array with duration per session
+  - Returns `totalReadingSessionsEnded` count
+  - Still returns `returnedBooks` for outside borrows
+- Rewrote QRScanScreen.tsx:
+  - "Book Scan" mode now shows two options: "Read in Library" (creates ReadingSession) and "Borrow to Take Home" (creates BorrowRecord)
+  - "Read in Library" button (purple, primary) calls POST /api/reading-sessions
+  - "Borrow to Take Home" button (outline) calls POST /api/borrow
+  - Success messages differentiate between in-library reading and outside borrowing
+  - Exit scan results now show separate sections for ended reading sessions and returned borrowed books
+- Updated HomeScreen.tsx:
+  - Added "Currently Reading" section with amber theme, shows active reading sessions
+  - Each card shows book title, author, duration with animated pulse dot
+  - "Stop Reading" button calls PUT /api/reading-sessions/[id]/end
+  - "View" button navigates to book detail
+  - Added "In Library" badge to distinguish from "Current Borrow" (which shows "Take Home" badge)
+  - Fetches active reading sessions from API on load
+- Updated BorrowedScreen.tsx:
+  - Added "Reading" tab (3 tabs now: Loans, Reading, History)
+  - Reading tab shows active in-library sessions with amber theme cards
+  - Each session shows title, author, duration, "In Library" badge
+  - "Stop Reading" button on each session card
+  - "Scan a Book" CTA when no active reading sessions
+  - Stats bar shows separate counts for Loans, Reading, and Returned
+- Updated BookDetailScreen.tsx:
+  - Replaced single "Borrow" button with two buttons: "Read Here" (primary, Library icon) and "Take Home" (outline, BookOpen icon)
+  - "Read Here" creates a ReadingSession (in-library reading)
+  - "Take Home" creates a BorrowRecord (outside borrowing with due date)
+  - When unavailable, shows "Reserve" button (unchanged)
+- All APIs tested and verified working:
+  - POST /api/reading-sessions returns 201 with session data
+  - GET /api/reading-sessions returns array with resource includes
+  - PUT /api/reading-sessions/[id]/end returns session + duration
+  - POST /api/library/exit ends reading sessions AND returns borrowed books
+- Lint passes with zero errors
+
+Files Created:
+- `/home/z/my-project/src/app/api/reading-sessions/route.ts` - GET + POST reading sessions API
+- `/home/z/my-project/src/app/api/reading-sessions/[id]/end/route.ts` - PUT end reading session API
+
+Files Modified:
+- `/home/z/my-project/prisma/schema.prisma` - Added ReadingSession model + relations
+- `/home/z/my-project/src/lib/db.ts` - Added readingSession cache invalidation check
+- `/home/z/my-project/src/app/api/library/exit/route.ts` - Added reading session ending logic
+- `/home/z/my-project/src/components/screens/QRScanScreen.tsx` - Two borrowing options + updated exit results
+- `/home/z/my-project/src/components/screens/HomeScreen.tsx` - Currently Reading section
+- `/home/z/my-project/src/components/screens/BorrowedScreen.tsx` - Reading tab + session management
+- `/home/z/my-project/src/components/screens/BookDetailScreen.tsx` - Read Here + Take Home buttons
+
+Stage Summary:
+- Two types of borrowing fully implemented: in-library reading (ReadingSession) and outside borrowing (BorrowRecord)
+- In-library reading: scan book → "Read in Library" → auto-ends on library exit
+- Outside borrowing: "Take Home" button → due date based borrowing → manual return
+- Home screen shows "Currently Reading" (amber) and "Current Borrow" (blue/purple) separately
+- Borrowed screen has 3 tabs: Loans, Reading, History
+- Book detail has "Read Here" + "Take Home" buttons
+- QR scan shows both options with clear labels
+- Library exit auto-ends all reading sessions and returns borrowed books
+- All APIs tested and working
+- Total API endpoints: 17 (added 3 reading session endpoints)
+- Total database models: 9 (added ReadingSession)
+
+Current Project Status:
+- All 13 screens functional with real API data
+- Backend APIs all working (17 endpoints)
+- Database has 9 models with ReadingSession
+- Two borrowing types implemented with proper separation
+- In-library reading auto-stops on library exit
+- All lint checks pass with zero errors
