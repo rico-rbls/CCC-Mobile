@@ -882,3 +882,33 @@ Files Modified:
 - `/home/z/my-project/src/components/screens/ProfileScreen.tsx` - Added QR code card with qrcode.react
 
 All lint checks pass with zero errors.
+
+---
+Task ID: 12
+Agent: Main Agent
+Task: Fix Recommended for You carousel horizontal alignment and add proper paddings
+
+Work Log:
+- Analyzed the "Recommended for You" carousel cards in HomeScreen.tsx
+- Identified alignment issue: cards had variable heights due to `line-clamp-2` on titles (1 vs 2 lines) and conditional badge overlays
+- Fixed carousel alignment:
+  1. Changed card width from `w-28` to `w-[120px]` with explicit pixel dimensions
+  2. Unified cover image container to single `div` with `w-[120px] h-[160px]` (both with-image and placeholder variants now share the same container)
+  3. Added fixed-height text area `h-[52px]` wrapping availability, title, and author
+  4. Added `min-h-[28px]` on title with `line-clamp-2` to ensure consistent 2-line height reservation
+  5. Added `truncate` on author text to prevent overflow
+  6. Added `flex-shrink-0` on availability dot indicator
+- Improved carousel padding:
+  1. Changed from `-mx-1 px-1` to `-mx-2 px-2` for better horizontal scroll padding
+  2. Changed from `pb-1` to `pb-2` for better bottom breathing room
+- Updated SkeletonRecommendations to match new dimensions (`w-[120px] h-[160px]` covers, `h-[52px]` text area)
+
+Files Modified:
+- `/home/z/my-project/src/components/screens/HomeScreen.tsx` - Fixed carousel card alignment and paddings
+
+Stage Summary:
+- All carousel cards now have consistent horizontal alignment with fixed dimensions
+- Cover images: 120x160px, text area: 52px height, title min-height: 28px
+- Better scroll padding with -mx-2 px-2 and pb-2
+- Skeleton loading matches real card dimensions
+- Lint passes with zero errors

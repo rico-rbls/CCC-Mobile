@@ -53,12 +53,15 @@ function SkeletonCard() {
 
 function SkeletonRecommendations() {
   return (
-    <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
+    <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="flex-shrink-0 w-32 space-y-2">
-          <Skeleton className="w-32 h-44 rounded-2xl" />
-          <Skeleton className="h-3 w-24" />
-          <Skeleton className="h-2 w-16" />
+        <div key={i} className="flex-shrink-0 w-[120px] space-y-2">
+          <Skeleton className="w-[120px] h-[160px] rounded-2xl" />
+          <div className="h-[52px] space-y-1.5">
+            <Skeleton className="h-2.5 w-16" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-2 w-14" />
+          </div>
         </div>
       ))}
     </div>
@@ -737,7 +740,7 @@ export default function HomeScreen() {
                 See All <ChevronRight className="w-3 h-3" />
               </button>
             </div>
-            <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-1 px-1">
+            <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-2 -mx-2 px-2">
               {recommendations.map((book) => {
                 const isForYou = user?.program && book.subject?.toLowerCase().includes(user.program.toLowerCase())
                 return (
@@ -746,50 +749,58 @@ export default function HomeScreen() {
                     whileTap={{ scale: 0.97 }}
                     whileHover={{ scale: 1.02 }}
                     onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
-                    className="flex-shrink-0 w-28 group"
+                    className="flex-shrink-0 w-[120px] group"
                   >
-                    {(() => {
-                      const coverSrc = getResourceCover(book.coverImage, book.title)
-                      return coverSrc ? (
-                        <div className="w-28 h-40 rounded-2xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
-                          <img src={coverSrc} alt={book.title} className="w-full h-full object-cover" />
-                          {book.category && (
-                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
-                              {book.category}
-                            </span>
-                          )}
-                          {isForYou && (
-                            <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none flex items-center gap-0.5">
-                              <Star className="w-2.5 h-2.5 fill-current" />
-                              For You
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="w-28 h-40 rounded-2xl bg-purple-gradient mb-2 flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow cover-pattern-overlay">
-                          <BookOpen className="w-7 h-7 text-white/50" />
-                          {book.category && (
-                            <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
-                              {book.category}
-                            </span>
-                          )}
-                          {isForYou && (
-                            <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none flex items-center gap-0.5">
-                              <Star className="w-2.5 h-2.5 fill-current" />
-                              For You
-                            </span>
-                          )}
-                        </div>
-                      )
-                    })()}
-                    <div className="flex items-center gap-1 mb-0.5">
-                      <span className={`w-1.5 h-1.5 rounded-full ${book.availableCopies > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
-                      <span className="text-[10px] text-muted-foreground">
-                        {book.availableCopies > 0 ? `${book.availableCopies} available` : 'Unavailable'}
-                      </span>
+                    {/* Cover image - fixed height for alignment */}
+                    <div className="w-[120px] h-[160px] rounded-2xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                      {(() => {
+                        const coverSrc = getResourceCover(book.coverImage, book.title)
+                        return coverSrc ? (
+                          <>
+                            <img src={coverSrc} alt={book.title} className="w-full h-full object-cover" />
+                            {book.category && (
+                              <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
+                                {book.category}
+                              </span>
+                            )}
+                            {isForYou && (
+                              <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none flex items-center gap-0.5">
+                                <Star className="w-2.5 h-2.5 fill-current" />
+                                For You
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-full h-full bg-purple-gradient flex items-center justify-center cover-pattern-overlay">
+                              <BookOpen className="w-7 h-7 text-white/50" />
+                            </div>
+                            {book.category && (
+                              <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
+                                {book.category}
+                              </span>
+                            )}
+                            {isForYou && (
+                              <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none flex items-center gap-0.5">
+                                <Star className="w-2.5 h-2.5 fill-current" />
+                                For You
+                              </span>
+                            )}
+                          </>
+                        )
+                      })()}
                     </div>
-                    <h4 className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{book.title}</h4>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{book.author}</p>
+                    {/* Text content - fixed min-height for alignment */}
+                    <div className="h-[52px] flex flex-col">
+                      <div className="flex items-center gap-1 mb-0.5">
+                        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${book.availableCopies > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
+                        <span className="text-[10px] text-muted-foreground truncate">
+                          {book.availableCopies > 0 ? `${book.availableCopies} available` : 'Unavailable'}
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-semibold text-foreground leading-tight line-clamp-2 min-h-[28px]">{book.title}</h4>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{book.author}</p>
+                    </div>
                   </motion.button>
                 )
               })}
