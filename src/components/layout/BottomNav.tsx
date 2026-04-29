@@ -40,9 +40,9 @@ export default function BottomNav() {
 
   return (
     <nav>
-      <div className="flex items-center gap-2 px-4 pt-2 pb-4">
-        {/* Card containing 4 nav icons — taller, tighter spacing */}
-        <div className="flex-1 flex items-center justify-around py-3 px-1 rounded-2xl bg-card shadow-sm">
+      <div className="flex items-center gap-2.5 px-4 pt-2 pb-4">
+        {/* Card containing 4 nav icons */}
+        <div className="flex-1 flex items-center justify-around py-2 px-1.5 rounded-2xl bg-card shadow-sm">
           {navItems.map((item) => {
             const isActive = currentScreen === item.id
             const Icon = item.icon
@@ -55,7 +55,7 @@ export default function BottomNav() {
                 aria-label={item.label}
               >
                 <div
-                  className={`relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-colors duration-200 ${
+                  className={`relative flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-colors duration-200 ${
                     isActive ? 'bg-lib-purple' : ''
                   }`}
                 >
@@ -85,14 +85,14 @@ export default function BottomNav() {
           })}
         </div>
 
-        {/* Scan — squircle card, same height as the 4-icon card */}
+        {/* Scan — same height as the 4-icon card */}
         <button
           onClick={() => handleNavClick('qr-scan')}
           className="self-stretch"
           aria-label="Scan"
         >
           <div
-            className={`h-full aspect-square rounded-2xl flex items-center justify-center shadow-sm transition-all duration-200 ${
+            className={`h-full min-h-[52px] w-[52px] rounded-2xl flex items-center justify-center shadow-sm transition-all duration-200 ${
               isScanActive
                 ? 'bg-lib-purple-light shadow-lib-purple/50'
                 : 'bg-lib-purple shadow-lib-purple/40'
