@@ -40,9 +40,9 @@ export default function BottomNav() {
 
   return (
     <nav>
-      <div className="flex items-center gap-2.5 px-4 pt-2 pb-4">
-        {/* Rounded rectangle card — same bg as home screen section cards */}
-        <div className="flex-1 flex items-center justify-around py-2 px-1.5 rounded-2xl bg-card shadow-sm">
+      <div className="flex items-center gap-2 px-4 pt-2 pb-4">
+        {/* Card containing 4 nav icons — taller, tighter spacing */}
+        <div className="flex-1 flex items-center justify-around py-3 px-1 rounded-2xl bg-card shadow-sm">
           {navItems.map((item) => {
             const isActive = currentScreen === item.id
             const Icon = item.icon
@@ -54,13 +54,17 @@ export default function BottomNav() {
                 className="flex flex-col items-center"
                 aria-label={item.label}
               >
-                <div className={`relative flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-colors duration-200 ${
-                  isActive ? 'bg-lib-purple' : ''
-                }`}>
+                <div
+                  className={`relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-colors duration-200 ${
+                    isActive ? 'bg-lib-purple' : ''
+                  }`}
+                >
                   <div className="relative flex items-center justify-center">
-                    <Icon className={`w-5 h-5 transition-colors duration-200 ${
-                      isActive ? 'text-white' : 'text-muted-foreground'
-                    }`} />
+                    <Icon
+                      className={`w-5 h-5 transition-colors duration-200 ${
+                        isActive ? 'text-white' : 'text-muted-foreground'
+                      }`}
+                    />
                     {/* Badge for active borrows */}
                     {item.id === 'borrowed' && activeBorrows > 0 && (
                       <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 rounded-full bg-red-500 text-[7px] text-white font-bold flex items-center justify-center px-0.5">
@@ -68,9 +72,11 @@ export default function BottomNav() {
                       </span>
                     )}
                   </div>
-                  <span className={`text-[8px] transition-colors duration-200 leading-tight ${
-                    isActive ? 'text-white font-semibold' : 'text-muted-foreground'
-                  }`}>
+                  <span
+                    className={`text-[8px] transition-colors duration-200 leading-tight ${
+                      isActive ? 'text-white font-semibold' : 'text-muted-foreground'
+                    }`}
+                  >
                     {item.label}
                   </span>
                 </div>
@@ -79,17 +85,19 @@ export default function BottomNav() {
           })}
         </div>
 
-        {/* Scan — same height as the 4-icon card */}
+        {/* Scan — squircle card, same height as the 4-icon card */}
         <button
           onClick={() => handleNavClick('qr-scan')}
           className="self-stretch"
           aria-label="Scan"
         >
-          <div className={`h-full min-h-[52px] w-[52px] rounded-2xl flex items-center justify-center shadow-sm transition-all duration-200 ${
-            isScanActive
-              ? 'bg-lib-purple-light shadow-lib-purple/50'
-              : 'bg-lib-purple shadow-lib-purple/40'
-          }`}>
+          <div
+            className={`h-full aspect-square rounded-2xl flex items-center justify-center shadow-sm transition-all duration-200 ${
+              isScanActive
+                ? 'bg-lib-purple-light shadow-lib-purple/50'
+                : 'bg-lib-purple shadow-lib-purple/40'
+            }`}
+          >
             <ScanLine className="w-6 h-6 text-white" />
           </div>
         </button>
