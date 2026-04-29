@@ -295,7 +295,7 @@ export default function AttendanceScreen() {
           </div>
         </motion.div>
 
-        <div className="h-6" />
+        <div className="h-24" />
       </div>
     </div>
   )

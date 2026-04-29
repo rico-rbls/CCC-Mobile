@@ -350,7 +350,7 @@ export default function SettingsScreen() {
           </Button>
         </motion.div>
 
-        <div className="h-6" />
+        <div className="h-24" />
       </div>
 
       {/* Password Change Modal */}

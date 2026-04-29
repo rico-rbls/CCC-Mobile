@@ -450,7 +450,7 @@ export default function BorrowedScreen() {
             </motion.div>
           </AnimatePresence>
         )}
-        <div className="h-4" />
+        <div className="h-24" />
       </div>
     </div>
   )

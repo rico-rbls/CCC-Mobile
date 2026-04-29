@@ -734,7 +734,7 @@ export default function BookDetailScreen() {
             </div>
           )}
         </div>
-        <div className="h-4" />
+        <div className="h-24" />
       </div>
 
       {/* Full-screen image viewer */}

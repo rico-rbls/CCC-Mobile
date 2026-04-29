@@ -54,9 +54,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#0d0618] flex justify-center">
-      <div className="w-full max-w-[430px] h-dvh bg-white dark:bg-[#110a1e] relative flex flex-col shadow-xl">
-        {/* Screen content - scrollable area */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
+      <div className="w-full max-w-[430px] h-dvh bg-white dark:bg-[#110a1e] relative shadow-xl">
+        {/* Screen content - full scrollable area */}
+        <div className="h-full overflow-y-auto overflow-x-hidden custom-scrollbar">
           <AnimatePresence mode="wait">
             <motion.div
               key={displayScreen}
@@ -70,10 +70,12 @@ export default function Home() {
           </AnimatePresence>
         </div>
 
-        {/* Bottom navigation - always stuck to bottom */}
+        {/* Bottom navigation - transparent overlay, only card & scan are visible */}
         {showNav && (
-          <div className="sticky bottom-0 shrink-0">
-            <BottomNav />
+          <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
+            <div className="pointer-events-auto">
+              <BottomNav />
+            </div>
           </div>
         )}
       </div>

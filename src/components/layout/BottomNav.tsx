@@ -39,8 +39,8 @@ export default function BottomNav() {
   const isScanActive = currentScreen === 'qr-scan'
 
   return (
-    <nav className="pb-3">
-      <div className="flex items-end justify-between px-4 pt-2">
+    <nav>
+      <div className="flex items-end justify-between px-4 pt-2 pb-4">
         {/* Rounded rectangle card — the visible nav element */}
         <div className="flex-1 flex items-center justify-around py-3 px-3 rounded-2xl bg-white/[0.06]">
           {navItems.map((item) => {

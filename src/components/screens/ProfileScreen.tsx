@@ -377,7 +377,7 @@ export default function ProfileScreen() {
         </motion.button>
       </div>
 
-      <div className="h-4" />
+      <div className="h-24" />
     </div>
   )
 }

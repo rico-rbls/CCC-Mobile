@@ -277,7 +277,7 @@ export default function NotificationsScreen() {
             ))}
           </div>
         )}
-        <div className="h-4" />
+        <div className="h-24" />
       </div>
     </div>
   )
