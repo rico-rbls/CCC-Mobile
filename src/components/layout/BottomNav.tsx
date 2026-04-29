@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react'
 
 const navItems: { id: AppScreen; icon: typeof Home; label: string }[] = [
   { id: 'home', icon: Home, label: 'Home' },
-  { id: 'search', icon: Search, label: 'Search' },
+  { id: 'search', icon: Search, label: 'Catalog' },
   { id: 'borrowed', icon: BookOpen, label: 'Borrowed' },
   { id: 'profile', icon: User, label: 'Profile' },
 ]
