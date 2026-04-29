@@ -861,3 +861,24 @@ Files Modified:
 - `/home/z/my-project/src/components/layout/BottomNav.tsx` - Complete redesign with individual floating cards per icon, Scan same size, no rectangle container
 
 All lint checks pass with zero errors.
+
+---
+Task ID: 13
+Agent: Main Agent
+Task: Bottom Nav redesign + Profile QR code
+
+Work Log:
+- BottomNav: Redesigned to have a rounded rectangle (bg-white/[0.06] rounded-2xl) covering only Home, Search, Borrowed, Profile icons
+- BottomNav: Scan button separated from the rectangle — now a big purple rounded card (w-14 h-14 rounded-2xl bg-lib-purple) with only the ScanLine icon, no text label, positioned on the right with -mt-4 to slightly elevate above the nav bar
+- BottomNav: Scan button has shadow-lg shadow-lib-purple/40 for emphasis
+- ProfileScreen: Added user's own QR code card between stats and menu items
+- ProfileScreen: QR code uses qrcode.react (QRCodeSVG) with purple fgColor (#652D90), size 140, level M
+- ProfileScreen: QR payload contains userId, name, universityId, role, type='library-access'
+- ProfileScreen: QR card has white background container with rounded-2xl, subtitle "My Library QR Code", helper text, and a "Valid for attendance" badge
+- Installed qrcode.react@4.2.0 package
+
+Files Modified:
+- `/home/z/my-project/src/components/layout/BottomNav.tsx` - Rounded rectangle for 4 icons, separate Scan purple card
+- `/home/z/my-project/src/components/screens/ProfileScreen.tsx` - Added QR code card with qrcode.react
+
+All lint checks pass with zero errors.

@@ -7,6 +7,7 @@ import {
   ChevronRight, Edit, LogOut, MapPin, Heart, Mail, GraduationCap, FileText, Calendar, Bookmark, Target
 } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 
 // Monthly reading data for bar chart
 const monthlyData = [
@@ -139,8 +140,45 @@ export default function ProfileScreen() {
         </div>
       </div>
 
-      {/* Menu items: Edit Profile, My Favorites, My Reservations — same bg-card color as home */}
+      {/* My QR Code card */}
       <div className="px-4 mt-4">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12 }}
+          className="bg-card rounded-[22px] shadow-sm p-5"
+        >
+          <div className="flex flex-col items-center">
+            <span className="text-sm font-semibold text-foreground dark:text-white mb-3">My Library QR Code</span>
+            <div className="bg-white p-3 rounded-2xl shadow-sm">
+              <QRCodeSVG
+                value={JSON.stringify({
+                  userId: user?.id,
+                  name: user?.fullName,
+                  universityId: user?.universityId,
+                  role: user?.role,
+                  type: 'library-access',
+                })}
+                size={140}
+                level="M"
+                bgColor="#ffffff"
+                fgColor="#652D90"
+                includeMargin={false}
+              />
+            </div>
+            <p className="text-[10px] text-muted-foreground dark:text-white/40 mt-3 text-center leading-relaxed">
+              Present this QR code at the library entrance<br />for attendance check-in
+            </p>
+            <div className="flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-full bg-lib-purple-50 dark:bg-white/10">
+              <Clock className="w-3 h-3 text-lib-purple dark:text-lib-purple-300" />
+              <span className="text-[9px] font-medium text-lib-purple dark:text-lib-purple-300">Valid for attendance</span>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Menu items: Edit Profile, My Favorites, My Reservations — same bg-card color as home */}
+      <div className="px-4 mt-3">
         <div className="bg-card rounded-[22px] shadow-sm overflow-hidden divide-y divide-gray-50 dark:divide-white/5">
           {menuItems.map((item, index) => {
             const Icon = item.icon
