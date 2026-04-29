@@ -39,8 +39,8 @@ export default function BottomNav() {
   return (
     <nav className="safe-bottom">
       <div className="flex items-end justify-between px-4 pt-2 pb-3 bg-[#0f0a1e]">
-        {/* 4 nav items — each in its own floating rounded card */}
-        <div className="flex items-center gap-2 flex-1">
+        {/* Single card containing all 4 nav icons */}
+        <div className="flex-1 flex items-center justify-around py-2.5 px-2 rounded-2xl bg-white/[0.06]">
           {navItems.map((item) => {
             const isActive = currentScreen === item.id
             const Icon = item.icon
@@ -49,27 +49,19 @@ export default function BottomNav() {
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className="flex-1 flex flex-col items-center gap-1"
+                className="flex flex-col items-center gap-1"
                 aria-label={item.label}
               >
-                <div
-                  className={`w-full py-2.5 rounded-2xl flex items-center justify-center transition-colors duration-200 ${
-                    isActive
-                      ? 'bg-lib-purple shadow-lg shadow-lib-purple/40'
-                      : 'bg-white/[0.06]'
-                  }`}
-                >
-                  <div className="relative">
-                    <Icon className={`w-5 h-5 transition-colors duration-200 ${
-                      isActive ? 'text-white' : 'text-white/35'
-                    }`} />
-                    {/* Badge for active borrows */}
-                    {item.id === 'borrowed' && activeBorrows > 0 && (
-                      <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 rounded-full bg-red-500 text-[8px] text-white font-bold flex items-center justify-center px-0.5">
-                        {activeBorrows}
-                      </span>
-                    )}
-                  </div>
+                <div className="relative w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200">
+                  <Icon className={`w-5 h-5 transition-colors duration-200 ${
+                    isActive ? 'text-white' : 'text-white/35'
+                  }`} />
+                  {/* Badge for active borrows */}
+                  {item.id === 'borrowed' && activeBorrows > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 rounded-full bg-red-500 text-[7px] text-white font-bold flex items-center justify-center px-0.5">
+                      {activeBorrows}
+                    </span>
+                  )}
                 </div>
                 <span className={`text-[9px] transition-colors duration-200 leading-tight ${
                   isActive ? 'text-white font-semibold' : 'text-white/30'
@@ -87,11 +79,7 @@ export default function BottomNav() {
           className="flex flex-col items-center gap-1 ml-3"
           aria-label="Scan"
         >
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-lib-purple/40 -mt-6 relative transition-colors duration-200 ${
-            currentScreen === 'qr-scan'
-              ? 'bg-lib-purple ring-2 ring-lib-purple/30'
-              : 'bg-lib-purple'
-          }`}>
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-lib-purple/40 -mt-6 relative transition-colors duration-200 bg-lib-purple`}>
             <ScanLine className="w-6 h-6 text-white" />
           </div>
           <span className={`text-[9px] transition-colors duration-200 leading-tight -mt-0.5 ${

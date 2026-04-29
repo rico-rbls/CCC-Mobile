@@ -788,3 +788,55 @@ Stage Summary:
 - Removed duplicate sections (Reading Goal, Reading Stats) that weren't in the desired hierarchy
 - No movement/animation on bottom nav clicks — only color transitions
 - Dark mode applied to both components
+
+---
+Task ID: 13
+Agent: Main Agent
+Task: Home Screen 2-col cards, Announcements fix, Profile card fixes, BookDetail full-image, BottomNav single-card
+
+Work Log:
+- **BottomNav Redesign**: Changed from individual floating cards per icon to a single rounded card containing all 4 icons (Home, Search, Borrowed, Profile). Icons are now square (rounded-xl w-10 h-10). Removed background behind icons — they sit directly inside the single card with no individual bg. Scan remains as a separate FAB on the right. Active state shows white icon/text, inactive shows white/35 muted.
+
+- **Home Screen — 2-column square cards**: Added a new grid section with 2 square cards between Announcements and Today's Highlight:
+  - Left card: Attendance Analytics — shows visit count (large number), hours, and streak
+  - Right card: Reading Goal — shows circular SVG progress ring with borrowCount/readingGoal, goal picker (12/24/36/48)
+  - Both cards use `aspect-square` for equal height, `bg-card rounded-3xl` matching home screen style
+  - Added new imports: Target, BarChart3
+  - Added new state: expandedAnnouncement, readingGoal, showGoalPicker, borrowCount, attendanceCount, totalHours
+  - Added API fetches for returned borrows and attendance data
+
+- **Announcements Fix**: Changed to title-only display by default (message hidden). Added "Read full" / "Read less" toggle button at the bottom. Card no longer flexes/changes height with long text. Carousel dot clicks reset expanded state.
+
+- **Profile Screen Fixes**:
+  - Fixed card colors: All menu items now use `bg-card` (same as home screen cards) instead of `dark:bg-[#2d1b4e]`
+  - Heart icon now uses same purple color scheme as Edit Profile (text-lib-purple, bg-lib-purple-50) instead of red
+  - All 3 menu items (Edit Profile, My Favorites, My Reservations) now have identical purple icon+card styling
+  - Brought back Reading Goal card with circular SVG progress and goal picker
+  - Brought back Reading Stats card with mini bar chart (7 months of data)
+  - Member Since card and Attendance History card remain with consistent bg-card styling
+
+- **Book Detail — Full-screen Image Viewer**: Added full-screen image overlay. Clicking the book cover opens a modal with:
+  - Black/95 backdrop covering entire screen
+  - Image scaled to max 90% width, 80vh height, centered with rounded corners
+  - Close button (X) in top-right corner
+  - Spring animation on open/close
+  - Click backdrop to dismiss
+  - Only works when actual cover image exists
+
+- Lint passes with zero errors
+- Dev server running without errors
+- All changes verified via agent-browser + VLM
+
+Files Modified:
+- `/home/z/my-project/src/components/layout/BottomNav.tsx` — Single card with 4 icons, no individual icon bg
+- `/home/z/my-project/src/components/screens/HomeScreen.tsx` — 2-col square cards, announcement title-only + Read full
+- `/home/z/my-project/src/components/screens/ProfileScreen.tsx` — Card color fix, purple heart, Reading Goal + Stats restored
+- `/home/z/my-project/src/components/screens/BookDetailScreen.tsx` — Full-screen image viewer
+
+Stage Summary:
+- Home screen now has 2-column square cards: Attendance Analytics (left) + Reading Goal (right)
+- Announcements show title only with "Read full" expand option — no height flex
+- Profile cards all use consistent bg-card styling; heart icon matches edit profile purple
+- Reading Goal and Reading Stats restored to Profile screen
+- Book detail supports full-screen image viewing on cover tap
+- Bottom nav: single card containing all 4 icons with Scan as separate FAB

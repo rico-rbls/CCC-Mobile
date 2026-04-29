@@ -4,14 +4,27 @@ import { useAppStore, type AppScreen } from '@/lib/store'
 import { motion } from 'framer-motion'
 import {
   BookOpen, Flame, Clock,
-  ChevronRight, Edit, LogOut, MapPin, Heart, Mail, GraduationCap, FileText, Calendar, Bookmark
+  ChevronRight, Edit, LogOut, MapPin, Heart, Mail, GraduationCap, FileText, Calendar, Bookmark, Target
 } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
+
+// Monthly reading data for bar chart
+const monthlyData = [
+  { month: 'Sep', books: 2 },
+  { month: 'Oct', books: 4 },
+  { month: 'Nov', books: 3 },
+  { month: 'Dec', books: 1 },
+  { month: 'Jan', books: 5 },
+  { month: 'Feb', books: 3 },
+  { month: 'Mar', books: 4 },
+]
 
 export default function ProfileScreen() {
   const { user, setCurrentScreen, logout, favorites } = useAppStore()
   const [borrowCount, setBorrowCount] = useState(0)
   const [attendanceCount, setAttendanceCount] = useState(0)
+  const [readingGoal, setReadingGoal] = useState(24)
+  const [showGoalPicker, setShowGoalPicker] = useState(false)
   const userIdRef = useRef(user?.id)
 
   useEffect(() => {
@@ -51,11 +64,12 @@ export default function ProfileScreen() {
   ]
 
   const roleLabel = user?.role === 'faculty' ? 'Faculty' : user?.role === 'visitor' ? 'Visitor' : 'Student'
+  const maxBooks = Math.max(...monthlyData.map(d => d.books), 1)
 
-  // Profile menu items in the user's requested hierarchy
+  // Profile menu items — all use purple theme (same as home screen cards)
   const menuItems = [
     { id: 'edit-profile' as AppScreen, icon: Edit, label: 'Edit Profile', desc: 'Update your information', color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10' },
-    { id: 'favorites' as AppScreen, icon: Heart, label: 'My Favorites', desc: `${favorites.length} saved book${favorites.length !== 1 ? 's' : ''}`, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
+    { id: 'favorites' as AppScreen, icon: Heart, label: 'My Favorites', desc: `${favorites.length} saved book${favorites.length !== 1 ? 's' : ''}`, color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10' },
     { id: 'reservations' as AppScreen, icon: Bookmark, label: 'My Reservations', desc: 'Track reserved items', color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10' },
   ]
 
@@ -78,14 +92,12 @@ export default function ProfileScreen() {
             <span className="text-2xl font-bold text-white">{user?.avatarInitials ?? 'U'}</span>
           </motion.div>
           <h2 className="text-xl font-bold text-white">{user?.fullName ?? 'User'}</h2>
-          {/* Email below name */}
           {user?.email && (
             <div className="flex items-center gap-1.5 mt-1">
               <Mail className="w-3 h-3 text-white/50" />
               <p className="text-white/60 text-xs">{user.email}</p>
             </div>
           )}
-          {/* Role badge and program info */}
           <div className="flex items-center gap-2 mt-1.5">
             <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white/90 text-[10px] font-medium">
               {roleLabel}
@@ -103,9 +115,9 @@ export default function ProfileScreen() {
         </div>
       </div>
 
-      {/* Stats cards - overlapping header */}
+      {/* Stats cards - overlapping header — same bg-card as home screen */}
       <div className="px-4 -mt-8 relative z-20">
-        <div className="bg-card dark:bg-[#2d1b4e] rounded-[22px] shadow-sm p-4 grid grid-cols-3 gap-3">
+        <div className="bg-card rounded-[22px] shadow-sm p-4 grid grid-cols-3 gap-3">
           {stats.map((stat, index) => {
             const Icon = stat.icon
             return (
@@ -127,9 +139,9 @@ export default function ProfileScreen() {
         </div>
       </div>
 
-      {/* Menu items: Edit Profile, My Favorites, My Reservations */}
+      {/* Menu items: Edit Profile, My Favorites, My Reservations — same bg-card color as home */}
       <div className="px-4 mt-4">
-        <div className="bg-card dark:bg-[#2d1b4e] rounded-[22px] shadow-sm overflow-hidden divide-y divide-gray-50 dark:divide-white/5">
+        <div className="bg-card rounded-[22px] shadow-sm overflow-hidden divide-y divide-gray-50 dark:divide-white/5">
           {menuItems.map((item, index) => {
             const Icon = item.icon
             return (
@@ -155,13 +167,129 @@ export default function ProfileScreen() {
         </div>
       </div>
 
-      {/* Member Since card */}
+      {/* Reading Goal card — same bg-card */}
       <div className="px-4 mt-3">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="bg-card dark:bg-[#2d1b4e] rounded-[22px] shadow-sm p-4 flex items-center gap-3"
+          className="bg-card rounded-[22px] shadow-sm p-4"
+        >
+          <div className="flex items-center gap-4">
+            {/* Circular progress */}
+            <div className="relative w-16 h-16 flex-shrink-0">
+              <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  className="text-lib-purple-200 dark:text-white/10"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeDasharray={`${Math.min(100, (borrowCount / readingGoal) * 100)}, 100`}
+                  strokeLinecap="round"
+                  className="text-lib-purple dark:text-lib-purple-300"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xs font-bold text-lib-purple dark:text-lib-purple-300">{borrowCount}/{readingGoal}</span>
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-foreground dark:text-white">Reading Goal</h4>
+                <button
+                  onClick={() => setShowGoalPicker(!showGoalPicker)}
+                  className="text-xs text-lib-purple dark:text-lib-purple-300 font-medium"
+                >
+                  {showGoalPicker ? 'Done' : 'Change'}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground dark:text-white/40 mt-0.5">
+                {borrowCount >= readingGoal
+                  ? 'Goal achieved! Great job!'
+                  : `${readingGoal - borrowCount} more book${readingGoal - borrowCount !== 1 ? 's' : ''} to reach your goal`
+                }
+              </p>
+              {showGoalPicker && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="flex gap-2 mt-2"
+                >
+                  {[12, 24, 36, 48].map(goal => (
+                    <button
+                      key={goal}
+                      onClick={() => { setReadingGoal(goal); setShowGoalPicker(false) }}
+                      className={`flex-1 py-1.5 rounded-[14px] text-xs font-medium transition-all ${
+                        readingGoal === goal
+                          ? 'bg-lib-purple text-white'
+                          : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-white/15'
+                      }`}
+                    >
+                      {goal}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Reading Stats card with mini bar chart — same bg-card */}
+      <div className="px-4 mt-3">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18 }}
+          className="bg-card rounded-[22px] shadow-sm p-4"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-semibold text-foreground dark:text-white">Reading Stats</span>
+            <span className="text-[10px] text-muted-foreground dark:text-white/40">Books per month</span>
+          </div>
+          {/* Mini bar chart */}
+          <div className="flex items-end gap-2 h-20">
+            {monthlyData.map((d, i) => (
+              <div key={d.month} className="flex-1 flex flex-col items-center gap-1">
+                <motion.div
+                  initial={{ height: 0 }}
+                  animate={{ height: `${(d.books / maxBooks) * 100}%` }}
+                  transition={{ delay: 0.2 + i * 0.05, duration: 0.4, ease: 'easeOut' }}
+                  className={`w-full rounded-t-md min-h-[4px] ${
+                    i === monthlyData.length - 1 ? 'bg-lib-purple' : 'bg-lib-purple-200 dark:bg-white/20'
+                  }`}
+                />
+                <span className={`text-[9px] ${i === monthlyData.length - 1 ? 'text-lib-purple dark:text-lib-purple-300 font-bold' : 'text-muted-foreground dark:text-white/30'}`}>
+                  {d.month}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50 dark:border-white/5">
+            <span className="text-[10px] text-muted-foreground dark:text-white/30">
+              Total: {monthlyData.reduce((sum, d) => sum + d.books, 0)} books this year
+            </span>
+            <span className="text-[10px] font-medium text-lib-purple dark:text-lib-purple-300">
+              Avg: {(monthlyData.reduce((sum, d) => sum + d.books, 0) / monthlyData.length).toFixed(1)}/mo
+            </span>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Member Since card — same bg-card */}
+      <div className="px-4 mt-3">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-card rounded-[22px] shadow-sm p-4 flex items-center gap-3"
         >
           <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
             <Calendar className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />
@@ -175,14 +303,14 @@ export default function ProfileScreen() {
         </motion.div>
       </div>
 
-      {/* Attendance History */}
+      {/* Attendance History — same bg-card */}
       <div className="px-4 mt-3">
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.22 }}
           onClick={() => setCurrentScreen('attendance')}
-          className="w-full bg-card dark:bg-[#2d1b4e] rounded-[22px] shadow-sm p-4 flex items-center gap-3"
+          className="w-full bg-card rounded-[22px] shadow-sm p-4 flex items-center gap-3"
         >
           <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
             <FileText className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />

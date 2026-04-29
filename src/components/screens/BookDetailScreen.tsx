@@ -2,7 +2,7 @@
 
 import { useAppStore, type ResourceItem } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, BookOpen, MapPin, Bookmark, ChevronRight, Loader2, Heart, Share2, Calendar, Hash, Star, MessageSquare, Trash2, Pencil } from 'lucide-react'
+import { ArrowLeft, BookOpen, MapPin, Bookmark, ChevronRight, Loader2, Heart, Share2, Calendar, Hash, Star, MessageSquare, Trash2, Pencil, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useState, useEffect, useCallback } from 'react'
@@ -42,6 +42,7 @@ export default function BookDetailScreen() {
   const [reserving, setReserving] = useState(false)
   const [hearted, setHearted] = useState(false)
   const [showShareToast, setShowShareToast] = useState(false)
+  const [showFullImage, setShowFullImage] = useState(false)
   const { toast } = useToast()
 
   // Review state
@@ -326,7 +327,7 @@ export default function BookDetailScreen() {
           {(() => {
             const coverSrc = getResourceCover(book.coverImage, book.title)
             return coverSrc ? (
-              <div className="h-48 relative overflow-hidden">
+              <div className="h-48 relative overflow-hidden cursor-pointer" onClick={() => setShowFullImage(true)}>
                 <img src={coverSrc} alt={book.title} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 {/* Category badge */}
@@ -735,6 +736,40 @@ export default function BookDetailScreen() {
         </div>
         <div className="h-4" />
       </div>
+
+      {/* Full-screen image viewer */}
+      <AnimatePresence>
+        {showFullImage && (() => {
+          const coverSrc = book ? getResourceCover(book.coverImage, book.title) : null
+          return coverSrc ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
+              onClick={() => setShowFullImage(false)}
+            >
+              <button
+                onClick={() => setShowFullImage(false)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
+                aria-label="Close"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
+              <motion.img
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                src={coverSrc}
+                alt={book?.title || 'Book cover'}
+                className="max-w-[90%] max-h-[80vh] object-contain rounded-2xl shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </motion.div>
+          ) : null
+        })()}
+      </AnimatePresence>
 
       {/* Share toast */}
       <AnimatePresence>

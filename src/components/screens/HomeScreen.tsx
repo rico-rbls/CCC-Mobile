@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Bell, Settings, BookOpen,
   ChevronRight, Loader2, Megaphone, X,
-  Star, Flame,
+  Star, Flame, Target, BarChart3,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -90,6 +90,14 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [highlightBook, setHighlightBook] = useState<ResourceItem | null>(null)
+  const [expandedAnnouncement, setExpandedAnnouncement] = useState<string | null>(null)
+
+  // Reading goal & attendance stats
+  const [readingGoal, setReadingGoal] = useState(24)
+  const [showGoalPicker, setShowGoalPicker] = useState(false)
+  const [borrowCount, setBorrowCount] = useState(0)
+  const [attendanceCount, setAttendanceCount] = useState(0)
+  const [totalHours, setTotalHours] = useState(0)
 
   // Announcement carousel
   const [announcementIndex, setAnnouncementIndex] = useState(0)
@@ -129,6 +137,24 @@ export default function HomeScreen() {
           }
         })
         setBorrowedBooks(books)
+      }
+
+      // Fetch borrow count and attendance for home cards
+      const [returnedRes, attendanceRes] = await Promise.all([
+        fetch(`/api/borrow?userId=${user.id}&status=returned`),
+        fetch(`/api/attendance?userId=${user.id}`),
+      ])
+      if (returnedRes.ok) {
+        const returnedData = await returnedRes.json()
+        const returnedRecords = Array.isArray(returnedData) ? returnedData : (returnedData.records || [])
+        setBorrowCount(borrowRecords.length + returnedRecords.length)
+      }
+      if (attendanceRes.ok) {
+        const attData = await attendanceRes.json()
+        const attRecords = Array.isArray(attData) ? attData : (attData.records || [])
+        setAttendanceCount(attRecords.length)
+        const hrs = attRecords.reduce((sum: number, r: Record<string, unknown>) => sum + ((r.duration as number) || 0), 0)
+        setTotalHours(Math.round(hrs / 60))
       }
 
       const program = user?.program || ''
@@ -442,16 +468,24 @@ export default function HomeScreen() {
                   </div>
                   <div className="min-w-0">
                     <h4 className="font-semibold text-lib-purple dark:text-lib-purple-300 text-sm leading-tight">{currentAnnouncement.title}</h4>
-                    <p className="text-xs text-lib-purple-700 dark:text-lib-purple-400/70 mt-1 leading-relaxed">{currentAnnouncement.message}</p>
+                    {expandedAnnouncement === currentAnnouncement.id && (
+                      <p className="text-xs text-lib-purple-700 dark:text-lib-purple-400/70 mt-1 leading-relaxed">{currentAnnouncement.message}</p>
+                    )}
                   </div>
                 </div>
+                <button
+                  onClick={() => setExpandedAnnouncement(prev => prev === currentAnnouncement.id ? null : currentAnnouncement.id)}
+                  className="mt-2 text-xs font-semibold text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-light transition-colors"
+                >
+                  {expandedAnnouncement === currentAnnouncement.id ? 'Read less' : 'Read full'}
+                </button>
                 {/* Carousel dots */}
                 {visibleAnnouncements.length > 1 && (
                   <div className="flex items-center justify-center gap-1.5 mt-3">
                     {visibleAnnouncements.map((a, idx) => (
                       <button
                         key={a.id}
-                        onClick={() => setAnnouncementIndex(idx)}
+                        onClick={() => { setAnnouncementIndex(idx); setExpandedAnnouncement(null) }}
                         className={`w-1.5 h-1.5 rounded-full transition-all ${
                           idx === announcementIndex ? 'bg-lib-purple w-4' : 'bg-lib-purple-300 dark:bg-lib-purple-700'
                         }`}
@@ -464,6 +498,101 @@ export default function HomeScreen() {
             </AnimatePresence>
           </motion.div>
         )}
+
+        {/* ── 2-column square cards: Attendance Analytics + Reading Goal ── */}
+        <motion.div
+          custom={0.5}
+          variants={sectionVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-2 gap-3"
+        >
+          {/* Left: Attendance Analytics */}
+          <div className="bg-card rounded-3xl shadow-sm p-4 aspect-square flex flex-col">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <span className="text-xs font-bold text-foreground leading-tight">Attendance</span>
+            </div>
+            <div className="flex-1 flex flex-col justify-center items-center gap-1">
+              <span className="text-3xl font-bold text-foreground">{attendanceCount}</span>
+              <span className="text-[10px] text-muted-foreground font-medium">visits</span>
+              <div className="w-full flex items-center justify-center gap-3 mt-2">
+                <div className="text-center">
+                  <span className="text-sm font-bold text-foreground">{totalHours}</span>
+                  <span className="text-[9px] text-muted-foreground block">hours</span>
+                </div>
+                <div className="w-px h-6 bg-gray-200 dark:bg-white/10" />
+                <div className="text-center">
+                  <span className="text-sm font-bold text-orange-500">x{user?.streakCount ?? 0}</span>
+                  <span className="text-[9px] text-muted-foreground block">streak</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Reading Goal */}
+          <div className="bg-card rounded-3xl shadow-sm p-4 aspect-square flex flex-col">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
+                <Target className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
+              </div>
+              <span className="text-xs font-bold text-foreground leading-tight">Reading Goal</span>
+            </div>
+            <div className="flex-1 flex flex-col items-center justify-center gap-2">
+              <div className="relative w-16 h-16">
+                <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    className="text-lib-purple-200 dark:text-white/10"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeDasharray={`${Math.min(100, (borrowCount / readingGoal) * 100)}, 100`}
+                    strokeLinecap="round"
+                    className="text-lib-purple dark:text-lib-purple-300"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-lib-purple dark:text-lib-purple-300">{borrowCount}/{readingGoal}</span>
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground text-center">
+                {borrowCount >= readingGoal ? 'Goal achieved!' : `${readingGoal - borrowCount} more to go`}
+              </p>
+              <button
+                onClick={() => setShowGoalPicker(!showGoalPicker)}
+                className="text-[9px] text-lib-purple dark:text-lib-purple-300 font-semibold"
+              >
+                {showGoalPicker ? 'Done' : 'Change'}
+              </button>
+              {showGoalPicker && (
+                <div className="flex gap-1 mt-0.5">
+                  {[12, 24, 36, 48].map(goal => (
+                    <button
+                      key={goal}
+                      onClick={() => { setReadingGoal(goal); setShowGoalPicker(false) }}
+                      className={`px-1.5 py-0.5 rounded-lg text-[9px] font-medium transition-all ${
+                        readingGoal === goal
+                          ? 'bg-lib-purple text-white'
+                          : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300'
+                      }`}
+                    >
+                      {goal}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
 
         {/* ── Today's Highlights feature card ─────────────── */}
         {highlightBook && (
