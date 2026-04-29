@@ -61,7 +61,7 @@ function NotificationCard({
         dragElastic={0.7}
         onDragEnd={handleDragEnd}
         animate={controls}
-        className="bg-card rounded-[22px] shadow-sm p-4 flex items-start gap-3 touch-pan-y"
+        className="bg-card rounded-[22px] dark:shadow-sm p-4 flex items-start gap-3 touch-pan-y"
       >
         <div className={`w-9 h-9 rounded-xl ${config.bg} flex items-center justify-center flex-shrink-0`}>
           <Icon className={`w-4 h-4 ${config.color}`} />
@@ -211,7 +211,7 @@ export default function NotificationsScreen() {
               onClick={() => setActiveFilter(tab.id)}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all ${
                 activeFilter === tab.id
-                  ? 'bg-lib-purple text-white shadow-sm shadow-lib-purple/20'
+                  ? 'bg-lib-purple text-white dark:shadow-sm dark:shadow-lib-purple/20'
                   : 'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 hover:bg-lib-purple-50 dark:hover:bg-white/5'
               }`}
             >

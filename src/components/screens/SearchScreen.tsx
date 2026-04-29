@@ -218,7 +218,7 @@ export default function SearchScreen() {
                 layout
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                   isActive
-                    ? 'bg-lib-purple text-white shadow-sm shadow-lib-purple/20'
+                    ? 'bg-lib-purple text-white dark:shadow-sm dark:shadow-lib-purple/20'
                     : 'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 hover:bg-lib-purple-50 dark:hover:bg-white/5'
                 }`}
               >
@@ -247,7 +247,7 @@ export default function SearchScreen() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
-                className="bg-card rounded-[22px] shadow-sm p-4 flex items-start gap-3"
+                className="bg-card rounded-[22px] dark:shadow-sm p-4 flex items-start gap-3"
               >
                 <Skeleton className="w-14 h-[72px] rounded-lg flex-shrink-0" />
                 <div className="flex-1 space-y-2">
@@ -314,7 +314,7 @@ export default function SearchScreen() {
                       onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
                       className="flex-shrink-0 w-[120px] group"
                     >
-                      <div className="w-[120px] h-[160px] rounded-2xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                      <div className="w-[120px] h-[160px] rounded-2xl mb-2 relative overflow-hidden dark:shadow-sm group-hover:dark:shadow-md transition-shadow">
                         {(() => {
                           const coverSrc = getResourceCover(resource.coverImage, resource.title)
                           return coverSrc ? (
@@ -358,14 +358,14 @@ export default function SearchScreen() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03 }}
                 onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
-                className="w-full bg-card rounded-[22px] shadow-sm p-4 flex items-start gap-3 text-left card-hover-effect"
+                className="w-full bg-card rounded-[22px] dark:shadow-sm p-4 flex items-start gap-3 text-left card-hover-effect"
               >
                 {(() => {
                   const coverSrc = getResourceCover(resource.coverImage, resource.title)
                   return coverSrc ? (
-                    <img src={coverSrc} alt={resource.title} className="w-14 h-[72px] rounded-lg object-cover flex-shrink-0 shadow-sm" />
+                    <img src={coverSrc} alt={resource.title} className="w-14 h-[72px] rounded-lg object-cover flex-shrink-0 dark:shadow-sm" />
                   ) : (
-                    <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 cover-pattern-overlay shadow-sm">
+                    <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 cover-pattern-overlay dark:shadow-sm">
                       <BookOpen className="w-5 h-5 text-white/50" />
                     </div>
                   )

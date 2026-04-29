@@ -43,7 +43,7 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 // ── Shimmer / skeleton card ────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <div className="bg-card rounded-3xl shadow-sm p-4 space-y-3">
+    <div className="bg-card rounded-3xl dark:shadow-sm p-4 space-y-3">
       <Skeleton className="h-4 w-3/4" />
       <Skeleton className="h-3 w-1/2" />
       <Skeleton className="h-1.5 w-full" />
@@ -368,7 +368,7 @@ export default function HomeScreen() {
             {/* Bell icon inside squircle card */}
             <button
               onClick={() => setCurrentScreen('notifications')}
-              className="relative p-2.5 rounded-xl bg-card shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
+              className="relative p-2.5 rounded-xl bg-card dark:shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
               aria-label="Notifications"
             >
               <Bell className="w-4.5 h-4.5 text-lib-purple dark:text-lib-purple-300" />
@@ -381,7 +381,7 @@ export default function HomeScreen() {
             {/* Settings icon inside squircle card */}
             <button
               onClick={() => setCurrentScreen('settings')}
-              className="p-2.5 rounded-xl bg-card shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
+              className="p-2.5 rounded-xl bg-card dark:shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
               aria-label="Settings"
             >
               <Settings className="w-4.5 h-4.5 text-lib-purple dark:text-lib-purple-300" />
@@ -402,9 +402,9 @@ export default function HomeScreen() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className="text-2xl font-bold text-foreground tracking-tight"
+            className="text-2xl text-foreground tracking-tight"
           >
-            {greeting()}, {user?.fullName?.split(' ')[0] ?? 'User'}!
+            {greeting()}, <span className="font-bold">{user?.fullName?.split(' ')[0] ?? 'User'}!</span>
           </motion.h1>
         </AnimatePresence>
 
@@ -440,7 +440,7 @@ export default function HomeScreen() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="bg-card rounded-3xl shadow-sm p-4"
+            className="bg-card rounded-3xl dark:shadow-sm p-4"
           >
             <div className="mb-3">
               <SectionHeader>Announcements</SectionHeader>
@@ -505,7 +505,7 @@ export default function HomeScreen() {
           className="grid grid-cols-2 gap-3"
         >
           {/* Left: Attendance Analytics */}
-          <div className="bg-card rounded-3xl shadow-sm p-4 aspect-square flex flex-col">
+          <div className="bg-card rounded-3xl dark:shadow-sm p-4 aspect-square flex flex-col">
             <span className="text-xs font-bold text-foreground leading-tight mb-3">Attendance</span>
             <div className="flex-1 flex flex-col justify-center items-center gap-2">
               <div className="text-center">
@@ -527,7 +527,7 @@ export default function HomeScreen() {
           </div>
 
           {/* Right: Reading Goal */}
-          <div className="bg-card rounded-3xl shadow-sm p-4 aspect-square flex flex-col">
+          <div className="bg-card rounded-3xl dark:shadow-sm p-4 aspect-square flex flex-col">
             <span className="text-xs font-bold text-foreground leading-tight mb-3">Reading Goal</span>
             <div className="flex-1 flex flex-col items-center justify-center gap-2">
               <div className="relative w-16 h-16">
@@ -590,7 +590,7 @@ export default function HomeScreen() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="bg-card rounded-3xl shadow-sm p-4"
+            className="bg-card rounded-3xl dark:shadow-sm p-4"
           >
             <div className="mb-3">
               <SectionHeader>Today&apos;s Highlight</SectionHeader>
@@ -635,7 +635,7 @@ export default function HomeScreen() {
           variants={sectionVariants}
           initial="hidden"
           animate="visible"
-          className="bg-card rounded-3xl shadow-sm p-4"
+          className="bg-card rounded-3xl dark:shadow-sm p-4"
         >
           <div className="mb-3">
             <SectionHeader>Current Borrow</SectionHeader>
@@ -711,7 +711,7 @@ export default function HomeScreen() {
               </div>
               <Button
                 size="sm"
-                className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-9 px-4 rounded-2xl shadow-sm shadow-lib-purple/20 flex-shrink-0"
+                className="bg-lib-purple hover:bg-lib-purple-light text-white text-xs h-9 px-4 rounded-2xl dark:shadow-sm dark:shadow-lib-purple/20 flex-shrink-0"
                 onClick={() => setCurrentScreen('search')}
               >
                 <BookOpen className="w-3.5 h-3.5 mr-1.5" />
@@ -728,7 +728,7 @@ export default function HomeScreen() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="bg-card rounded-3xl shadow-sm p-4"
+            className="bg-card rounded-3xl dark:shadow-sm p-4"
           >
             <div className="flex items-center justify-between mb-3">
               <SectionHeader>Recommended for You</SectionHeader>
@@ -751,7 +751,7 @@ export default function HomeScreen() {
                     className="flex-shrink-0 w-[120px] group"
                   >
                     {/* Cover image - fixed height for alignment */}
-                    <div className="w-[120px] h-[160px] rounded-2xl mb-2 relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                    <div className="w-[120px] h-[160px] rounded-2xl mb-2 relative overflow-hidden dark:shadow-sm group-hover:dark:shadow-md transition-shadow">
                       {(() => {
                         const coverSrc = getResourceCover(book.coverImage, book.title)
                         return coverSrc ? (
@@ -808,7 +808,7 @@ export default function HomeScreen() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="bg-card rounded-3xl shadow-sm p-4"
+            className="bg-card rounded-3xl dark:shadow-sm p-4"
           >
             <div className="flex items-center justify-between mb-3">
               <SectionHeader>Trending in Your Department</SectionHeader>

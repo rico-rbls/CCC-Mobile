@@ -108,7 +108,7 @@ export default function ReservationsScreen() {
               onClick={() => setActiveFilter(tab)}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all ${
                 activeFilter === tab
-                  ? 'bg-lib-purple text-white shadow-sm shadow-lib-purple/20'
+                  ? 'bg-lib-purple text-white dark:shadow-sm dark:shadow-lib-purple/20'
                   : 'bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-white/5'
               }`}
             >
@@ -166,7 +166,7 @@ export default function ReservationsScreen() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-card rounded-[22px] shadow-sm overflow-hidden"
+                  className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden"
                 >
                   <div className="p-4 flex items-start gap-3">
                     <button
@@ -176,9 +176,9 @@ export default function ReservationsScreen() {
                       {(() => {
                         const coverSrc = getResourceCover(null, reservation.resourceTitle)
                         return coverSrc ? (
-                          <img src={coverSrc} alt={reservation.resourceTitle} className="w-14 h-[72px] rounded-lg object-cover shadow-sm" />
+                          <img src={coverSrc} alt={reservation.resourceTitle} className="w-14 h-[72px] rounded-lg object-cover dark:shadow-sm" />
                         ) : (
-                          <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center cover-pattern-overlay shadow-sm">
+                          <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center cover-pattern-overlay dark:shadow-sm">
                             <BookOpen className="w-5 h-5 text-white/50" />
                           </div>
                         )

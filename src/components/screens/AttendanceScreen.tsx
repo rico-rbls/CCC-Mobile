@@ -146,21 +146,21 @@ export default function AttendanceScreen() {
           transition={{ delay: 0.05 }}
           className="grid grid-cols-3 gap-3"
         >
-          <div className="bg-card rounded-[22px] shadow-sm p-3 text-center">
+          <div className="bg-card rounded-[22px] dark:shadow-sm p-3 text-center">
             <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mx-auto mb-2">
               <MapPin className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
             </div>
             <p className="text-xl font-bold text-foreground">{totalVisits}</p>
             <p className="text-[10px] text-muted-foreground font-medium">Total Visits</p>
           </div>
-          <div className="bg-card rounded-[22px] shadow-sm p-3 text-center">
+          <div className="bg-card rounded-[22px] dark:shadow-sm p-3 text-center">
             <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center mx-auto mb-2">
               <Clock className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
             </div>
             <p className="text-xl font-bold text-foreground">{totalHours}</p>
             <p className="text-[10px] text-muted-foreground font-medium">Total Hours</p>
           </div>
-          <div className="bg-card rounded-[22px] shadow-sm p-3 text-center">
+          <div className="bg-card rounded-[22px] dark:shadow-sm p-3 text-center">
             <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center mx-auto mb-2">
               <Flame className="w-4 h-4 text-orange-500" />
             </div>
@@ -174,7 +174,7 @@ export default function AttendanceScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-card rounded-[22px] shadow-sm p-4"
+          className="bg-card rounded-[22px] dark:shadow-sm p-4"
         >
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
@@ -258,7 +258,7 @@ export default function AttendanceScreen() {
           <h3 className="text-xs font-semibold text-lib-purple dark:text-lib-purple-300 uppercase tracking-wider mb-2 px-1">
             Recent Visits
           </h3>
-          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
+          <div className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden">
             {loading ? (
               <div className="px-4 py-8 text-center text-sm text-muted-foreground">
                 Loading attendance records...

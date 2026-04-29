@@ -181,7 +181,7 @@ export default function LoginScreen() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-[#1a0e2e] rounded-2xl shadow-xl p-6 ring-1 ring-black/5 dark:ring-white/5 glass-card"
+          className="bg-white dark:bg-[#1a0e2e] rounded-2xl dark:shadow-xl p-6 ring-1 ring-black/5 dark:ring-white/5 glass-card"
         >
           <h2 className="text-lg font-bold text-foreground mb-1">Welcome back</h2>
           <p className="text-xs text-muted-foreground mb-5">Sign in to your account</p>
@@ -212,7 +212,7 @@ export default function LoginScreen() {
                   onBlur={() => setEmailFocused(false)}
                   className={`h-12 pl-10 rounded-xl transition-all duration-200 ${
                     emailFocused
-                      ? 'border-lib-purple ring-2 ring-lib-purple/20 shadow-sm shadow-lib-purple/5'
+                      ? 'border-lib-purple ring-2 ring-lib-purple/20 dark:shadow-sm dark:shadow-lib-purple/5'
                       : 'border-gray-200 dark:border-gray-700'
                   }`}
                 />
@@ -246,7 +246,7 @@ export default function LoginScreen() {
                   onBlur={() => setPasswordFocused(false)}
                   className={`h-12 rounded-xl transition-all duration-200 pr-10 ${
                     passwordFocused
-                      ? 'border-lib-purple ring-2 ring-lib-purple/20 shadow-sm shadow-lib-purple/5'
+                      ? 'border-lib-purple ring-2 ring-lib-purple/20 dark:shadow-sm dark:shadow-lib-purple/5'
                       : 'border-gray-200 dark:border-gray-700'
                   }`}
                 />
@@ -264,7 +264,7 @@ export default function LoginScreen() {
             <Button
               onClick={handleLogin}
               disabled={loading || !email || !password}
-              className="w-full h-12 rounded-xl bg-lib-purple hover:bg-lib-purple-dark text-white font-semibold text-base disabled:opacity-50 shadow-lg shadow-lib-purple/25 active:scale-[0.98] transition-all relative overflow-hidden"
+              className="w-full h-12 rounded-xl bg-lib-purple hover:bg-lib-purple-dark text-white font-semibold text-base disabled:opacity-50 dark:shadow-lg dark:shadow-lib-purple/25 active:scale-[0.98] transition-all relative overflow-hidden"
               style={isValidEmail && !loading ? {
                 boxShadow: '0 0 20px 4px rgba(101, 45, 144, 0.35), 0 4px 14px -2px rgba(101, 45, 144, 0.25)',
               } : undefined}

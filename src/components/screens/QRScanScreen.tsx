@@ -157,7 +157,7 @@ export default function QRScanScreen() {
             onClick={() => { setMode('attendance'); setResult(null); setScanning(false) }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
               mode === 'attendance'
-                ? 'bg-lib-purple text-white shadow-lg shadow-lib-purple/30'
+                ? 'bg-lib-purple text-white dark:shadow-lg dark:shadow-lib-purple/30'
                 : 'bg-white/10 text-white/60 hover:bg-white/15'
             }`}
           >
@@ -168,7 +168,7 @@ export default function QRScanScreen() {
             onClick={() => { setMode('checkout'); setResult(null); setScanning(false) }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
               mode === 'checkout'
-                ? 'bg-lib-purple text-white shadow-lg shadow-lib-purple/30'
+                ? 'bg-lib-purple text-white dark:shadow-lg dark:shadow-lib-purple/30'
                 : 'bg-white/10 text-white/60 hover:bg-white/15'
             }`}
           >
@@ -207,7 +207,7 @@ export default function QRScanScreen() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-              className="bg-white dark:bg-[#1a0e2e] rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl"
+              className="bg-white dark:bg-[#1a0e2e] rounded-3xl p-8 w-full max-w-sm text-center dark:shadow-2xl"
             >
               {/* Success icon */}
               <motion.div

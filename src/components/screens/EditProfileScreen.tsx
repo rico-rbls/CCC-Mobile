@@ -104,7 +104,7 @@ export default function EditProfileScreen() {
             <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-2xl font-bold text-white border-2 border-white/30">
               {user?.avatarInitials || '??'}
             </div>
-            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-lib-purple flex items-center justify-center border-2 border-white dark:border-background shadow-sm">
+            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-lib-purple flex items-center justify-center border-2 border-white dark:border-background dark:shadow-sm">
               <Camera className="w-3.5 h-3.5 text-white" />
             </div>
           </motion.div>
@@ -117,7 +117,7 @@ export default function EditProfileScreen() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-card rounded-[22px] shadow-sm border border-gray-100 dark:border-white/5 p-5 space-y-4"
+          className="bg-card rounded-[22px] dark:shadow-sm border border-gray-100 dark:border-white/5 p-5 space-y-4"
         >
           {/* Full Name */}
           <div className="space-y-1.5">
@@ -189,7 +189,7 @@ export default function EditProfileScreen() {
                     onClick={() => setYearLevel(yl)}
                     className={`py-2 px-1 rounded-lg text-xs font-medium transition-all ${
                       yearLevel === yl
-                        ? 'bg-lib-purple text-white shadow-sm'
+                        ? 'bg-lib-purple text-white dark:shadow-sm'
                         : 'bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10'
                     }`}
                   >

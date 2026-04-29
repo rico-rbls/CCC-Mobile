@@ -120,7 +120,7 @@ export default function FavoritesScreen() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -100, height: 0, marginBottom: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-card rounded-[22px] shadow-sm overflow-hidden"
+                  className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden"
                 >
                   <div className="p-4 flex items-start gap-3">
                     <button
@@ -130,9 +130,9 @@ export default function FavoritesScreen() {
                       {(() => {
                         const coverSrc = getResourceCover(resource.coverImage, resource.title)
                         return coverSrc ? (
-                          <img src={coverSrc} alt={resource.title} className="w-14 h-[72px] rounded-lg object-cover shadow-sm" />
+                          <img src={coverSrc} alt={resource.title} className="w-14 h-[72px] rounded-lg object-cover dark:shadow-sm" />
                         ) : (
-                          <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center cover-pattern-overlay shadow-sm">
+                          <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center cover-pattern-overlay dark:shadow-sm">
                             <BookOpen className="w-5 h-5 text-white/50" />
                           </div>
                         )

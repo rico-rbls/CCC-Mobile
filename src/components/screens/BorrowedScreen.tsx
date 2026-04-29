@@ -66,7 +66,7 @@ function SuccessOverlay({ bookTitle, onDismiss }: { bookTitle: string; onDismiss
           initial={{ scale: 0 }}
           animate={{ scale: [0, 1.2, 1] }}
           transition={{ duration: 0.5, times: [0, 0.6, 1], ease: 'easeOut' }}
-          className="w-24 h-24 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/30"
+          className="w-24 h-24 rounded-full bg-green-500 flex items-center justify-center dark:shadow-lg dark:shadow-green-500/30"
         >
           <motion.svg
             initial={{ pathLength: 0 }}
@@ -231,7 +231,7 @@ export default function BorrowedScreen() {
               onClick={() => setActiveTab(tab)}
               className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === tab
-                  ? 'bg-white dark:bg-[#1a0e2e] shadow-sm text-lib-purple dark:text-white'
+                  ? 'bg-white dark:bg-[#1a0e2e] dark:shadow-sm text-lib-purple dark:text-white'
                   : 'text-lib-purple-400 dark:text-gray-400 hover:text-lib-purple-600 dark:hover:text-gray-300'
               }`}
             >
@@ -338,15 +338,15 @@ export default function BorrowedScreen() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.07 }}
-                    className="bg-card rounded-[22px] shadow-sm overflow-hidden relative"
+                    className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden relative"
                   >
                     <div className="flex items-start gap-3 p-4">
                       {(() => {
                         const coverSrc = getResourceCover(book.coverImage, book.title)
                         return coverSrc ? (
-                          <img src={coverSrc} alt={book.title} className="w-14 h-[72px] rounded-lg object-cover flex-shrink-0 shadow-sm" />
+                          <img src={coverSrc} alt={book.title} className="w-14 h-[72px] rounded-lg object-cover flex-shrink-0 dark:shadow-sm" />
                         ) : (
-                          <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 shadow-sm cover-pattern-overlay">
+                          <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 dark:shadow-sm cover-pattern-overlay">
                             <BookOpen className="w-5 h-5 text-white/50" />
                           </div>
                         )
@@ -378,7 +378,7 @@ export default function BorrowedScreen() {
                                 size="sm"
                                 onClick={() => handleReturn(book.id, book.title)}
                                 disabled={returningId === book.id}
-                                className="h-8 px-4 text-xs bg-lib-purple hover:bg-lib-purple-dark text-white rounded-xl shadow-sm shadow-lib-purple/20 font-semibold"
+                                className="h-8 px-4 text-xs bg-lib-purple hover:bg-lib-purple-dark text-white rounded-xl dark:shadow-sm dark:shadow-lib-purple/20 font-semibold"
                               >
                                 {returningId === book.id ? (
                                   <Loader2 className="w-3 h-3 animate-spin" />

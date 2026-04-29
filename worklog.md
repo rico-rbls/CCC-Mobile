@@ -965,3 +965,38 @@ Stage Summary:
 - Notification cards are clean without colored left edges
 - Catalog carousel cards are horizontally aligned with fixed dimensions
 - Light mode: background #f9f9f9, cards pure white #ffffff
+
+---
+Task ID: 12
+Agent: Shadow & Greeting Agent
+Task: Remove light mode shadows + Fix greeting styling
+
+Work Log:
+- Converted all shadow-* Tailwind classes to dark:shadow-* across 15 screen/page files
+- HomeScreen.tsx: Changed 13 shadow instances (shadow-sm on cards/buttons, shadow-sm shadow-lib-purple/20 on Browse button, shadow-sm group-hover:shadow-md on cover images) to dark: prefix
+- BookDetailScreen.tsx: Changed 5 shadow instances (shadow-sm on cards, shadow-2xl on image viewer, shadow-lg on toast) to dark: prefix
+- SettingsScreen.tsx: Changed 5 shadow-sm on section cards (Account, Notifications, Appearance, Help, About) to dark:shadow-sm
+- FavoritesScreen.tsx: Changed 3 shadow-sm instances (card, cover images) to dark:shadow-sm
+- SearchScreen.tsx: Changed 6 shadow instances (shadow-sm shadow-lib-purple/20 on active pill, shadow-sm on skeleton/result cards, shadow-sm group-hover:shadow-md on recently viewed, shadow-sm on cover images) to dark: prefix
+- AttendanceScreen.tsx: Changed 5 shadow-sm instances (3 summary cards, calendar card, recent visits card) to dark:shadow-sm
+- EditProfileScreen.tsx: Changed 3 shadow-sm instances (camera icon, form card, active year level button) to dark:shadow-sm
+- LoginScreen.tsx: Changed 4 shadow instances (shadow-xl on form card, shadow-sm shadow-lib-purple/5 on focused inputs x2, shadow-lg shadow-lib-purple/25 on login button) to dark: prefix
+- ProfileScreen.tsx: Changed 8 shadow-sm and 1 shadow-2xl instances to dark: prefix
+- ReservationsScreen.tsx: Changed 4 shadow instances (shadow-sm shadow-lib-purple/20 on active filter, shadow-sm on card and cover images) to dark: prefix
+- BorrowedScreen.tsx: Changed 6 shadow instances (shadow-sm on tab/card/covers, shadow-sm shadow-lib-purple/20 on return button, shadow-lg shadow-green-500/30 on success overlay) to dark: prefix
+- OnboardingScreen.tsx: Changed 9 shadow instances (shadow-sm shadow-lib-purple/30, shadow-lg shadow-lib-purple/25, shadow-md shadow-lib-purple/10, shadow-md shadow-lib-purple/20, shadow-sm shadow-lib-purple/10, shadow-lg shadow-lib-purple/30) to dark: prefix
+- NotificationsScreen.tsx: Changed 2 shadow instances (shadow-sm on notification card, shadow-sm shadow-lib-purple/20 on filter tab) to dark: prefix
+- QRScanScreen.tsx: Changed 3 shadow instances (shadow-lg shadow-lib-purple/30 on mode buttons x2, shadow-2xl on success modal) to dark: prefix
+- page.tsx: Changed shadow-xl on wrapper div to dark:shadow-xl
+- Fixed HomeScreen greeting: Removed font-bold from h1, added <span className="font-bold"> around user name only
+- Updated globals.css: Removed box-shadow from light mode for .card-hover-effect, .hover-lift, .glass-card, .press-effect; moved shadows to .dark context only
+- Removed duplicate .dark .card-hover-effect:hover rule from globals.css
+- Did NOT modify BottomNav.tsx (shadows preserved in both modes per spec)
+- Did NOT modify any shadcn/ui components
+- All lint checks pass with zero errors
+
+Stage Summary:
+- All light-mode shadows removed from 15 screen/page files; shadows now only visible in dark mode
+- BottomNav and QR scan center button shadows preserved in both light and dark mode
+- globals.css box-shadow styles moved to .dark context only (card-hover-effect, hover-lift, glass-card, press-effect)
+- HomeScreen greeting now shows "Good afternoon," in normal weight and "Juan!" in bold

@@ -120,7 +120,7 @@ export default function ProfileScreen() {
 
       {/* Stats cards - overlapping header — same bg-card as home screen */}
       <div className="px-4 -mt-8 relative z-20">
-        <div className="bg-card rounded-[22px] shadow-sm p-4 grid grid-cols-3 gap-3">
+        <div className="bg-card rounded-[22px] dark:shadow-sm p-4 grid grid-cols-3 gap-3">
           {stats.map((stat, index) => {
             const Icon = stat.icon
             return (
@@ -148,13 +148,13 @@ export default function ProfileScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="bg-card rounded-[22px] shadow-sm p-5"
+          className="bg-card rounded-[22px] dark:shadow-sm p-5"
         >
           <div className="flex flex-col items-center">
             <span className="text-sm font-semibold text-foreground dark:text-white mb-3">My Library QR Code</span>
             <button
               onClick={() => setShowFullQR(true)}
-              className="bg-white p-3 rounded-2xl shadow-sm active:scale-95 transition-transform"
+              className="bg-white p-3 rounded-2xl dark:shadow-sm active:scale-95 transition-transform"
               aria-label="View QR code full screen"
             >
               <QRCodeSVG
@@ -199,7 +199,7 @@ export default function ProfileScreen() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.7, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="bg-white rounded-3xl p-8 shadow-2xl flex flex-col items-center"
+              className="bg-white rounded-3xl p-8 dark:shadow-2xl flex flex-col items-center"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between w-full mb-6">
@@ -246,7 +246,7 @@ export default function ProfileScreen() {
 
       {/* Menu items: Edit Profile, My Favorites, My Reservations — same bg-card color as home */}
       <div className="px-4 mt-3">
-        <div className="bg-card rounded-[22px] shadow-sm overflow-hidden divide-y divide-gray-50 dark:divide-white/5">
+        <div className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden divide-y divide-gray-50 dark:divide-white/5">
           {menuItems.map((item, index) => {
             const Icon = item.icon
             return (
@@ -278,7 +278,7 @@ export default function ProfileScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="bg-card rounded-[22px] shadow-sm p-4"
+          className="bg-card rounded-[22px] dark:shadow-sm p-4"
         >
           <div className="flex items-center gap-4">
             {/* Circular progress */}
@@ -353,7 +353,7 @@ export default function ProfileScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.18 }}
-          className="bg-card rounded-[22px] shadow-sm p-4"
+          className="bg-card rounded-[22px] dark:shadow-sm p-4"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-semibold text-foreground dark:text-white">Reading Stats</span>
@@ -394,7 +394,7 @@ export default function ProfileScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-card rounded-[22px] shadow-sm p-4 flex items-center gap-3"
+          className="bg-card rounded-[22px] dark:shadow-sm p-4 flex items-center gap-3"
         >
           <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
             <Calendar className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />
@@ -415,7 +415,7 @@ export default function ProfileScreen() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.22 }}
           onClick={() => setCurrentScreen('attendance')}
-          className="w-full bg-card rounded-[22px] shadow-sm p-4 flex items-center gap-3"
+          className="w-full bg-card rounded-[22px] dark:shadow-sm p-4 flex items-center gap-3"
         >
           <div className="w-10 h-10 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
             <FileText className="w-5 h-5 text-lib-purple dark:text-lib-purple-300" />

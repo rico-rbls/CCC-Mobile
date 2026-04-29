@@ -107,7 +107,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background flex justify-center">
-      <div className="w-full max-w-[430px] h-dvh bg-background relative shadow-xl">
+      <div className="w-full max-w-[430px] h-dvh bg-background relative dark:shadow-xl">
         {/* Screen content - full scrollable area */}
         <div
           ref={scrollRef}

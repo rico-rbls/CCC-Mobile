@@ -202,7 +202,7 @@ export default function OnboardingScreen() {
                 i < step
                   ? 'bg-lib-purple'
                   : i === step
-                  ? 'bg-gradient-to-r from-lib-purple to-lib-purple-light shadow-sm shadow-lib-purple/30'
+                  ? 'bg-gradient-to-r from-lib-purple to-lib-purple-light dark:shadow-sm dark:shadow-lib-purple/30'
                   : 'bg-lib-purple-200 dark:bg-lib-purple-800'
               }`}
             />
@@ -229,7 +229,7 @@ export default function OnboardingScreen() {
                   }}
                   transition={{ duration: 0.3 }}
                   className={`w-7 h-7 rounded-full flex items-center justify-center ${
-                    i === step ? 'shadow-sm shadow-lib-purple/30' : ''
+                    i === step ? 'dark:shadow-sm dark:shadow-lib-purple/30' : ''
                   }`}
                 >
                   {i < step ? (
@@ -264,7 +264,7 @@ export default function OnboardingScreen() {
                   initial={{ scale: 0, rotate: -90 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                  className="w-24 h-24 rounded-3xl bg-purple-gradient flex items-center justify-center mb-5 shadow-lg shadow-lib-purple/25 gradient-border"
+                  className="w-24 h-24 rounded-3xl bg-purple-gradient flex items-center justify-center mb-5 dark:shadow-lg dark:shadow-lib-purple/25 gradient-border"
                 >
                   <Sparkles className="w-12 h-12 text-white" />
                 </motion.div>
@@ -287,8 +287,8 @@ export default function OnboardingScreen() {
                         onClick={() => setOnboardingData({ role: r.id })}
                         className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 ${
                           selected
-                            ? 'border-lib-purple bg-lib-purple-50 dark:bg-lib-purple-900/30 shadow-md shadow-lib-purple/10 gradient-border'
-                            : 'border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] hover:border-lib-purple-200 dark:hover:border-lib-purple-700 hover:shadow-sm'
+                            ? 'border-lib-purple bg-lib-purple-50 dark:bg-lib-purple-900/30 dark:shadow-md dark:shadow-lib-purple/10 gradient-border'
+                            : 'border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] hover:border-lib-purple-200 dark:hover:border-lib-purple-700 dark:hover:shadow-sm'
                         }`}
                       >
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
@@ -321,7 +321,7 @@ export default function OnboardingScreen() {
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center shadow-md shadow-lib-purple/20"
+                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center dark:shadow-md dark:shadow-lib-purple/20"
                 >
                   <User className="w-8 h-8 text-white" />
                 </motion.div>
@@ -360,7 +360,7 @@ export default function OnboardingScreen() {
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center shadow-md shadow-lib-purple/20"
+                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center dark:shadow-md dark:shadow-lib-purple/20"
                 >
                   <GraduationCap className="w-8 h-8 text-white" />
                 </motion.div>
@@ -406,7 +406,7 @@ export default function OnboardingScreen() {
                             onClick={() => setOnboardingData({ yearLevel: y })}
                             className={`py-3 rounded-xl text-sm font-medium border-2 transition-all duration-200 ${
                               onboardingData.yearLevel === y
-                                ? 'border-lib-purple bg-lib-purple-50 dark:bg-lib-purple-900/30 text-lib-purple dark:text-lib-purple-300 shadow-sm shadow-lib-purple/10'
+                                ? 'border-lib-purple bg-lib-purple-50 dark:bg-lib-purple-900/30 text-lib-purple dark:text-lib-purple-300 dark:shadow-sm dark:shadow-lib-purple/10'
                                 : 'border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-lib-purple-200 dark:hover:border-lib-purple-700'
                             }`}
                           >
@@ -432,7 +432,7 @@ export default function OnboardingScreen() {
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center shadow-md shadow-lib-purple/20"
+                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center dark:shadow-md dark:shadow-lib-purple/20"
                 >
                   <ShieldCheck className="w-8 h-8 text-white" />
                 </motion.div>
@@ -525,7 +525,7 @@ export default function OnboardingScreen() {
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center shadow-md shadow-lib-purple/20 animate-micro-pulse-glow"
+                  className="w-16 h-16 rounded-2xl bg-purple-gradient flex items-center justify-center mb-4 self-center dark:shadow-md dark:shadow-lib-purple/20 animate-micro-pulse-glow"
                 >
                   <Bell className="w-8 h-8 text-white" />
                 </motion.div>
@@ -538,7 +538,7 @@ export default function OnboardingScreen() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.05 }}
-                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] hover:shadow-sm transition-shadow"
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] dark:hover:shadow-sm transition-shadow"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center">
@@ -559,7 +559,7 @@ export default function OnboardingScreen() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] hover:shadow-sm transition-shadow"
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1a0e2e] dark:hover:shadow-sm transition-shadow"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
@@ -610,7 +610,7 @@ export default function OnboardingScreen() {
           disabled={!canContinue() || isSubmitting}
           className={`w-full h-12 rounded-xl text-white font-semibold text-base disabled:opacity-50 transition-all active:scale-[0.98] ${
             step === totalSteps - 1
-              ? 'bg-gradient-to-r from-lib-purple via-lib-purple-light to-lib-purple shadow-lg shadow-lib-purple/30'
+              ? 'bg-gradient-to-r from-lib-purple via-lib-purple-light to-lib-purple dark:shadow-lg dark:shadow-lib-purple/30'
               : 'bg-lib-purple hover:bg-lib-purple-dark'
           }`}
         >

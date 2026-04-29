@@ -321,7 +321,7 @@ export default function BookDetailScreen() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card rounded-[22px] shadow-sm overflow-hidden"
+          className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden"
         >
           {/* Cover with image or decorative pattern overlay */}
           {(() => {
@@ -426,7 +426,7 @@ export default function BookDetailScreen() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-card rounded-[22px] shadow-sm p-4"
+          className="bg-card rounded-[22px] dark:shadow-sm p-4"
         >
           {/* Section Header */}
           <div className="flex items-center gap-2 mb-4">
@@ -708,7 +708,7 @@ export default function BookDetailScreen() {
       {/* Related books from API */}
       <div className="px-4 mt-6 flex-1 overflow-y-auto">
         <h3 className="font-bold text-foreground mb-3">More Resources</h3>
-        <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
+        <div className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden">
           {relatedBooks.length > 0 ? (
             relatedBooks.map((relBook, index) => (
               <button
@@ -763,7 +763,7 @@ export default function BookDetailScreen() {
                 transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                 src={coverSrc}
                 alt={book?.title || 'Book cover'}
-                className="max-w-[90%] max-h-[80vh] object-contain rounded-2xl shadow-2xl"
+                className="max-w-[90%] max-h-[80vh] object-contain rounded-2xl dark:shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
               />
             </motion.div>
@@ -778,7 +778,7 @@ export default function BookDetailScreen() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-foreground text-background px-4 py-2 rounded-full text-sm font-medium shadow-lg z-50"
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-foreground text-background px-4 py-2 rounded-full text-sm font-medium dark:shadow-lg z-50"
           >
             Copied to clipboard!
           </motion.div>

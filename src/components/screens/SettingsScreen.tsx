@@ -151,7 +151,7 @@ export default function SettingsScreen() {
             <User className="w-3.5 h-3.5" />
             Account
           </h3>
-          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
+          <div className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden">
             <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
               <div className="w-10 h-10 rounded-[14px] bg-lib-purple flex items-center justify-center">
                 <span className="text-white font-bold text-sm">
@@ -195,7 +195,7 @@ export default function SettingsScreen() {
             <Bell className="w-3.5 h-3.5" />
             Notifications
           </h3>
-          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
+          <div className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
@@ -253,7 +253,7 @@ export default function SettingsScreen() {
             <Palette className="w-3.5 h-3.5" />
             Appearance
           </h3>
-          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
+          <div className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
@@ -279,7 +279,7 @@ export default function SettingsScreen() {
             <HelpCircle className="w-3.5 h-3.5" />
             Help
           </h3>
-          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
+          <div className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden">
             <button
               onClick={() => {/* TODO: Open help guide */}}
               className="flex items-center gap-3 w-full px-4 py-3.5 border-b border-border hover:bg-lib-purple-50/50 dark:hover:bg-white/5 transition-colors"
@@ -325,7 +325,7 @@ export default function SettingsScreen() {
             <Info className="w-3.5 h-3.5" />
             About
           </h3>
-          <div className="bg-card rounded-[22px] shadow-sm overflow-hidden">
+          <div className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3.5">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
