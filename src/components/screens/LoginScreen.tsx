@@ -51,7 +51,6 @@ export default function LoginScreen() {
         streakCount: data.streakCount || 0,
         isOnboarded: data.isOnboarded,
         notificationDueDate: data.notificationDueDate,
-        notificationReservation: data.notificationReservation,
         notificationAnnouncements: data.notificationAnnouncements,
       })
       setCurrentScreen('home')

@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const today = new Date().toISOString().split('T')[0]
 
     // 1. Time-out attendance for today
-    let attendanceResult = null
+    let attendanceResult: any = null
     const existingAttendance = await db.attendance.findFirst({
       where: { userId, date: today, timeOut: null },
     })

@@ -16,11 +16,6 @@ export async function GET(
           take: 5,
           orderBy: { borrowDate: 'desc' },
         },
-        reservations: {
-          where: { status: 'pending' },
-          take: 5,
-          orderBy: { createdAt: 'desc' },
-        },
       },
     })
 

@@ -1,12 +1,13 @@
 'use client'
 
-import { useAppStore, type ResourceItem } from '@/lib/store'
-import { Search, BookOpen, FileText, Newspaper, Loader2, Clock, TrendingUp, X } from 'lucide-react'
+import { useAppStore } from '@/lib/store'
+import { Search, BookOpen, FileText, Newspaper, Loader2, Clock, TrendingUp, X, Star } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
-import { getResourceCover } from '@/lib/covers'
+import { useState, useEffect, useRef } from 'react'
+import { useSearch } from '@/hooks/useSearch'
+import BookCard from '@/components/shared/BookCard'
 
 const categories = [
   { id: 'all' as const, label: 'All', icon: Search },
@@ -24,86 +25,25 @@ const categoryColors: Record<string, string> = {
 const popularSearches = ['Algorithms', 'Deep Learning', 'Database', 'Nursing', 'Psychology', 'Clean Code']
 
 export default function SearchScreen() {
-  const { searchQuery, setSearchQuery, searchCategory, setSearchCategory, setCurrentScreen, setSelectedBookId, user } = useAppStore()
-  const [localQuery, setLocalQuery] = useState(searchQuery)
-  const [resources, setResources] = useState<ResourceItem[]>([])
-  const [loading, setLoading] = useState(false)
-  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null)
-  const [recentlyViewed, setRecentlyViewed] = useState<ResourceItem[]>([])
+  const { setCurrentScreen, setSelectedBookId, user } = useAppStore()
+  const {
+    localQuery,
+    searchCategory,
+    setSearchCategory,
+    recentlyViewed,
+    recommendations,
+    loading,
+    filtered,
+    handleSearchChange,
+    handleQuickSearch,
+    clearSearch,
+  } = useSearch()
+
   const [searchFocused, setSearchFocused] = useState(false)
   const [animatedCount, setAnimatedCount] = useState(0)
   const [prevCount, setPrevCount] = useState(0)
   const [countHighlight, setCountHighlight] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  const fetchResources = useCallback(async (query: string, category: string) => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams()
-      if (query.trim()) params.set('search', query)
-      if (category !== 'all') params.set('category', category)
-      params.set('limit', '50')
-      const res = await fetch(`/api/resources?${params.toString()}`)
-      const data = await res.json()
-      if (res.ok && data.resources) {
-        const items: ResourceItem[] = data.resources.map((r: Record<string, unknown>) => ({
-          id: r.id as string,
-          title: r.title as string,
-          author: r.author as string,
-          category: r.category as 'book' | 'research' | 'magazine',
-          coverImage: r.coverImage as string | null,
-          availableCopies: r.availableCopies as number,
-          totalCopies: r.copies as number,
-          shelfLocation: r.shelfLocation as string,
-          status: r.status as string,
-          subject: r.subject as string,
-          tags: (r.tags as string || '').split(',').filter(Boolean),
-        }))
-        setResources(items)
-      }
-    } catch (e) {
-      console.error('Failed to fetch resources:', e)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  // Fetch recently viewed (use general resources as a stand-in)
-  const fetchRecentlyViewed = useCallback(async () => {
-    try {
-      const res = await fetch('/api/resources?limit=4')
-      const data = await res.json()
-      if (res.ok && data.resources) {
-        setRecentlyViewed(data.resources.map((r: Record<string, unknown>) => ({
-          id: r.id as string,
-          title: r.title as string,
-          author: r.author as string,
-          category: r.category as 'book' | 'research' | 'magazine',
-          coverImage: r.coverImage as string | null,
-          availableCopies: r.availableCopies as number,
-          totalCopies: r.copies as number,
-          shelfLocation: r.shelfLocation as string,
-          status: r.status as string,
-          subject: r.subject as string,
-          tags: (r.tags as string || '').split(',').filter(Boolean),
-        })))
-      }
-    } catch {
-      // silently fail
-    }
-  }, [])
-
-  // Filter resources with useMemo (declared before useEffect that references it)
-  const filtered = useMemo(() => {
-    if (!localQuery.trim() && searchCategory === 'all') return resources
-    return resources
-  }, [resources, localQuery, searchCategory])
-
-  // Initial load
-  useEffect(() => {
-    fetchResources(searchQuery, searchCategory)
-    fetchRecentlyViewed()
-  }, [searchCategory, fetchResources, fetchRecentlyViewed])
 
   // Animate result count and highlight on change
   useEffect(() => {
@@ -123,30 +63,6 @@ export default function SearchScreen() {
     }
     setPrevCount(filtered.length)
   }, [filtered.length, prevCount])
-
-  // Debounced search
-  const handleSearchChange = (value: string) => {
-    setLocalQuery(value)
-    setSearchQuery(value)
-    if (debounceTimer) clearTimeout(debounceTimer)
-    const timer = setTimeout(() => {
-      fetchResources(value, searchCategory)
-    }, 300)
-    setDebounceTimer(timer)
-  }
-
-  const handleQuickSearch = (term: string) => {
-    setLocalQuery(term)
-    setSearchQuery(term)
-    fetchResources(term, searchCategory)
-    inputRef.current?.blur()
-  }
-
-  const clearSearch = () => {
-    setLocalQuery('')
-    setSearchQuery('')
-    fetchResources('', searchCategory)
-  }
 
   const isSearchEmpty = !localQuery.trim() && searchCategory === 'all'
 
@@ -308,97 +224,49 @@ export default function SearchScreen() {
                 </div>
                 <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-2 px-2">
                   {recentlyViewed.map((resource) => (
-                    <motion.button
+                    <BookCard
                       key={resource.id}
-                      whileTap={{ scale: 0.97 }}
+                      book={resource}
+                      layout="grid"
                       onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
-                      className="flex-shrink-0 w-[120px] group"
-                    >
-                      <div className="w-[120px] h-[160px] rounded-2xl mb-2 relative overflow-hidden dark:shadow-sm group-hover:dark:shadow-md transition-shadow">
-                        {(() => {
-                          const coverSrc = getResourceCover(resource.coverImage, resource.title)
-                          return coverSrc ? (
-                            <>
-                              <img src={coverSrc} alt={resource.title} className="w-full h-full object-cover" />
-                              {resource.category && (
-                                <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
-                                  {resource.category}
-                                </span>
-                              )}
-                            </>
-                          ) : (
-                            <>
-                              <div className="w-full h-full bg-purple-gradient flex items-center justify-center cover-pattern-overlay">
-                                <BookOpen className="w-7 h-7 text-white/50" />
-                              </div>
-                              {resource.category && (
-                                <span className="absolute top-1.5 left-1.5 bg-white/90 dark:bg-black/60 text-lib-purple dark:text-lib-purple-300 text-[8px] font-bold px-1.5 py-0.5 rounded-lg leading-none">
-                                  {resource.category}
-                                </span>
-                              )}
-                            </>
-                          )
-                        })()}
-                      </div>
-                      <div className="flex flex-col">
-                        <h4 className="text-xs font-semibold text-foreground leading-tight line-clamp-2 min-h-[28px]">{resource.title}</h4>
-                        <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{resource.author}</p>
-                      </div>
-                    </motion.button>
+                    />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Result cards */}
-            {filtered.map((resource, index) => (
-              <motion.button
-                key={resource.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.03 }}
-                onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
-                className="w-full bg-card rounded-[22px] dark:shadow-sm p-4 flex items-start gap-3 text-left card-hover-effect"
-              >
-                {(() => {
-                  const coverSrc = getResourceCover(resource.coverImage, resource.title)
-                  return coverSrc ? (
-                    <img src={coverSrc} alt={resource.title} className="w-14 h-[72px] rounded-lg object-cover flex-shrink-0 dark:shadow-sm" />
-                  ) : (
-                    <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 cover-pattern-overlay dark:shadow-sm">
-                      <BookOpen className="w-5 h-5 text-white/50" />
-                    </div>
-                  )
-                })()}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-semibold text-sm text-foreground leading-tight line-clamp-2">{resource.title}</h4>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{resource.author}</p>
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${categoryColors[resource.category] || 'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400'}`}>
-                      {resource.category.charAt(0).toUpperCase() + resource.category.slice(1)}
-                    </span>
-                    {/* Subject/tag pills */}
-                    {resource.tags.slice(0, 2).map(tag => (
-                      <span key={tag} className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 text-[10px] font-medium">
-                        {tag}
-                      </span>
-                    ))}
-                    {resource.subject && resource.tags.length === 0 && (
-                      <span className="px-2 py-0.5 rounded-full bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 text-[10px] font-medium">
-                        {resource.subject}
-                      </span>
-                    )}
-                    <span className={`flex items-center gap-1 text-[10px] font-medium ${
-                      resource.availableCopies > 0 ? 'text-green-600' : 'text-red-500'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${resource.availableCopies > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
-                      {resource.availableCopies > 0 ? `${resource.availableCopies}/${resource.totalCopies}` : 'Out'}
-                    </span>
-                  </div>
+            {/* Recommended for You section when search is empty */}
+            {isSearchEmpty && recommendations.length > 0 && (
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                  <h3 className="text-sm font-semibold text-foreground">Search Catalog</h3>
                 </div>
-              </motion.button>
+                <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-2 px-2">
+                  {recommendations.map((resource) => {
+                    const isForYou = user?.program && resource.subject?.toLowerCase().includes(user.program.toLowerCase())
+                    return (
+                      <BookCard
+                        key={resource.id}
+                        book={resource}
+                        layout="grid"
+                        isForYou={!!isForYou}
+                        onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
+                      />
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Result cards */}
+            {filtered.map((resource) => (
+              <BookCard
+                key={resource.id}
+                book={resource}
+                layout="search-result"
+                onClick={() => { setSelectedBookId(resource.id); setCurrentScreen('book-detail') }}
+              />
             ))}
           </div>
         )}

@@ -15,7 +15,6 @@ import NotificationsScreen from '@/components/screens/NotificationsScreen'
 import BookDetailScreen from '@/components/screens/BookDetailScreen'
 import AttendanceScreen from '@/components/screens/AttendanceScreen'
 import FavoritesScreen from '@/components/screens/FavoritesScreen'
-import ReservationsScreen from '@/components/screens/ReservationsScreen'
 import EditProfileScreen from '@/components/screens/EditProfileScreen'
 import BottomNav from '@/components/layout/BottomNav'
 import { useRef, useCallback } from 'react'
@@ -33,7 +32,6 @@ const screenComponents: Record<string, React.ComponentType> = {
   'book-detail': BookDetailScreen,
   attendance: AttendanceScreen,
   favorites: FavoritesScreen,
-  reservations: ReservationsScreen,
   'edit-profile': EditProfileScreen,
 }
 

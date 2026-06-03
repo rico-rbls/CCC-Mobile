@@ -33,9 +33,7 @@ import { useTheme } from 'next-themes'
 
 export default function SettingsScreen() {
   const { user, setCurrentScreen, goBack, logout } = useAppStore()
-  const [dueDateNotif, setDueDateNotif] = useState(user?.notificationDueDate ?? true)
-  const [reservationNotif, setReservationNotif] = useState(user?.notificationReservation ?? true)
-  const [announcementNotif, setAnnouncementNotif] = useState(user?.notificationAnnouncements ?? false)
+
   const { theme, setTheme } = useTheme()
   const { toast } = useToast()
 
@@ -50,25 +48,7 @@ export default function SettingsScreen() {
   const [showConfirmPwd, setShowConfirmPwd] = useState(false)
   const [passwordError, setPasswordError] = useState('')
 
-  const handleToggle = async (
-    field: 'notificationDueDate' | 'notificationReservation' | 'notificationAnnouncements',
-    value: boolean
-  ) => {
-    if (field === 'notificationDueDate') setDueDateNotif(value)
-    if (field === 'notificationReservation') setReservationNotif(value)
-    if (field === 'notificationAnnouncements') setAnnouncementNotif(value)
 
-    try {
-      await fetch('/api/auth/update', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user?.id, [field]: value }),
-      })
-      toast({ title: 'Preference updated' })
-    } catch {
-      toast({ title: 'Failed to update preference', variant: 'destructive' })
-    }
-  }
 
   const handleLogout = () => {
     logout()
@@ -185,64 +165,6 @@ export default function SettingsScreen() {
                 <p className="text-xs text-muted-foreground">{user?.email ?? 'No email set'}</p>
               </div>
               <span className="text-xs text-lib-purple dark:text-lib-purple-300 font-medium">Verified</span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Notifications section */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <h3 className="text-xs font-semibold text-lib-purple dark:text-lib-purple-300 uppercase tracking-wider mb-2 px-1 flex items-center gap-1.5">
-            <Bell className="w-3.5 h-3.5" />
-            Notifications
-          </h3>
-          <div className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                  <Bell className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-foreground">Due Date Reminders</span>
-                  <p className="text-xs text-muted-foreground">Get reminded before books are due</p>
-                </div>
-              </div>
-              <Switch
-                checked={dueDateNotif}
-                onCheckedChange={(v) => handleToggle('notificationDueDate', v)}
-                className="data-[state=checked]:bg-lib-purple"
-              />
-            </div>
-            <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                  <Bell className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-foreground">Reservation Alerts</span>
-                  <p className="text-xs text-muted-foreground">When reserved books are available</p>
-                </div>
-              </div>
-              <Switch
-                checked={reservationNotif}
-                onCheckedChange={(v) => handleToggle('notificationReservation', v)}
-                className="data-[state=checked]:bg-lib-purple"
-              />
-            </div>
-            <div className="flex items-center justify-between px-4 py-3.5">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-[14px] bg-lib-purple-50 dark:bg-white/10 flex items-center justify-center">
-                  <Bell className="w-4 h-4 text-lib-purple dark:text-lib-purple-300" />
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-foreground">System Announcements</span>
-                  <p className="text-xs text-muted-foreground">Updates and news from the library</p>
-                </div>
-              </div>
-              <Switch
-                checked={announcementNotif}
-                onCheckedChange={(v) => handleToggle('notificationAnnouncements', v)}
-                className="data-[state=checked]:bg-lib-purple"
-              />
             </div>
           </div>
         </motion.div>

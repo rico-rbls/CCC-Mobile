@@ -7,11 +7,10 @@ import { useState, useEffect, useCallback } from 'react'
 
 const typeConfig: Record<string, { icon: typeof Calendar; color: string; bg: string }> = {
   due_date: { icon: Calendar, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
-  reservation: { icon: BookOpen, color: 'text-lib-purple dark:text-lib-purple-300', bg: 'bg-lib-purple-50 dark:bg-white/10' },
   announcement: { icon: Megaphone, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
 }
 
-type FilterTab = 'all' | 'unread' | 'mentions'
+type FilterTab = 'all' | 'unread'
 
 function getGroupLabel(dateStr: string): string {
   const date = new Date(dateStr)
@@ -112,7 +111,7 @@ export default function NotificationsScreen() {
       if (res.ok && data.notifications) {
         const items: NotificationItem[] = data.notifications.map((n: Record<string, unknown>) => ({
           id: n.id as string,
-          type: n.type as 'due_date' | 'reservation' | 'announcement',
+          type: n.type as 'due_date' | 'announcement',
           title: n.title as string,
           message: n.message as string,
           isRead: n.isRead as boolean,
@@ -147,11 +146,9 @@ export default function NotificationsScreen() {
     setNotifications(prev => prev.filter(n => n.id !== id))
   }
 
-  // Filter notifications
   const filteredNotifications = notifications.filter(n => {
     if (dismissedIds.has(n.id)) return false
     if (activeFilter === 'unread') return !n.isRead
-    if (activeFilter === 'mentions') return n.type === 'reservation'
     return true
   })
 
@@ -176,7 +173,6 @@ export default function NotificationsScreen() {
   const filterTabs: { id: FilterTab; label: string }[] = [
     { id: 'all', label: 'All' },
     { id: 'unread', label: 'Unread' },
-    { id: 'mentions', label: 'Mentions' },
   ]
 
   const hasUnread = notifications.some(n => !n.isRead)

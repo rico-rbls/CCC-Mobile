@@ -2,12 +2,13 @@
 
 import { useAppStore, type ResourceItem } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, BookOpen, MapPin, Bookmark, ChevronRight, Loader2, Heart, Share2, Calendar, Hash, Star, MessageSquare, Trash2, Pencil, X, Library } from 'lucide-react'
+import { ArrowLeft, BookOpen, MapPin, Bookmark, ChevronRight, Loader2, Heart, Calendar, Hash, Star, MessageSquare, Trash2, Pencil, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useState, useEffect, useCallback } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { getResourceCover } from '@/lib/covers'
+import { useBorrow } from '@/hooks/useBorrow'
 
 interface ReviewUser {
   id: string
@@ -38,11 +39,8 @@ export default function BookDetailScreen() {
   const [book, setBook] = useState<(ResourceItem & { description: string; isbn?: string; publicationDate?: string }) | null>(null)
   const [relatedBooks, setRelatedBooks] = useState<ResourceItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [borrowing, setBorrowing] = useState(false)
-  const [startingReading, setStartingReading] = useState(false)
-  const [reserving, setReserving] = useState(false)
   const [hearted, setHearted] = useState(false)
-  const [showShareToast, setShowShareToast] = useState(false)
+  const { borrowBook, isLoading: borrowing } = useBorrow()
   const [showFullImage, setShowFullImage] = useState(false)
   const { toast } = useToast()
 
@@ -137,76 +135,12 @@ export default function BookDetailScreen() {
     fetchReviews()
   }, [fetchBook, fetchRelated, fetchReviews])
 
-  const handleStartReading = async () => {
-    if (!user?.id || !book) return
-    setStartingReading(true)
-    try {
-      const res = await fetch('/api/reading-sessions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, resourceId: book.id }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        if (data.error?.includes('already have an active')) {
-          toast({ title: 'Already Reading', description: 'You already have an active reading session for this book.' })
-        } else {
-          toast({ title: 'Cannot Start Reading', description: data.error || 'Something went wrong', variant: 'destructive' })
-        }
-        return
-      }
-      toast({ title: 'Reading Started!', description: `You're now reading "${book.title}" in the library.` })
-      fetchBook()
-    } catch {
-      toast({ title: 'Error', description: 'Something went wrong.', variant: 'destructive' })
-    } finally {
-      setStartingReading(false)
-    }
-  }
+
 
   const handleBorrow = async () => {
-    if (!user?.id || !book) return
-    setBorrowing(true)
-    try {
-      const res = await fetch('/api/borrow', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, resourceId: book.id }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        toast({ title: 'Cannot Borrow', description: data.error || 'Something went wrong', variant: 'destructive' })
-        return
-      }
-      toast({ title: 'Book Borrowed!', description: `${book.title} has been checked out to you.` })
-      fetchBook()
-    } catch {
-      toast({ title: 'Error', description: 'Something went wrong.', variant: 'destructive' })
-    } finally {
-      setBorrowing(false)
-    }
-  }
-
-  const handleReserve = async () => {
-    if (!user?.id || !book) return
-    setReserving(true)
-    try {
-      const res = await fetch('/api/reservations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, resourceId: book.id }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        toast({ title: 'Cannot Reserve', description: data.error || 'Something went wrong', variant: 'destructive' })
-        return
-      }
-      toast({ title: 'Reserved!', description: `You'll be notified when ${book.title} becomes available.` })
-    } catch {
-      toast({ title: 'Error', description: 'Something went wrong.', variant: 'destructive' })
-    } finally {
-      setReserving(false)
-    }
+    if (!book) return
+    const success = await borrowBook(book.id, book.title)
+    if (success) fetchBook()
   }
 
   const handleFavorite = () => {
@@ -219,21 +153,7 @@ export default function BookDetailScreen() {
     })
   }
 
-  const handleShare = async () => {
-    if (!book) return
-    const shareText = `Check out "${book.title}" by ${book.author} on LibLog!`
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: book.title, text: shareText })
-      } catch {
-        // user cancelled
-      }
-    } else {
-      await navigator.clipboard.writeText(shareText)
-      setShowShareToast(true)
-      setTimeout(() => setShowShareToast(false), 2000)
-    }
-  }
+
 
   const handleSubmitReview = async () => {
     if (!user?.id || !book || reviewRating === 0) return
@@ -327,20 +247,13 @@ export default function BookDetailScreen() {
         <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/5" />
         <div className="absolute bottom-4 -left-6 w-24 h-24 rounded-full bg-white/5" />
 
-        <div className="flex items-center justify-between mb-2 relative z-10">
+        <div className="flex items-center justify-between relative z-10">
           <div className="flex items-center gap-3">
             <button onClick={goBack} className="p-2 -ml-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
             <span className="text-white/70 text-sm">Book Details</span>
           </div>
-          <button
-            onClick={handleShare}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-            aria-label="Share"
-          >
-            <Share2 className="w-5 h-5 text-white" />
-          </button>
         </div>
       </div>
 
@@ -430,11 +343,7 @@ export default function BookDetailScreen() {
               )}
             </div>
 
-            {/* Description */}
-            <div className="mt-4">
-              <h3 className="text-sm font-semibold text-foreground mb-1">About this book</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{book.description}</p>
-            </div>
+
 
             {/* Tags */}
             <div className="flex flex-wrap gap-1.5 mt-3">
@@ -448,324 +357,30 @@ export default function BookDetailScreen() {
         </motion.div>
       </div>
 
-      {/* ─── Ratings & Reviews Section ─────────────────────────────── */}
-      <div className="px-4 mt-4">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-card rounded-[22px] dark:shadow-sm p-4"
-        >
-          {/* Section Header */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-1 h-5 rounded-full bg-lib-purple" />
-            <h3 className="font-bold text-foreground text-sm">Ratings & Reviews</h3>
-            <span className="text-[10px] text-muted-foreground ml-auto">{reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}</span>
-          </div>
 
-          {/* Rating Summary Card */}
-          <div className="flex gap-4 items-start">
-            {/* Left: big average */}
-            <div className="flex flex-col items-center min-w-[72px]">
-              <span className="text-3xl font-bold text-foreground">
-                {reviewStats.totalReviews > 0 ? reviewStats.averageRating.toFixed(1) : '–'}
-              </span>
-              <div className="flex items-center gap-0.5 mt-1">
-                {[1, 2, 3, 4, 5].map(s => (
-                  <Star
-                    key={s}
-                    className={`w-3.5 h-3.5 ${
-                      s <= Math.round(reviewStats.averageRating)
-                        ? 'text-lib-purple dark:text-lib-purple-300 fill-lib-purple dark:fill-lib-purple-300'
-                        : 'text-gray-200 dark:text-gray-700'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-[10px] text-muted-foreground mt-0.5">
-                {reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}
-              </span>
-            </div>
 
-            {/* Right: distribution bars */}
-            <div className="flex-1 space-y-1.5">
-              {[5, 4, 3, 2, 1].map(star => {
-                const count = reviewStats.distribution[star - 1]
-                const pct = reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0
-                return (
-                  <div key={star} className="flex items-center gap-2">
-                    <span className="text-[10px] text-muted-foreground w-3 text-right">{star}</span>
-                    <Star className="w-2.5 h-2.5 text-lib-purple dark:text-lib-purple-300 fill-lib-purple dark:fill-lib-purple-300" />
-                    <div className="flex-1 h-2 rounded-full bg-gray-100 dark:bg-white/10 overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${pct}%` }}
-                        transition={{ duration: 0.5, delay: 0.05 * star }}
-                        className="h-full rounded-full bg-lib-purple"
-                      />
-                    </div>
-                    <span className="text-[10px] text-muted-foreground w-4 text-right">{count}</span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Write a Review / Edit your Review button */}
-          <div className="mt-4">
-            {user && (
-              <Button
-                onClick={openReviewForm}
-                variant="outline"
-                className={`w-full h-10 rounded-xl text-sm font-semibold transition-colors ${
-                  userReview
-                    ? 'border-lib-purple-200 dark:border-lib-purple-700 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-50 dark:hover:bg-white/5'
-                    : 'bg-lib-purple hover:bg-lib-purple-dark text-white border-0'
-                }`}
-              >
-                {userReview ? (
-                  <span className="flex items-center gap-2">
-                    <Pencil className="w-4 h-4" /> Edit your review
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4" /> Write a Review
-                  </span>
-                )}
-              </Button>
-            )}
-
-            {/* Inline Review Form */}
-            <AnimatePresence>
-              {showReviewForm && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="overflow-hidden"
-                >
-                  <div className="mt-3 p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 space-y-3">
-                    {/* Star Selector */}
-                    <div>
-                      <p className="text-xs font-medium text-foreground mb-1.5">Your Rating</p>
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map(s => (
-                          <button
-                            key={s}
-                            onClick={() => setReviewRating(s)}
-                            className="p-0.5 transition-transform active:scale-90"
-                            aria-label={`Rate ${s} star${s > 1 ? 's' : ''}`}
-                          >
-                            <Star
-                              className={`w-7 h-7 transition-colors ${
-                                s <= reviewRating
-                                  ? 'text-lib-purple dark:text-lib-purple-300 fill-lib-purple dark:fill-lib-purple-300'
-                                  : 'text-gray-200 dark:text-gray-700 hover:text-lib-purple-300'
-                              }`}
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Comment Textarea */}
-                    <div>
-                      <p className="text-xs font-medium text-foreground mb-1.5">Comment <span className="text-muted-foreground font-normal">(optional)</span></p>
-                      <textarea
-                        value={reviewComment}
-                        onChange={(e) => setReviewComment(e.target.value.slice(0, 200))}
-                        placeholder="Share your thoughts about this book..."
-                        rows={3}
-                        className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1a0e2e] px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-lib-purple/30 focus:border-lib-purple resize-none transition-colors"
-                      />
-                      <p className="text-[10px] text-muted-foreground text-right mt-0.5">{reviewComment.length}/200</p>
-                    </div>
-
-                    {/* Submit / Cancel */}
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={handleSubmitReview}
-                        disabled={reviewRating === 0 || submittingReview}
-                        className="flex-1 h-9 rounded-lg bg-lib-purple hover:bg-lib-purple-dark text-white text-xs font-semibold disabled:opacity-50"
-                      >
-                        {submittingReview ? (
-                          <span className="flex items-center gap-1.5">
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Submitting...
-                          </span>
-                        ) : (
-                          'Submit Review'
-                        )}
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setShowReviewForm(false)
-                          setReviewRating(0)
-                          setReviewComment('')
-                        }}
-                        variant="outline"
-                        className="h-9 px-4 rounded-lg text-xs"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Reviews List */}
-          <div className="mt-4 max-h-96 overflow-y-auto custom-scrollbar">
-            {reviews.length > 0 ? (
-              <div className="space-y-3">
-                {reviews.map((review, index) => (
-                  <motion.div
-                    key={review.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 * index }}
-                    className="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 relative"
-                  >
-                    <div className="flex items-start gap-2.5">
-                      {/* Avatar initials circle */}
-                      <div className="w-8 h-8 rounded-full bg-lib-purple/10 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
-                        <span className="text-[10px] font-bold text-lib-purple dark:text-lib-purple-300">
-                          {review.user.avatarInitials || review.user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </span>
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        {/* Name + role badge */}
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-xs font-semibold text-foreground">{review.user.fullName}</span>
-                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${
-                            review.user.role === 'faculty'
-                              ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
-                              : review.user.role === 'student'
-                              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                              : 'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400'
-                          }`}>
-                            {review.user.role.charAt(0).toUpperCase() + review.user.role.slice(1)}
-                          </span>
-                        </div>
-
-                        {/* Star rating */}
-                        <div className="flex items-center gap-0.5 mt-0.5">
-                          {[1, 2, 3, 4, 5].map(s => (
-                            <Star
-                              key={s}
-                              className={`w-3 h-3 ${
-                                s <= review.rating ? 'text-lib-purple dark:text-lib-purple-300 fill-lib-purple dark:fill-lib-purple-300' : 'text-gray-200 dark:text-gray-700'
-                              }`}
-                            />
-                          ))}
-                          <span className="text-[10px] text-muted-foreground ml-1">{formatDate(review.createdAt)}</span>
-                        </div>
-
-                        {/* Comment */}
-                        {review.comment && (
-                          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{review.comment}</p>
-                        )}
-                      </div>
-
-                      {/* Delete button for own review */}
-                      {user?.id === review.userId && (
-                        <button
-                          onClick={() => handleDeleteReview(review.id)}
-                          disabled={deletingReviewId === review.id}
-                          className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0"
-                          aria-label="Delete review"
-                        >
-                          {deletingReviewId === review.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <MessageSquare className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-                <p className="text-xs text-muted-foreground">No reviews yet. Be the first to review!</p>
-              </div>
-            )}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Action buttons */}
       <div className="px-4 mt-4 flex gap-3">
-        {isAvailable ? (
-          <>
-            <Button
-              onClick={handleStartReading}
-              disabled={startingReading}
-              className="flex-1 h-12 rounded-xl font-semibold text-base bg-lib-purple hover:bg-lib-purple-dark text-white"
-            >
-              {startingReading ? (
-                <span className="flex items-center gap-2">
-                  <motion.div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-                  Starting...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <Library className="w-4 h-4" /> Read Here
-                </span>
-              )}
-            </Button>
-            <Button
-              onClick={handleBorrow}
-              disabled={borrowing}
-              variant="outline"
-              className="flex-1 h-12 rounded-xl font-semibold text-base border-lib-purple-200 dark:border-lib-purple-700 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-50 dark:hover:bg-white/5"
-            >
-              {borrowing ? (
-                <span className="flex items-center gap-2">
-                  <motion.div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-                  Borrowing...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4" /> Take Home
-                </span>
-              )}
-            </Button>
-          </>
-        ) : (
           <Button
-            onClick={handleReserve}
-            disabled={reserving}
-            className="flex-1 h-12 rounded-xl font-semibold text-base bg-lib-purple-50 dark:bg-white/10 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-100 dark:hover:bg-white/15"
+            onClick={handleBorrow}
+            disabled={borrowing || !isAvailable}
+            className="flex-1 h-12 rounded-xl font-semibold text-base bg-lib-purple hover:bg-lib-purple-dark text-white disabled:opacity-50"
           >
-            {reserving ? (
+            {borrowing ? (
               <span className="flex items-center gap-2">
                 <motion.div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-                Processing...
+                Borrowing...
               </span>
             ) : (
               <span className="flex items-center gap-2">
-                <Bookmark className="w-4 h-4" /> Reserve
+                <BookOpen className="w-4 h-4" /> {isAvailable ? "Borrow" : "Unavailable"}
               </span>
             )}
           </Button>
-        )}
-        <Button
-          variant="outline"
-          onClick={handleShare}
-          className="h-12 px-4 rounded-xl border-lib-purple-200 dark:border-lib-purple-700 text-lib-purple dark:text-lib-purple-300 hover:bg-lib-purple-50 dark:hover:bg-white/5"
-        >
-          <Share2 className="w-4 h-4" />
-        </Button>
       </div>
 
       {/* Related books from API */}
       <div className="px-4 mt-6 flex-1 overflow-y-auto">
-        <h3 className="font-bold text-foreground mb-3">More Resources</h3>
+        <h3 className="font-bold text-foreground mb-3">Related Book</h3>
         <div className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden">
           {relatedBooks.length > 0 ? (
             relatedBooks.map((relBook, index) => (
@@ -827,20 +442,6 @@ export default function BookDetailScreen() {
             </motion.div>
           ) : null
         })()}
-      </AnimatePresence>
-
-      {/* Share toast */}
-      <AnimatePresence>
-        {showShareToast && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-foreground text-background px-4 py-2 rounded-full text-sm font-medium dark:shadow-lg z-50"
-          >
-            Copied to clipboard!
-          </motion.div>
-        )}
       </AnimatePresence>
     </div>
   )

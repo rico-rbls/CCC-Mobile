@@ -11,6 +11,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { getResourceCover } from '@/lib/covers'
+import { useBorrow } from '@/hooks/useBorrow'
 
 type ScanMode = 'attendance' | 'checkout' | 'exit'
 
@@ -35,9 +36,7 @@ export default function QRScanScreen() {
   const [scanning, setScanning] = useState(false)
   const [result, setResult] = useState<ScanResult | null>(null)
   const [scannedBook, setScannedBook] = useState<ResourceItem | null>(null)
-  const [startingReading, setStartingReading] = useState(false)
-  const [readingStarted, setReadingStarted] = useState(false)
-  const [borrowing, setBorrowing] = useState(false)
+  const { borrowBook, isLoading: borrowing } = useBorrow()
   const [borrowed, setBorrowed] = useState(false)
   const [exitSummary, setExitSummary] = useState<ExitSummary | null>(null)
   const [processingExit, setProcessingExit] = useState(false)
@@ -119,46 +118,11 @@ export default function QRScanScreen() {
     }
   }, [user?.id])
 
-  const handleStartReading = async () => {
-    if (!user?.id || !scannedBook) return
-    setStartingReading(true)
-    try {
-      const res = await fetch('/api/reading-sessions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, resourceId: scannedBook.id }),
-      })
-      if (res.ok) {
-        setReadingStarted(true)
-      } else {
-        const data = await res.json()
-        if (data.error?.includes('already have an active')) {
-          setReadingStarted(true) // Already reading
-        }
-      }
-    } catch (e) {
-      console.error('Failed to start reading:', e)
-    } finally {
-      setStartingReading(false)
-    }
-  }
-
   const handleBorrow = async () => {
-    if (!user?.id || !scannedBook) return
-    setBorrowing(true)
-    try {
-      const res = await fetch('/api/borrow', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, resourceId: scannedBook.id }),
-      })
-      if (res.ok) {
-        setBorrowed(true)
-      }
-    } catch (e) {
-      console.error('Failed to borrow book:', e)
-    } finally {
-      setBorrowing(false)
+    if (!scannedBook) return
+    const success = await borrowBook(scannedBook.id, scannedBook.title)
+    if (success) {
+      setBorrowed(true)
     }
   }
 
@@ -173,7 +137,6 @@ export default function QRScanScreen() {
     setResult(null)
     setScanning(false)
     setScannedBook(null)
-    setReadingStarted(false)
     setBorrowed(false)
     setExitSummary(null)
     setProcessingExit(false)
@@ -455,18 +418,7 @@ export default function QRScanScreen() {
                       </Badge>
                     )}
 
-                    {/* Reading started success message */}
-                    {readingStarted ? (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-4 text-center mb-4"
-                      >
-                        <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                        <p className="text-sm font-semibold text-green-700 dark:text-green-400">You&apos;re now reading!</p>
-                        <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-1">Read inside the library. Your session will end when you exit.</p>
-                      </motion.div>
-                    ) : borrowed ? (
+                    {borrowed ? (
                       <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -477,27 +429,7 @@ export default function QRScanScreen() {
                         <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">You can take this book outside the library.</p>
                       </motion.div>
                     ) : scannedBook.availableCopies > 0 ? (
-                      <div className="space-y-2.5 mb-3">
-                        {/* Read in library option */}
-                        <Button
-                          onClick={handleStartReading}
-                          disabled={startingReading}
-                          className="w-full rounded-xl py-5 bg-lib-purple hover:bg-lib-purple/90 text-white font-semibold text-sm"
-                        >
-                          {startingReading ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Starting...
-                            </>
-                          ) : (
-                            <>
-                              <Library className="w-4 h-4 mr-2" />
-                              Read in Library
-                            </>
-                          )}
-                        </Button>
-
-                        {/* Borrow to take outside option */}
+                      <div className="space-y-2.5 mb-3">                        {/* Borrow to take outside option */}
                         <Button
                           onClick={handleBorrow}
                           disabled={borrowing}
@@ -601,36 +533,7 @@ export default function QRScanScreen() {
                     </motion.div>
                   )}
 
-                  {/* Ended reading sessions (in-library) */}
-                  {exitSummary.totalReadingSessionsEnded > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.55 }}
-                      className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-3 mb-3"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <Library className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                        <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">
-                          {exitSummary.totalReadingSessionsEnded} reading session{exitSummary.totalReadingSessionsEnded > 1 ? 's' : ''} ended
-                        </p>
-                      </div>
-                      <div className="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar">
-                        {exitSummary.endedReadingSessions.map((book) => (
-                          <div key={book.id} className="flex items-center gap-2 py-1 px-2 bg-white dark:bg-white/5 rounded-lg">
-                            <BookOpen className="w-3 h-3 text-amber-600/60 dark:text-amber-400/60 flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-foreground truncate">{book.title}</p>
-                              <p className="text-[10px] text-muted-foreground truncate">{book.author}</p>
-                            </div>
-                            <span className="text-[9px] text-amber-600 dark:text-amber-400 font-medium flex-shrink-0">
-                              {book.durationMinutes} min
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
+
 
                   {/* Returned borrowed books (outside) */}
                   {exitSummary.totalReturned > 0 && (
@@ -661,7 +564,7 @@ export default function QRScanScreen() {
                     </motion.div>
                   )}
 
-                  {exitSummary.totalReadingSessionsEnded === 0 && exitSummary.totalReturned === 0 && (
+                  {exitSummary.totalReturned === 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}

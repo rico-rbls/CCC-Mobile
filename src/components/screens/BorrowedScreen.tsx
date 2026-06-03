@@ -4,10 +4,12 @@ import { useAppStore, type BorrowedBook } from '@/lib/store'
 import { BookOpen, Clock, Loader2, CheckCircle2, ChevronRight, AlertTriangle, Info, Library } from 'lucide-react'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getResourceCover } from '@/lib/covers'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { useBorrow } from '@/hooks/useBorrow'
 import { useToast } from '@/hooks/use-toast'
+import ScreenHeader from '@/components/shared/ScreenHeader'
+import BookCard from '@/components/shared/BookCard'
 
 // ── Confetti Particle Component ──────────────────────────────────────
 function ConfettiParticle({ delay, x, color, size }: { delay: number; x: number; color: string; size: number }) {
@@ -114,20 +116,14 @@ function formatCurrency(amount: number): string {
 export default function BorrowedScreen() {
   const { user, setSelectedBookId, setCurrentScreen } = useAppStore()
   const { toast } = useToast()
-  const [activeTab, setActiveTab] = useState<'active' | 'reading' | 'history'>('active')
+  const [activeTab, setActiveTab] = useState<'active' | 'history'>('active')
   const [activeBooks, setActiveBooks] = useState<BorrowedBook[]>([])
   const [historyBooks, setHistoryBooks] = useState<BorrowedBook[]>([])
-  const [readingSessions, setReadingSessions] = useState<{
-    id: string
-    title: string
-    author: string
-    startTime: string
-    resourceId: string
-  }[]>([])
   const [loading, setLoading] = useState(true)
-  const [returningId, setReturningId] = useState<string | null>(null)
   const [showSuccess, setShowSuccess] = useState(false)
   const [returnedBookTitle, setReturnedBookTitle] = useState('')
+  const { returnBook } = useBorrow()
+  const [returningId, setReturningId] = useState<string | null>(null)
 
   // Derived fine calculations
   const overdueBooks = useMemo(() => activeBooks.filter(b => b.status === 'overdue'), [activeBooks])
@@ -161,19 +157,7 @@ export default function BorrowedScreen() {
         setActiveBooks(books)
       }
 
-      // Active reading sessions
-      const readingRes = await fetch(`/api/reading-sessions?userId=${user.id}&status=active`)
-      if (readingRes.ok) {
-        const readingData = await readingRes.json()
-        const sessions = Array.isArray(readingData) ? readingData : []
-        setReadingSessions(sessions.map((s: Record<string, unknown>) => ({
-          id: s.id as string,
-          title: (s.resource as Record<string, unknown>)?.title as string || 'Unknown',
-          author: (s.resource as Record<string, unknown>)?.author as string || 'Unknown',
-          startTime: s.startTime as string,
-          resourceId: s.resourceId as string,
-        })))
-      }
+
 
       // History
       const historyRes = await fetch(`/api/borrow?userId=${user.id}&status=returned`)
@@ -211,29 +195,20 @@ export default function BorrowedScreen() {
 
   const handleReturn = async (borrowId: string, bookTitle: string) => {
     setReturningId(borrowId)
-    try {
-      const res = await fetch(`/api/borrow/${borrowId}/return`, { method: 'PUT' })
-      const data = await res.json()
-      if (!res.ok) {
-        toast({ title: 'Cannot Return', description: data.error || 'Something went wrong', variant: 'destructive' })
-        return
-      }
-      // Show celebration overlay
+    const success = await returnBook(borrowId)
+    if (success) {
       setReturnedBookTitle(bookTitle)
       setShowSuccess(true)
       fetchData()
-    } catch {
-      toast({ title: 'Error', description: 'Failed to return book. Please try again.', variant: 'destructive' })
-    } finally {
-      setReturningId(null)
     }
+    setReturningId(null)
   }
 
   const dismissSuccess = useCallback(() => {
     setShowSuccess(false)
   }, [])
 
-  const books = activeTab === 'active' ? activeBooks : activeTab === 'reading' ? [] : historyBooks
+  const books = activeTab === 'active' ? activeBooks : historyBooks
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -244,10 +219,10 @@ export default function BorrowedScreen() {
         )}
       </AnimatePresence>
       {/* Header with gradient accent */}
-      <div className="bg-card px-4 pt-4 pb-3 border-b border-gray-100 dark:border-white/5">
-        <h2 className="font-bold text-foreground text-lg mb-3">My Loans</h2>
+      <ScreenHeader title="Borrowed Books" />
+      <div className="bg-card px-4 pb-3 border-b border-gray-100 dark:border-white/5">
         <div className="flex bg-lib-purple-50 dark:bg-white/10 rounded-xl p-1">
-          {(['active', 'reading', 'history'] as const).map((tab) => (
+          {(['active', 'history'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -257,21 +232,16 @@ export default function BorrowedScreen() {
                   : 'text-lib-purple-400 dark:text-gray-400 hover:text-lib-purple-600 dark:hover:text-gray-300'
               }`}
             >
-              {tab === 'active' ? `Loans (${activeBooks.length})` : tab === 'reading' ? `Reading (${readingSessions.length})` : `History (${historyBooks.length})`}
+              {tab === 'active' ? `Active (${activeBooks.length})` : `History (${historyBooks.length})`}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Summary stats bar */}
       <div className="flex items-center gap-4 px-4 py-2">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-lib-purple" />
-          <span className="text-xs text-muted-foreground">{activeBooks.length} Loans</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-amber-500" />
-          <span className="text-xs text-muted-foreground">{readingSessions.length} Reading</span>
+          <span className="text-xs text-muted-foreground">{activeBooks.length} Active</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -291,109 +261,6 @@ export default function BorrowedScreen() {
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-6 h-6 text-lib-purple animate-spin" />
           </div>
-        ) : activeTab === 'reading' ? (
-          readingSessions.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center justify-center py-16"
-            >
-              <div className="w-20 h-20 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mb-4">
-                <Library className="w-10 h-10 text-amber-500 dark:text-amber-400" />
-              </div>
-              <h3 className="font-bold text-foreground mb-1">Not reading</h3>
-              <p className="text-sm text-muted-foreground text-center mb-4">
-                Scan a book QR code to start reading in the library
-              </p>
-              <Button
-                onClick={() => setCurrentScreen('qr-scan')}
-                className="bg-amber-500 hover:bg-amber-600 text-white text-xs h-9 px-4 rounded-xl"
-              >
-                Scan a Book
-              </Button>
-            </motion.div>
-          ) : (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key="reading"
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                className="space-y-3"
-              >
-                {readingSessions.map((session, index) => {
-                  const startTime = new Date(session.startTime)
-                  const now = new Date()
-                  const diffMs = now.getTime() - startTime.getTime()
-                  const diffMins = Math.floor(diffMs / (1000 * 60))
-                  const diffHours = Math.floor(diffMins / 60)
-                  const remainingMins = diffMins % 60
-                  const durationText = diffHours > 0
-                    ? `${diffHours}h ${remainingMins}m`
-                    : diffMins === 0 ? 'Just started' : `${diffMins}m`
-
-                  return (
-                    <motion.div
-                      key={session.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.07 }}
-                      className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden relative border border-amber-200 dark:border-amber-800/30"
-                    >
-                      <div className="flex items-start gap-3 p-4">
-                        <div className="w-14 h-[72px] rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
-                          <Library className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <h4 className="font-semibold text-sm text-foreground leading-tight line-clamp-2">{session.title}</h4>
-                            <Badge className="text-[9px] h-5 flex-shrink-0 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-0">
-                              In Library
-                            </Badge>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-0.5">{session.author}</p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
-                              <Clock className="w-3 h-3" />
-                              {durationText}
-                            </span>
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                          </div>
-                          <div className="flex items-center justify-between mt-3">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2 text-xs text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
-                              onClick={() => { setSelectedBookId(session.resourceId); setCurrentScreen('book-detail') }}
-                            >
-                              View Details <ChevronRight className="w-3 h-3 ml-0.5" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={async () => {
-                                try {
-                                  const res = await fetch(`/api/reading-sessions/${session.id}/end`, { method: 'PUT' })
-                                  if (res.ok) {
-                                    setReadingSessions(prev => prev.filter(s => s.id !== session.id))
-                                    toast({ title: 'Reading Ended', description: `Finished reading "${session.title}"` })
-                                  }
-                                } catch (e) {
-                                  console.error('Failed to stop reading:', e)
-                                }
-                              }}
-                              className="h-8 px-4 text-xs bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold"
-                            >
-                              Stop Reading
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </motion.div>
-            </AnimatePresence>
-          )
         ) : books.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -454,107 +321,91 @@ export default function BorrowedScreen() {
                 const overdueFine = isOverdue ? Math.abs(book.daysLeft) * FINE_RATE_PER_DAY : 0
 
                 return (
-                  <motion.div
+                  <BookCard
                     key={book.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.07 }}
-                    className="bg-card rounded-[22px] dark:shadow-sm overflow-hidden relative"
+                    book={book}
+                    layout="search-result"
                   >
-                    <div className="flex items-start gap-3 p-4">
-                      {(() => {
-                        const coverSrc = getResourceCover(book.coverImage, book.title)
-                        return coverSrc ? (
-                          <img src={coverSrc} alt={book.title} className="w-14 h-[72px] rounded-lg object-cover flex-shrink-0 dark:shadow-sm" />
-                        ) : (
-                          <div className="w-14 h-[72px] rounded-lg bg-purple-gradient flex items-center justify-center flex-shrink-0 dark:shadow-sm cover-pattern-overlay">
-                            <BookOpen className="w-5 h-5 text-white/50" />
-                          </div>
-                        )
-                      })()}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-sm text-foreground leading-tight line-clamp-2">{book.title}</h4>
-                        <p className="text-xs text-muted-foreground mt-0.5">{book.author}</p>
-                        <div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
-                          <span>Borrowed: {book.borrowDate}</span>
-                          <span>Due: {book.dueDate}</span>
-                        </div>
-                        {activeTab === 'active' && (
-                          <>
-                            <div className="flex items-center justify-between mt-2">
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                isOverdue
-                                  ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                                  : isDueSoon
-                                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
-                                  : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                              }`}>
-                                <Clock className="w-3 h-3" />
-                                {isOverdue
-                                  ? `${Math.abs(book.daysLeft)} days overdue`
-                                  : `${book.daysLeft} days left`
-                                }
-                              </span>
-                              <Button
-                                size="sm"
-                                onClick={() => handleReturn(book.id, book.title)}
-                                disabled={returningId === book.id}
-                                className="h-8 px-4 text-xs bg-lib-purple hover:bg-lib-purple-dark text-white rounded-xl dark:shadow-sm dark:shadow-lib-purple/20 font-semibold"
-                              >
-                                {returningId === book.id ? (
-                                  <Loader2 className="w-3 h-3 animate-spin" />
-                                ) : (
-                                  'Return'
-                                )}
-                              </Button>
-                            </div>
-                            {/* Overdue Fine Badge */}
-                            {isOverdue && (
-                              <div className="mt-2 flex items-center gap-2">
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-600 dark:bg-red-700 text-white">
-                                  <AlertTriangle className="w-3 h-3" />
-                                  Overdue Fine: {formatCurrency(overdueFine)}
-                                </span>
-                                <span className="text-[10px] text-red-500 dark:text-red-400">
-                                  Overdue {Math.abs(book.daysLeft)} days · Fine: {formatCurrency(overdueFine)}
-                                </span>
-                              </div>
-                            )}
-                            {/* Due Soon Warning */}
-                            {isDueSoon && (
-                              <div className="mt-2 flex items-start gap-1.5 text-[10px] text-amber-600 dark:text-amber-400">
-                                <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
-                                <span>Due soon — return within {book.daysLeft} {book.daysLeft === 1 ? 'day' : 'days'} to avoid fines</span>
-                              </div>
-                            )}
-                            {/* Fine accrual notice for overdue */}
-                            {isOverdue && (
-                              <p className="mt-1 text-[10px] text-muted-foreground dark:text-gray-500 flex items-center gap-1">
-                                <Info className="w-2.5 h-2.5" />
-                                Fines accrue at {formatCurrency(FINE_RATE_PER_DAY)}/day until returned
-                              </p>
-                            )}
-                          </>
-                        )}
-                        {activeTab === 'history' && (
+                    <div className="flex-1 w-full min-w-0">
+                      <div className="flex items-center justify-between mt-2 text-[10px] text-muted-foreground">
+                        <span>Borrowed: {book.borrowDate}</span>
+                        <span>Due: {book.dueDate}</span>
+                      </div>
+                      {activeTab === 'active' && (
+                        <>
                           <div className="flex items-center justify-between mt-2">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
-                              <CheckCircle2 className="w-3 h-3" />
-                              Returned{book.returnDate ? ` on ${book.returnDate}` : ''}
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                              isOverdue
+                                ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                                : isDueSoon
+                                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
+                                : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                            }`}>
+                              <Clock className="w-3 h-3" />
+                              {isOverdue
+                                ? `${Math.abs(book.daysLeft)} days overdue`
+                                : `${book.daysLeft} days left`
+                              }
                             </span>
                             <Button
-                              variant="ghost"
                               size="sm"
-                              onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
-                              className="h-7 px-2 text-xs text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
+                              onClick={() => handleReturn(book.id, book.title)}
+                              disabled={returningId === book.id}
+                              className="h-8 px-4 text-xs bg-lib-purple hover:bg-lib-purple-dark text-white rounded-xl dark:shadow-sm dark:shadow-lib-purple/20 font-semibold"
                             >
-                              View <ChevronRight className="w-3 h-3" />
+                              {returningId === book.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                'Return'
+                              )}
                             </Button>
                           </div>
-                        )}
-                      </div>
+                          {/* Overdue Fine Badge */}
+                          {isOverdue && (
+                            <div className="mt-2 flex items-center gap-2">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-600 dark:bg-red-700 text-white">
+                                <AlertTriangle className="w-3 h-3" />
+                                Overdue Fine: {formatCurrency(overdueFine)}
+                              </span>
+                              <span className="text-[10px] text-red-500 dark:text-red-400">
+                                Overdue {Math.abs(book.daysLeft)} days · Fine: {formatCurrency(overdueFine)}
+                              </span>
+                            </div>
+                          )}
+                          {/* Due Soon Warning */}
+                          {isDueSoon && (
+                            <div className="mt-2 flex items-start gap-1.5 text-[10px] text-amber-600 dark:text-amber-400">
+                              <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                              <span>Due soon — return within {book.daysLeft} {book.daysLeft === 1 ? 'day' : 'days'} to avoid fines</span>
+                            </div>
+                          )}
+                          {/* Fine accrual notice for overdue */}
+                          {isOverdue && (
+                            <p className="mt-1 text-[10px] text-muted-foreground dark:text-gray-500 flex items-center gap-1">
+                              <Info className="w-2.5 h-2.5" />
+                              Fines accrue at {formatCurrency(FINE_RATE_PER_DAY)}/day until returned
+                            </p>
+                          )}
+                        </>
+                      )}
+                      {activeTab === 'history' && (
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Returned{book.returnDate ? ` on ${book.returnDate}` : ''}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => { setSelectedBookId(book.id); setCurrentScreen('book-detail') }}
+                            className="h-7 px-2 text-xs text-lib-purple dark:text-lib-purple-300 hover:text-lib-purple-dark hover:bg-lib-purple-50 dark:hover:bg-white/5 font-medium"
+                          >
+                            View <ChevronRight className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  </motion.div>
+                  </BookCard>
                 )
               })}
             </motion.div>

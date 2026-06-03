@@ -56,3 +56,6 @@ export async function POST(
     )
   }
 }
+
+export { POST as PUT }
+
